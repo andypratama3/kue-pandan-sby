@@ -365,7 +365,7 @@
                         badgeColorClasses = 'bg-orange-100 text-orange-800';
                         break;
                     case 'selesai':
-                        badgeColorClasses = 'bg-green-100 text-green-800';
+                        badgeColorClasses = 'bg-brand-light text-brand-deep';
                         break;
                 }
                 // 3. Gabungkan kelas dasar dengan kelas warna baru
@@ -374,7 +374,7 @@
                 // icon success
                 if (order.status === 'selesai' && statusIcon) {
                     statusIcon.innerHTML =
-                        `<svg class="w-8 h-8" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#10b981" stroke-width="1.5" fill="#d1fae5"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" stroke="#10b981" stroke-width="2"/></svg>`;
+                        `<svg class="w-8 h-8" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#6f8f5f" stroke-width="1.5" fill="#eef3ec"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" stroke="#6f8f5f" stroke-width="2"/></svg>`;
                     statusIcon.classList.remove('hidden');
                 } else if (statusIcon) {
                     statusIcon.innerHTML = ''; // Kosongkan ikon jika status bukan 'selesai'
@@ -447,7 +447,7 @@
                 <p class="text-sm text-gray-600 dark:text-gray-300">
                     Awal: <span class="font-medium text-gray-800 dark:text-gray-200">${initialQty}</span> |
                     Retur: <span class="font-medium text-red-500">${returnedQty}</span> |
-                    Sisa: <span class="font-medium text-green-600">${remainingQty}</span>
+                    Sisa: <span class="font-medium text-brand-deep">${remainingQty}</span>
                 </p>
             `;
                     }
@@ -689,11 +689,11 @@
                     updateButton.classList.add('opacity-50', 'cursor-not-allowed');
                     if (currentStatus === 'diverifikasi_admin') {
                         updateButton.classList.remove('bg-blue-700', 'hover:bg-blue-800');
-                        updateButton.classList.add('bg-teal-600', 'hover:bg-teal-700');
+                        updateButton.classList.add('bg-brand-deep', 'hover:bg-brand-deep');
                     }
                 } else {
                     updateButton.disabled = false;
-                    updateButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-teal-600', 'hover:bg-teal-700');
+                    updateButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-brand-deep', 'hover:bg-brand-deep');
                     updateButton.classList.add('bg-blue-700', 'hover:bg-blue-800');
                     updateButton.setAttribute('data-next-status', currentStatusInfo.nextStatus);
                 }
@@ -742,19 +742,19 @@
                 const desktopLineEl = document.getElementById(step === 'diambil' ? 'line-diantar' : `line-${step}`);
 
                 // Reset warna
-                iconEl.classList.remove('bg-green-600', 'text-green-600', 'border-green-600');
-                if (mobileLineEl) mobileLineEl.classList.remove('bg-green-600');
-                if (desktopLineEl) desktopLineEl.classList.remove('bg-green-600');
+                iconEl.classList.remove('bg-brand-deep', 'text-brand-deep', 'border-brand-deep');
+                if (mobileLineEl) mobileLineEl.classList.remove('bg-brand-deep');
+                if (desktopLineEl) desktopLineEl.classList.remove('bg-brand-deep');
 
                 // Cek apakah langkah sudah selesai
                 if (timestamps[step]) {
-                    iconEl.innerHTML = '<i class="text-white dark:text-green-600 fas fa-check-circle"></i>';
-                    iconEl.classList.add('bg-green-600', 'border-green-600');
+                    iconEl.innerHTML = '<i class="text-white dark:text-brand-deep fas fa-check-circle"></i>';
+                    iconEl.classList.add('bg-brand-deep', 'border-brand-deep');
                     timeSpanEl.textContent = `${timestamps[step]}  ${tzAbbr}`;
-                    if (mobileLineEl) mobileLineEl.classList.add('bg-green-600');
-                    if (desktopLineEl) desktopLineEl.classList.add('bg-green-600');
+                    if (mobileLineEl) mobileLineEl.classList.add('bg-brand-deep');
+                    if (desktopLineEl) desktopLineEl.classList.add('bg-brand-deep');
                 } else {
-                    iconEl.innerHTML = `<i class="fas ${icons[step]} text-green-600"></i>`;
+                    iconEl.innerHTML = `<i class="fas ${icons[step]} text-brand-deep"></i>`;
                     timeSpanEl.textContent = tzAbbr; // Tampilkan hanya label jika belum ada waktu
                 }
             });
@@ -869,8 +869,8 @@
                     newColorBarClass = 'bg-orange-500';
                     break;
                 case 'selesai':
-                    newClasses = 'bg-green-100 text-green-800';
-                    newColorBarClass = 'bg-green-500';
+                    newClasses = 'bg-brand-light text-brand-deep';
+                    newColorBarClass = 'bg-brand';
                     break;
             }
 

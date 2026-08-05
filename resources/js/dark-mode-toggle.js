@@ -2,13 +2,13 @@
 // This script handles the dark/light mode toggle functionality for navbar and sidebar
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Get both toggle elements
+    // Get both toggle elements (sidebar toggle is optional)
     const navToggle = document.getElementById('theme-toggle-checkbox-navbar');
     const sideToggle = document.getElementById('theme-toggle-checkbox-sidebar');
     const html = document.documentElement;
+    const toggles = [navToggle, sideToggle].filter(Boolean);
     
-    if (!navToggle || !sideToggle) {
-        console.error('Dark mode toggle elements not found!');
+    if (!toggles.length) {
         return;
     }
     
@@ -22,9 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('color-theme', 'light');
         }
         
-        // Sync both toggles
-        navToggle.checked = isDark;
-        sideToggle.checked = isDark;
+        // Sync all available toggles
+        toggles.forEach(toggle => { toggle.checked = isDark; });
     }
     
     // Initialize theme
@@ -35,8 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let isDark = savedTheme ? savedTheme === 'dark' : currentlyDark;
         
         // Set toggle states
-        navToggle.checked = isDark;
-        sideToggle.checked = isDark;
+        toggles.forEach(toggle => { toggle.checked = isDark; });
         
         // Ensure HTML class matches
         if (isDark) {
@@ -54,13 +52,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize
     initTheme();
     
-    // Add event listeners for navbar toggle
-    navToggle.addEventListener('change', function() {
-        updateTheme(this.checked);
-    });
-    
-    // Add event listeners for sidebar toggle
-    sideToggle.addEventListener('change', function() {
-        updateTheme(this.checked);
+    // Add event listeners for all toggles
+    toggles.forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            updateTheme(this.checked);
+        });
     });
 });

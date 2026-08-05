@@ -21,7 +21,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $admin = Auth::user();
-        $orders = Order::with(['customer.category', 'createdBy'])
+        $orders = Order::with(['customer.category', 'createdBy', 'returns'])
             ->where('region_id', $admin->region_id)
             ->where('status', '!=', 'diverifikasi_admin');
 
@@ -29,25 +29,6 @@ class OrderController extends Controller
 
         $newOrdersCount = Order::where('region_id', $admin->region_id)
             ->where('status', 'pending')->count();
-
-        foreach ($orders as $order) {
-            $order->show_warning = false;
-            if (is_null($order->payment_proof) && $order->customer && $order->customer->category) {
-                $categoryName = strtolower($order->customer->category->name);
-                $warningDays = 0;
-                if ($categoryName === 'reseller') {
-                    $warningDays = 5;
-                } elseif ($categoryName === 'supermarket') {
-                    $warningDays = 28;
-                }
-                if ($warningDays > 0) {
-                    $daysSinceCreation = Carbon::parse($order->created_at)->diffInDays(now());
-                    if ($daysSinceCreation >= $warningDays) {
-                        $order->show_warning = true;
-                    }
-                }
-            }
-        }
 
         $orders->when($search, function ($query, $searchTerm) {
             $query->where(function ($q) use ($searchTerm) {
@@ -63,7 +44,7 @@ class OrderController extends Controller
         });
 
 
-        $orders = $orders->latest()->get();
+        $orders = $orders->latest()->paginate(10);
 
         return view('dashboard.admin.order-list.index', compact('orders', 'newOrdersCount'));
     }

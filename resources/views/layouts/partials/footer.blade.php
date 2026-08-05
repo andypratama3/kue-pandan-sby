@@ -1,36 +1,18 @@
-{{--
-NO CHANGES NEEDED: This component is already responsive
-<footer class="fixed bottom-0 left-0 w-full pt-4">
-  <div class="w-full px-6 mx-auto">
-    <div class="flex flex-wrap items-center -mx-3 lg:justify-between">
-      <div class="w-full max-w-full px-3 mt-0 mb-6 shrink-0 lg:mb-0 lg:w-1/2 lg:flex-none">
-        <div class="text-sm leading-normal text-center text-slate-500 lg:text-left">
-          &copy;
-          <script>
-            document.write(new Date().getFullYear());
-          </script>
-          , made with <i class="fa fa-heart"></i> by
-          <a href="https://www.creative-tim.com" class="font-semibold text-slate-700 dark:text-white" target="_blank">Creative Tim</a>
-          for a better web.
+<footer class="w-full py-6 mt-auto border-t border-slate-200/60 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md">
+    <div class="w-full px-6 mx-auto">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-mint text-brand-deep dark:bg-brand-deep dark:text-brand border border-brand-deep/5 dark:border-brand-deep">
+                    <span class="w-1.5 h-1.5 mr-1.5 bg-brand rounded-full animate-pulse"></span>
+                    {{ Auth::user()->region->name ?? 'System' }} Online
+                </span>
+                <span>&copy; {{ date('Y') }} <strong>Kue Pandan Asli</strong>. All rights reserved.</span>
+            </div>
+            <div class="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+                <span class="hover:text-brand-deep dark:hover:text-brand transition-colors">v1.0.0</span>
+                <span>&bull;</span>
+                <span class="hover:text-brand-deep dark:hover:text-brand transition-colors">Reseller & Delivery Admin Portal</span>
+            </div>
         </div>
-      </div>
-      <div class="w-full max-w-full px-3 mt-0 shrink-0 lg:w-1/2 lg:flex-none">
-        <ul class="flex flex-wrap justify-center pl-0 mb-0 list-none lg:justify-end">
-          <li class="nav-item">
-            <a href="https://www.creative-tim.com" class="block px-4 pt-0 pb-1 text-sm font-normal text-slate-500" target="_blank">Creative Tim</a>
-          </li>
-          <li class="nav-item">
-            <a href="https://www.creative-tim.com/presentation" class="block px-4 pt-0 pb-1 text-sm font-normal text-slate-500" target="_blank">About Us</a>
-          </li>
-          <li class="nav-item">
-            <a href="https://creative-tim.com/blog" class="block px-4 pt-0 pb-1 text-sm font-normal text-slate-500" target="_blank">Blog</a>
-          </li>
-          <li class="nav-item">
-            <a href="https://www.creative-tim.com/license" class="block px-4 pt-0 pb-1 pr-0 text-sm font-normal text-slate-500" target="_blank">License</a>
-          </li>
-        </ul>
-      </div>
     </div>
-  </div>
 </footer>
---}}

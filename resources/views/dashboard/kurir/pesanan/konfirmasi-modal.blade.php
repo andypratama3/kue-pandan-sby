@@ -62,7 +62,7 @@
             {{-- Total Keseluruhan --}}
             <div class="flex items-baseline justify-end mb-2 text-right">
                 <span class="text-lg font-medium text-gray-800 dark:text-white">Total :</span>
-                <span id="modal-total-amount" class="ml-4 text-2xl font-bold text-green-700 dark:text-green-500">-</span>
+                <span id="modal-total-amount" class="ml-4 text-2xl font-bold text-brand-deep dark:text-brand">-</span>
             </div>
 
             {{-- Tombol Aksi --}}
@@ -70,7 +70,7 @@
                 <button type="button" class="mt-4 px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg js-close-modal-btn hover:bg-gray-100 focus:outline-none dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:bg-gray-600">
                     Batal
                 </button>
-                <button type="button" id="submit-order-button" onclick="submitOrder()" class=" mt-4 inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-[#748c54] rounded-lg hover:bg-[#5a6e40] focus:outline-none focus:ring-4 focus:ring-green-300 dark:focus:ring-green-800">
+                <button type="button" id="submit-order-button" onclick="submitOrder()" class=" mt-4 inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-deep focus:outline-none focus:ring-4 focus:ring-brand-light dark:focus:ring-brand-deep">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M20 6 9 17l-5-5"/></svg>
                     Konfirmasi Pesanan
                 </button>

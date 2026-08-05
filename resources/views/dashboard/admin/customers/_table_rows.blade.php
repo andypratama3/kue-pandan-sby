@@ -109,6 +109,6 @@
     </tr>
 @empty
     <tr>
-        <td colspan="6" class="px-4 py-4 text-center text-gray-500">Tidak ada data customer.</td>
+        <td colspan="7" class="px-4 py-4 text-center text-gray-500">Tidak ada data customer.</td>
     </tr>
 @endforelse

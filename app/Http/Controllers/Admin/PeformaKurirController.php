@@ -302,8 +302,6 @@ class PeformaKurirController extends Controller
      */
     public function show($kurir)
     {
-        // Untuk sementara return view kosong dengan parameter kurir
-        // Nanti akan diisi dengan logika untuk menampilkan detail peforma kurir tertentu
-        return view('dashboard.admin.peforma-kurir.peforma-kurir', compact('kurir'));
+        return redirect()->route('admin.peforma-kurir.index');
     }
 }

@@ -74,7 +74,7 @@
                     <div id="returnedTotalContainer-admin" class="hidden">
                         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Tagihan</label>
                         <p id="initialTotalAmount-admin" class="text-sm font-bold text-gray-400 line-through dark:text-gray-500"></p>
-                        <p id="latestTotalAmount-admin" class="text-2xl font-extrabold text-green-600 dark:text-green-500"></p>
+                        <p id="latestTotalAmount-admin" class="text-2xl font-extrabold text-brand-deep dark:text-brand"></p>
                     </div>
                     <div id="returnTotalValueContainer-admin" class="hidden pt-4 mt-4 border-t border-gray-200 dark:border-gray-600">
                         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Nilai Retur</label>
@@ -123,7 +123,7 @@
                 <div data-role="return-info">
                     <span>Awal: <b class="font-medium text-gray-800 dark:text-gray-100" data-role="initial-qty"></b></span> |
                     <span class="font-medium text-red-600 dark:text-red-400">Retur: <b data-role="returned-qty"></b></span> |
-                    <span class="font-medium text-green-600 dark:text-green-400">Sisa: <b data-role="remaining-qty"></b></span>
+                    <span class="font-medium text-brand-deep dark:text-brand-light">Sisa: <b data-role="remaining-qty"></b></span>
                 </div>
                 <div data-role="normal-info">
                     Jumlah: <b class="font-medium text-gray-800 dark:text-gray-100" data-role="quantity"></b>

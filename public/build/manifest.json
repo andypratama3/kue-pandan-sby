@@ -1,0 +1,129 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-DCLK95Ox.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/argon-dashboard-tailwind.css": {
+    "file": "assets/argon-dashboard-tailwind-CzM6MeM3.css",
+    "src": "resources/css/argon-dashboard-tailwind.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-BulKHd2n.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "css": [
+      "assets/app-DCLK95Ox.css"
+    ]
+  },
+  "resources/js/argon-dashboard-tailwind.js": {
+    "file": "assets/argon-dashboard-tailwind-l0sNRNKZ.js",
+    "name": "argon-dashboard-tailwind",
+    "src": "resources/js/argon-dashboard-tailwind.js",
+    "isEntry": true
+  },
+  "resources/js/bootstrap.js": {
+    "file": "assets/bootstrap-DNxiirP_.js",
+    "name": "bootstrap",
+    "src": "resources/js/bootstrap.js",
+    "isEntry": true
+  },
+  "resources/js/carousel.js": {
+    "file": "assets/carousel-CJbbzEAk.js",
+    "name": "carousel",
+    "src": "resources/js/carousel.js",
+    "isEntry": true
+  },
+  "resources/js/charts.js": {
+    "file": "assets/charts-fSDEoSqJ.js",
+    "name": "charts",
+    "src": "resources/js/charts.js",
+    "isEntry": true
+  },
+  "resources/js/custom-modal.js": {
+    "file": "assets/custom-modal-Csgs9VrG.js",
+    "name": "custom-modal",
+    "src": "resources/js/custom-modal.js",
+    "isEntry": true
+  },
+  "resources/js/custom.js": {
+    "file": "assets/custom-DxEaepB7.js",
+    "name": "custom",
+    "src": "resources/js/custom.js",
+    "isEntry": true
+  },
+  "resources/js/dark-mode-toggle.js": {
+    "file": "assets/dark-mode-toggle-DYsi8Xh0.js",
+    "name": "dark-mode-toggle",
+    "src": "resources/js/dark-mode-toggle.js",
+    "isEntry": true
+  },
+  "resources/js/dropdown.js": {
+    "file": "assets/dropdown-b7O9jo2r.js",
+    "name": "dropdown",
+    "src": "resources/js/dropdown.js",
+    "isEntry": true
+  },
+  "resources/js/fixed-plugin.js": {
+    "file": "assets/fixed-plugin-CWo2eNXa.js",
+    "name": "fixed-plugin",
+    "src": "resources/js/fixed-plugin.js",
+    "isEntry": true
+  },
+  "resources/js/live-search.js": {
+    "file": "assets/live-search-BUGH-Qpm.js",
+    "name": "live-search",
+    "src": "resources/js/live-search.js",
+    "isEntry": true
+  },
+  "resources/js/nav-pills.js": {
+    "file": "assets/nav-pills-CJiG_89C.js",
+    "name": "nav-pills",
+    "src": "resources/js/nav-pills.js",
+    "isEntry": true
+  },
+  "resources/js/navbar-collapse.js": {
+    "file": "assets/navbar-collapse-CmVrcd1t.js",
+    "name": "navbar-collapse",
+    "src": "resources/js/navbar-collapse.js",
+    "isEntry": true
+  },
+  "resources/js/navbar-scroll-fix.js": {
+    "file": "assets/navbar-scroll-fix-CtGIODeA.js",
+    "name": "navbar-scroll-fix",
+    "src": "resources/js/navbar-scroll-fix.js",
+    "isEntry": true
+  },
+  "resources/js/navbar-sticky.js": {
+    "file": "assets/navbar-sticky-l0sNRNKZ.js",
+    "name": "navbar-sticky",
+    "src": "resources/js/navbar-sticky.js",
+    "isEntry": true
+  },
+  "resources/js/perfect-scrollbar.js": {
+    "file": "assets/perfect-scrollbar-otOSKMG2.js",
+    "name": "perfect-scrollbar",
+    "src": "resources/js/perfect-scrollbar.js",
+    "isEntry": true
+  },
+  "resources/js/script_homepage.js": {
+    "file": "assets/script_homepage-GaJEsE8U.js",
+    "name": "script_homepage",
+    "src": "resources/js/script_homepage.js",
+    "isEntry": true
+  },
+  "resources/js/sidenav-burger.js": {
+    "file": "assets/sidenav-burger-C1Ki2HOM.js",
+    "name": "sidenav-burger",
+    "src": "resources/js/sidenav-burger.js",
+    "isEntry": true
+  },
+  "resources/js/tooltips.js": {
+    "file": "assets/tooltips-B97cObPU.js",
+    "name": "tooltips",
+    "src": "resources/js/tooltips.js",
+    "isEntry": true
+  }
+}

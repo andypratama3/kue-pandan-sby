@@ -5,7 +5,7 @@
         @csrf
         <div class="p-4 md:p-5">
             {{-- Area utama yang bisa di-scroll --}}
-            <div class.blade.php"overflow-y-auto max-h-[70vh] p-1">
+            <div class="overflow-y-auto max-h-[70vh] p-1">
                 <div class="grid grid-cols-2 gap-4">
                     {{-- Nama Produk --}}
                     <div class="col-span-2">
@@ -65,7 +65,7 @@
             </div>
             {{-- Footer Modal --}}
             <div class="flex items-center justify-end pt-4 mt-4 space-x-2 border-t border-gray-200 dark:border-gray-600">
-                <button type="submit" class="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Simpan Produk</button>
+                <button type="submit" class="text-white bg-brand hover:bg-brand-deep font-medium rounded-lg text-sm px-5 py-2.5 text-center">Simpan Produk</button>
                 <button type="button" class="js-close-modal-btn py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100">Batal</button>
             </div>
         </div>

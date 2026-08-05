@@ -7,8 +7,8 @@
         <div class="space-y-10">
             <!-- Success Message -->
             @if (session('success'))
-                <div class="p-4 rounded-lg bg-green-50 border border-green-200">
-                    <p class="text-green-800">{{ session('success') }}</p>
+                <div class="p-4 rounded-lg bg-mint border border-brand-light">
+                    <p class="text-brand-deep">{{ session('success') }}</p>
                 </div>
             @endif
 

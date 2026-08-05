@@ -1,135 +1,137 @@
 @extends('layouts.argon')
-@section('title', 'Peforma Kurir')
-@section('page_title', 'Peforma Kurir')
+@section('title', 'Performa Kurir')
+@section('page_title', 'Performa Tim Kurir')
 
 @section('content')
-    <div class="w-full p-6 bg-white rounded-lg shadow dark:bg-gray-800 min-h-[715px]">
-        <div class="flex flex-col gap-4 mb-4 md:flex-row md:items-center md:justify-between">
-            <h2 class="mb-2 text-2xl font-bold text-gray-800 dark:text-white md:mb-0">Peforma Kurir</h2>
-            <form method="GET" class="flex flex-row flex-wrap items-center gap-2">
-                {{-- <div class="relative"> --}}
-                {{-- Kelas 'appearance-none' di bawah ini berfungsi untuk MENGHAPUS panah dropdown bawaan browser. --}}
-                {{-- <select name="month"
-                        class="px-4 py-1 pr-8 text-sm border rounded appearance-none focus:ring focus:ring-blue-200">
-                        @foreach ($months as $num => $name)
-                            <option value="{{ $num }}" @if ($selectedMonth == $num) selected @endif>
-                                {{ $name }}</option>
-                        @endforeach
-                    </select> --}}
-                {{-- Icon dropdown custom dihapus --}}
-                {{-- </div> --}}
-
-
-                <div class="relative">
-                    {{-- Kelas 'appearance-none' di bawah ini berfungsi untuk MENGHAPUS panah dropdown bawaan browser. --}}
-                    <div class="mb-4">
-                        <label for="daterange" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Pilih
-                            Rentang
-                            Tanggal</label>
-                        <input type="text" name="daterange" id="daterange" value="{{ request('daterange') }}"
-                            class="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-blue-200 dark:bg-slate-700 dark:border-slate-600 dark:text-white"
-                            autocomplete="off">
-                    </div>
-                    {{-- Icon dropdown custom dihapus --}}
+    <div class="space-y-6">
+        <!-- Main Card Container -->
+        <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm space-y-6 min-h-[700px]">
+            
+            <!-- Header Section & Date Range Form -->
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div class="space-y-1">
+                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
+                        <div class="w-9 h-9 rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center">
+                            <i class="fas fa-chart-bar text-base"></i>
+                        </div>
+                        <span>Peringkat Performa Pengiriman Kurir</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 dark:text-slate-500">
+                        Pantau produktivitas pengantaran dan omset penagihan kurir di Cabang {{ Auth::user()->region->name ?? 'N/A' }}.
+                    </p>
                 </div>
 
-                {{-- <div class="relative"> --}}
-                {{-- Kelas 'appearance-none' di bawah ini juga MENGHAPUS panah dropdown bawaan browser. --}}
-                {{-- <select name="year"
-                        class="px-4 py-1 pr-8 text-sm border rounded appearance-none focus:ring focus:ring-blue-200">
-                        @foreach ($years as $year)
-                            <option value="{{ $year }}" @if ($selectedYear == $year) selected @endif>
-                                {{ $year }}</option>
-                        @endforeach
-                    </select> --}}
-                {{-- Icon dropdown custom dihapus --}}
-                {{-- </div> --}}
+                <form method="GET" class="flex flex-wrap items-center gap-2.5">
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" name="daterange" id="daterange" value="{{ request('daterange') }}"
+                            placeholder="Pilih Rentang Tanggal..."
+                            class="w-full px-3.5 py-2 text-xs font-semibold border border-slate-200 rounded-2xl bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-cyan-500"
+                            autocomplete="off">
+                    </div>
+                    <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-700 rounded-2xl shadow-md transition-all">
+                        <i class="fas fa-filter"></i> Lihat
+                    </button>
+                </form>
+            </div>
 
-                <button type="submit"
-                    class="px-3 py-1 text-sm font-semibold text-white bg-blue-600 rounded hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700">Lihat</button>
-
-            </form>
-        </div>
-
-        <div x-data="{ show: true }" x-show="show" class="mb-4">
-            <div class="relative flex items-center justify-between px-4 py-3 text-black bg-green-100 rounded dark:bg-slate-700 dark:text-white dark:border dark:border-slate-600"
-                role="alert">
-                <span class="ml-2">Kurir yang berhasil mengantarkan pesanan <b>"Sudah diverifikasi Admin"</b> maka akan
-                    mendapat poin 1, Kurir yang mengantarkan pesanan terbanyak adalah kurir yang memiliki poin skor
-                    tertinggi</span>
-                <button type="button" @click="show = false"
-                    class="ml-4 text-blue-700 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 focus:outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+            <!-- Informational Banner -->
+            <div x-data="{ show: true }" x-show="show" x-transition
+                class="p-4 rounded-2xl bg-mint/80 dark:bg-brand-deep/40 border border-brand-light/80 dark:border-brand-deep flex items-start justify-between gap-4">
+                <div class="flex items-start gap-3 text-xs text-brand-deep dark:text-brand-light">
+                    <i class="fas fa-info-circle text-base text-brand-deep dark:text-brand-light mt-0.5"></i>
+                    <div>
+                        <span class="font-bold">Sistem Poin:</span> Setiap pesanan yang berhasil diantar dan <strong>verifikasi admin</strong> memberikan poin produktivitas. Kurir dengan omset & pesanan selesai tertinggi berada di peringkat teratas.
+                    </div>
+                </div>
+                <button type="button" @click="show = false" class="text-brand-deep dark:text-brand-light hover:opacity-75">
+                    <i class="fas fa-times text-xs"></i>
                 </button>
             </div>
-        </div>
 
-        <div class="mb-4 font-semibold text-gray-600 dark:text-gray-300">
-            Ranking Peforma Kurir {{ request('daterange') }}
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 table-fixed dark:divide-gray-700">
-                <thead class="bg-gray-100 dark:bg-gray-700">
-                    <tr>
-                        <th class="w-24 px-4 py-2 text-xs font-bold text-center text-gray-700 uppercase dark:text-gray-200">
-                            Rank</th>
-                        <th class="px-4 py-2 text-xs font-bold text-center text-gray-700 uppercase dark:text-gray-200">Nama
-                            Kurir</th>
-                        <th class="px-4 py-2 text-xs font-bold text-center text-gray-700 uppercase dark:text-gray-200">Total
-                            Customer</th>
-                        <th class="px-4 py-2 text-xs font-bold text-center text-gray-700 uppercase dark:text-gray-200">
-                            Jumlah Pesanan Selesai</th>
-                        <th class="px-4 py-2 text-xs font-bold text-center text-gray-700 uppercase dark:text-gray-200">
-                            Total</th>
-                        <th class="px-4 py-2 text-xs font-bold text-center text-gray-700 uppercase dark:text-gray-200">
-                            Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                    @forelse($ranking as $row)
-                        <tr>
-                            <td class="px-4 py-2 font-bold text-center">
-                                @if ($row['rank'] == 1)
-                                    <i class="fas fa-medal text-yellow-500 text-xl"></i>
-                                @elseif($row['rank'] == 2)
-                                    <i class="fas fa-medal text-gray-400 text-xl"></i>
-                                @elseif($row['rank'] == 3)
-                                    <i class="fas fa-medal text-orange-600 text-xl"></i>
-                                @else
-                                    {{ $row['rank'] }}
-                                @endif
-                            </td>
-                            <td class="px-4 py-2 text-center">{{ $row['nama_kurir'] }}</td>
-                            <td class="px-4 py-2 text-center">{{ $row['total_customer'] }}</td>
-                            <td class="px-4 py-2 text-center">{{ $row['jumlah_order'] }}</td>
-                            <td class="px-4 py-2 text-center  block font-bold text-green-600">Rp
-                                {{ number_format($row['total'], 0, ',', '.') }}
-                            </td>
-                            <td class="px-4 py-2 text-center">
-                                <form
-                                    action="peforma-kurir/export/{{ $row['kurir_id'] }}/pdf?daterange={{ request('daterange') }}"
-                                    method="get">
-                                    <button type="submit"
-                                        class="flex items-center px-3 py-1 text-sm font-semibold text-white bg-orange-500 rounded hover:bg-orange-600">
-                                        <i class="mr-1 fas fa-file-export"></i> Export
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">Belum ada data
-                                peforma kurir {{ request('daterange') }}.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        <div class="mt-4">
-            {{ $ranking->withQueryString()->links() }}
+            <!-- Subtitle -->
+            <div class="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-200">
+                <span>Ranking Performa Kurir: {{ request('daterange') ?: 'Semua Waktu' }}</span>
+                <span class="text-slate-400">Total Personel: {{ $ranking->total() }}</span>
+            </div>
+
+            <!-- Ranking Table Container -->
+            <div class="overflow-hidden border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900">
+                <div class="overflow-x-auto min-h-[450px]">
+                    <table class="w-full text-xs text-left">
+                        <thead class="text-[11px] font-extrabold text-slate-400 uppercase bg-slate-50/80 dark:bg-slate-800/80">
+                            <tr>
+                                <th scope="col" class="px-5 py-3.5 text-center w-24">Peringkat</th>
+                                <th scope="col" class="px-5 py-3.5">Nama Kurir</th>
+                                <th scope="col" class="px-5 py-3.5 text-center">Total Customer Dilayani</th>
+                                <th scope="col" class="px-5 py-3.5 text-center">Pesanan Selesai</th>
+                                <th scope="col" class="px-5 py-3.5 text-right">Total Setoran</th>
+                                <th scope="col" class="px-5 py-3.5 text-center w-28">Export Rekap</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                            @forelse($ranking as $row)
+                                <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/60 transition-colors">
+                                    <td class="px-5 py-3.5 font-black text-center">
+                                        @if ($row['rank'] == 1)
+                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-600 shadow-md">
+                                                <i class="fas fa-trophy text-sm"></i>
+                                            </span>
+                                        @elseif($row['rank'] == 2)
+                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 shadow-sm">
+                                                <i class="fas fa-medal text-sm"></i>
+                                            </span>
+                                        @elseif($row['rank'] == 3)
+                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-900/20 text-amber-700 shadow-sm">
+                                                <i class="fas fa-award text-sm"></i>
+                                            </span>
+                                        @else
+                                            <span class="text-slate-500 font-extrabold">#{{ $row['rank'] }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-5 py-3.5 font-bold text-slate-800 dark:text-white">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-7 h-7 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 font-extrabold flex items-center justify-center text-[11px]">
+                                                {{ strtoupper(substr($row['nama_kurir'], 0, 1)) }}
+                                            </div>
+                                            <span>{{ $row['nama_kurir'] }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-5 py-3.5 text-center font-bold text-slate-600 dark:text-slate-300">
+                                        {{ $row['total_customer'] }}
+                                    </td>
+                                    <td class="px-5 py-3.5 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-light text-brand-deep dark:bg-brand-deep dark:text-brand-light">
+                                            {{ $row['jumlah_order'] }} Pesanan
+                                        </span>
+                                    </td>
+                                    <td class="px-5 py-3.5 text-right font-black text-brand-deep dark:text-brand-light">
+                                        Rp {{ number_format($row['total'], 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-5 py-3.5 text-center">
+                                        <form action="peforma-kurir/export/{{ $row['kurir_id'] }}/pdf?daterange={{ request('daterange') }}" method="get">
+                                            <button type="submit"
+                                                class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors shadow-sm">
+                                                <i class="fas fa-file-pdf text-[10px]"></i> PDF
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="px-5 py-12 text-center text-slate-400">
+                                        Belum ada data performa kurir untuk rentang tanggal {{ request('daterange') }}.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination Nav -->
+            <nav class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2" aria-label="Table navigation">
+                {{ $ranking->withQueryString()->links() }}
+            </nav>
         </div>
     </div>
 @endsection
@@ -156,8 +158,7 @@
                 autoUpdateInput: false
             });
             $('#daterange').on('apply.daterangepicker', function(ev, picker) {
-                $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format(
-                    'YYYY-MM-DD'));
+                $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
             });
             $('#daterange').on('cancel.daterangepicker', function(ev, picker) {
                 $(this).val('');

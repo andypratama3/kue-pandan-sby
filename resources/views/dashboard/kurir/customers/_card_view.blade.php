@@ -71,7 +71,7 @@
                     <div>
                         <h5 class="flex items-center text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                            {{-- DIUBAH: Ikon diberi warna teal/hijau toska --}}
-                           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-teal-500 dark:text-teal-400"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg>
+                           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-brand dark:text-brand-light"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg>
                             Catatan
                         </h5>
                         <p class="mt-1 text-sm italic text-gray-800 dark:text-gray-200">"{{ $customer->note }}"</p>
@@ -84,7 +84,7 @@
         {{-- DIUBAH: Padding pt-4 mt-4 menjadi pt-3 mt-3 --}}
         <div class="flex items-center justify-end mt-3 space-x-2 border-t border-gray-200 dark:border-gray-700">
             <a href="https://wa.me/{{ $customer->phone }}" target="_blank"
-                class="text-lg text-green-600 transition transform dark:text-green-500 hover:scale-125 active:scale-90" title="Hubungi via WhatsApp">
+                class="text-lg text-brand-deep transition transform dark:text-brand hover:scale-125 active:scale-90" title="Hubungi via WhatsApp">
                 <i class="fab fa-whatsapp"></i>
             </a>
             <button type="button" data-target-modal="note-customer-modal-{{ $customer->id }}" class="p-2 text-yellow-600 rounded-full js-open-modal-btn hover:bg-yellow-50 dark:text-yellow-500 dark:hover:bg-gray-700" title="Edit Catatan">

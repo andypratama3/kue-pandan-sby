@@ -199,8 +199,6 @@ class PeformaCustomerController extends Controller
      */
     public function show($customer)
     {
-        // Untuk sementara return view kosong dengan parameter customer
-        // Nanti akan diisi dengan logika untuk menampilkan detail peforma customer tertentu
-        return view('dashboard.admin.peforma-customer.peforma-customer', compact('customer'));
+        return redirect()->route('admin.peforma-customer.index');
     }
 }

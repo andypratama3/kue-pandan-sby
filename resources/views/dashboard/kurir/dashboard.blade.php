@@ -272,8 +272,8 @@
                                 <div class="flex items-center space-x-3">
                                     <div class="flex-shrink-0">
                                         <div
-                                            class="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full dark:bg-green-900/50">
-                                            <i class="text-lg text-green-600 fas fa-check-circle dark:text-green-400"></i>
+                                            class="flex items-center justify-center w-10 h-10 bg-brand-light rounded-full dark:bg-brand-deep/50">
+                                            <i class="text-lg text-brand-deep fas fa-check-circle dark:text-brand-light"></i>
                                         </div>
                                     </div>
                                     <div class="flex-1 min-w-0">
@@ -312,13 +312,13 @@
                     <div class="flex flex-wrap -mx-3">
                         <a href="{{ route('kurir.pesanan.create') }}" class="w-1/2 px-3">
                             <div
-                                class="relative flex items-center justify-center p-4 overflow-hidden transition-all duration-300 ease-out transform border border-green-100 shadow-xl group md:justify-start bg-gradient-to-br from-green-50 to-emerald-50 dark:from-slate-800 dark:to-slate-700 rounded-2xl hover:shadow-2xl hover:scale-105 dark:border-slate-600">
+                                class="relative flex items-center justify-center p-4 overflow-hidden transition-all duration-300 ease-out transform border border-brand-light shadow-xl group md:justify-start bg-gradient-to-br from-mint to-mint dark:from-slate-800 dark:to-slate-700 rounded-2xl hover:shadow-2xl hover:scale-105 dark:border-slate-600">
                                 <div
-                                    class="absolute inset-0 transition-opacity duration-300 opacity-0 bg-gradient-to-br from-green-400/10 to-emerald-500/10 group-hover:opacity-100">
+                                    class="absolute inset-0 transition-opacity duration-300 opacity-0 bg-gradient-to-br from-brand-light/10 to-brand/10 group-hover:opacity-100">
                                 </div>
                                 <div class="relative z-10 flex items-center">
                                     <div
-                                        class="flex items-center justify-center w-12 h-12 transition-shadow duration-300 shadow-lg md:mr-3 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl group-hover:shadow-xl">
+                                        class="flex items-center justify-center w-12 h-12 transition-shadow duration-300 shadow-lg md:mr-3 bg-gradient-to-br from-brand-light to-brand rounded-xl group-hover:shadow-xl">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -327,7 +327,7 @@
                                     </div>
                                     <div class="flex-1 hidden min-w-0 md:block">
                                         <div
-                                            class="mb-1 text-lg font-bold text-gray-800 truncate transition-colors duration-300 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400">
+                                            class="mb-1 text-lg font-bold text-gray-800 truncate transition-colors duration-300 dark:text-white group-hover:text-brand-deep dark:group-hover:text-brand-light">
                                             Pesanan</div>
                                         <div class="text-xs font-medium text-gray-600 truncate dark:text-gray-400">
                                             Buat pesanan baru</div>
@@ -387,14 +387,14 @@
                                 </div>
                             @else
                                 <div class="flex items-center mb-4">
-                                    <div class="p-2 mr-3 rounded-lg bg-gradient-to-br from-green-400 to-emerald-500">
+                                    <div class="p-2 mr-3 rounded-lg bg-gradient-to-br from-brand-light to-brand">
                                         <i class="text-sm text-white fas fa-check-circle"></i>
                                     </div>
                                     <h6 class="mb-0 text-lg font-bold text-gray-800 dark:text-white">Tidak Ada Catatan Baru
                                     </h6>
                                 </div>
                                 <div
-                                    class="p-4 border-l-4 border-green-400 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-slate-700 dark:to-slate-600 rounded-2xl">
+                                    class="p-4 border-l-4 border-brand-light bg-gradient-to-r from-mint to-mint dark:from-slate-700 dark:to-slate-600 rounded-2xl">
                                     <p class="leading-relaxed text-gray-700 dark:text-gray-300">
                                         Saat ini tidak ada catatan baru dari admin.
                                     </p>
@@ -430,7 +430,7 @@
                                         id="chart-total-orders">{{ $totalOrdersInRange }}</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <span class="w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
+                                    <span class="w-3 h-3 mr-2 bg-brand rounded-full"></span>
                                     <span class="mr-1 text-sm font-medium text-gray-600 dark:text-gray-300">Selesai </span>
                                     {{-- DITAMBAHKAN: ID untuk pembaruan JS --}}
                                     <span class="text-sm font-bold text-gray-800 dark:text-white"
@@ -645,7 +645,7 @@
                                                                         Rp {{ number_format($initialTotal, 0, ',', '.') }}
                                                                     </p>
                                                                     <p
-                                                                        class="text-lg font-extrabold text-green-600 dark:text-green-500">
+                                                                        class="text-lg font-extrabold text-brand-deep dark:text-brand">
                                                                         Rp {{ number_format($latestTotal, 0, ',', '.') }}
                                                                     </p>
                                                                 </div>
@@ -678,7 +678,7 @@
                                                                     break;
                                                                 case 'selesai':
                                                                 case 'diverifikasi_admin':
-                                                                    $statusClass = 'bg-green-100 text-green-800';
+                                                                    $statusClass = 'bg-brand-light text-brand-deep';
                                                                     break;
                                                                 case 'menunggu_retur':
                                                                     $statusClass = 'bg-red-100 text-red-800';
@@ -811,7 +811,7 @@
                                                                 <del class="mr-1 text-xs text-gray-500">Rp
                                                                     {{ number_format($initialTotal, 0, ',', '.') }}</del>
                                                                 <span
-                                                                    class="font-bold text-green-600 dark:text-green-500">Rp
+                                                                    class="font-bold text-brand-deep dark:text-brand">Rp
                                                                     {{ number_format($latestTotal, 0, ',', '.') }}</span>
                                                             </span>
                                                         @else
@@ -840,7 +840,7 @@
                                                                 break;
                                                             case 'selesai':
                                                             case 'diverifikasi_admin':
-                                                                $statusClass = 'bg-green-100 text-green-800';
+                                                                $statusClass = 'bg-brand-light text-brand-deep';
                                                                 break;
                                                             case 'menunggu_retur':
                                                                 $statusClass = 'bg-red-100 text-red-800';
@@ -861,7 +861,7 @@
                                                     <div class="flex items-center space-x-3">
                                                         @if ($formattedPhone)
                                                             <a href="https://wa.me/{{ $formattedPhone }}" target="_blank"
-                                                                class="text-green-500 transition-colors hover:text-green-600">
+                                                                class="text-brand transition-colors hover:text-brand-deep">
                                                                 <i class="text-2xl fab fa-whatsapp"></i>
                                                             </a>
                                                         @endif
@@ -892,8 +892,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    </div>
     </div>
     @push('flowbite-modals')
         @if (isset($customerCategories))
@@ -950,8 +948,8 @@
                             {
                                 label: 'Selesai',
                                 data: @json($chartDataCompleted),
-                                borderColor: '#22c55e', // Hijau
-                                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                                borderColor: '#6f8f5f', // Hijau
+                                backgroundColor: 'rgba(111, 143, 95, 0.12)',
                                 fill: true,
                                 tension: 0.4,
                             },
@@ -1255,7 +1253,7 @@
                         badgeColorClasses = 'bg-orange-100 text-orange-800';
                         break;
                     case 'selesai':
-                        badgeColorClasses = 'bg-green-100 text-green-800';
+                        badgeColorClasses = 'bg-brand-light text-brand-deep';
                         break;
                 }
                 // 3. Gabungkan kelas dasar dengan kelas warna baru
@@ -1264,7 +1262,7 @@
                 // icon success
                 if (order.status === 'selesai' && statusIcon) {
                     statusIcon.innerHTML =
-                        `<svg class="w-8 h-8" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#10b981" stroke-width="1.5" fill="#d1fae5"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" stroke="#10b981" stroke-width="2"/></svg>`;
+                        `<svg class="w-8 h-8" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#6f8f5f" stroke-width="1.5" fill="#eef3ec"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" stroke="#6f8f5f" stroke-width="2"/></svg>`;
                     statusIcon.classList.remove('hidden');
                 } else if (statusIcon) {
                     statusIcon.innerHTML = ''; // Kosongkan ikon jika status bukan 'selesai'
@@ -1337,7 +1335,7 @@
                     <p class="text-sm text-gray-600 dark:text-gray-300">
                         Awal: <span class="font-medium text-gray-800 dark:text-gray-200">${initialQty}</span> |
                         Retur: <span class="font-medium text-red-500">${returnedQty}</span> |
-                        Sisa: <span class="font-medium text-green-600">${remainingQty}</span>
+                        Sisa: <span class="font-medium text-brand-deep">${remainingQty}</span>
                     </p>
                 `;
                     }
@@ -1579,11 +1577,11 @@
                     updateButton.classList.add('opacity-50', 'cursor-not-allowed');
                     if (currentStatus === 'diverifikasi_admin') {
                         updateButton.classList.remove('bg-blue-700', 'hover:bg-blue-800');
-                        updateButton.classList.add('bg-teal-600', 'hover:bg-teal-700');
+                        updateButton.classList.add('bg-brand-deep', 'hover:bg-brand-deep');
                     }
                 } else {
                     updateButton.disabled = false;
-                    updateButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-teal-600', 'hover:bg-teal-700');
+                    updateButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-brand-deep', 'hover:bg-brand-deep');
                     updateButton.classList.add('bg-blue-700', 'hover:bg-blue-800');
                     updateButton.setAttribute('data-next-status', currentStatusInfo.nextStatus);
                 }
@@ -1629,20 +1627,20 @@
                 const desktopLineEl = document.getElementById(step === 'diambil' ? 'line-diantar' : `line-${step}`);
 
                 // Reset warna
-                iconEl.classList.remove('bg-green-600', 'text-green-600', 'border-green-600');
-                if (mobileLineEl) mobileLineEl.classList.remove('bg-green-600');
-                if (desktopLineEl) desktopLineEl.classList.remove('bg-green-600');
+                iconEl.classList.remove('bg-brand-deep', 'text-brand-deep', 'border-brand-deep');
+                if (mobileLineEl) mobileLineEl.classList.remove('bg-brand-deep');
+                if (desktopLineEl) desktopLineEl.classList.remove('bg-brand-deep');
 
                 // Cek apakah langkah sudah selesai
                 if (timestamps[step]) {
                     iconEl.innerHTML =
-                    '<i class="text-white dark:text-green-600 fas fa-check-circle"></i>'; // [!code ++]
-                    iconEl.classList.add('bg-green-600', 'border-green-600');
+                    '<i class="text-white dark:text-brand-deep fas fa-check-circle"></i>'; // [!code ++]
+                    iconEl.classList.add('bg-brand-deep', 'border-brand-deep');
                     timeSpanEl.textContent = `${timestamps[step]}  ${tzAbbr}`;
-                    if (mobileLineEl) mobileLineEl.classList.add('bg-green-600');
-                    if (desktopLineEl) desktopLineEl.classList.add('bg-green-600');
+                    if (mobileLineEl) mobileLineEl.classList.add('bg-brand-deep');
+                    if (desktopLineEl) desktopLineEl.classList.add('bg-brand-deep');
                 } else {
-                    iconEl.innerHTML = `<i class="fas ${icons[step]} text-green-600"></i>`;
+                    iconEl.innerHTML = `<i class="fas ${icons[step]} text-brand-deep"></i>`;
                     timeSpanEl.textContent = tzAbbr; // Tampilkan hanya label jika belum ada waktu
                 }
             });
@@ -1754,13 +1752,13 @@
                     break;
                 case 'selesai':
                 case 'diverifikasi_admin':
-                    newClasses = 'bg-green-100 text-green-800';
+                    newClasses = 'bg-brand-light text-brand-deep';
                     break;
             }
 
             const colorClassesToRemove = [
                 'bg-blue-100', 'text-blue-800', 'bg-yellow-100', 'text-yellow-800',
-                'bg-purple-100', 'text-purple-800', 'bg-green-100', 'text-green-800',
+                'bg-purple-100', 'text-purple-800', 'bg-brand-light', 'text-brand-deep',
                 'bg-red-100', 'text-red-800', 'bg-orange-100', 'text-orange-800',
                 'dark:bg-orange-900', 'dark:text-orange-300', 'bg-gray-100', 'text-gray-800'
             ];

@@ -1,5 +1,5 @@
 @forelse ($orders as $order)
-<div class="px-3 py-2 border-l-8 border-green-500 rounded-lg shadow-md bg-gray-50 dark:bg-gray-700">
+<div class="px-3 py-2 border-l-8 border-brand rounded-lg shadow-md bg-gray-50 dark:bg-gray-700">
     {{-- BAGIAN ATAS: INVOICE & TOMBOL DETAIL ICON --}}
     <div class="flex items-start justify-between pb-1 border-b dark:border-gray-600">
         <div>
@@ -53,11 +53,11 @@
                 <p class="text-xs leading-tight line-through text-slate-400">
                     Rp {{ number_format($order->total_amount, 0, ',', '.') }}
                 </p>
-                <p class="text-xl font-bold text-green-600 dark:text-green-400">
+                <p class="text-xl font-bold text-brand-deep dark:text-brand-light">
                     Rp {{ number_format($order->final_total, 0, ',', '.') }}
                 </p>
                 @else
-                <p class="text-lg font-bold text-green-800 dark:text-green-200">
+                <p class="text-lg font-bold text-brand-deep dark:text-brand-light">
                     Rp {{ number_format($order->total_amount, 0, ',', '.') }}
                 </p>
                 @endif

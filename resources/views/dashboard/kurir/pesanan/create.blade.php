@@ -19,7 +19,7 @@
                         <div class="flex justify-end mb-4">
                             {{-- DIUBAH: Menggunakan class js-open-modal-btn dan data-target-modal --}}
                             <button type="button" data-target-modal="produkModal"
-                                class="js-open-modal-btn bg-[#345c7c] text-white px-6 py-1 rounded hover:bg-[#2a4964] transition">
+                                class="js-open-modal-btn bg-brand text-white px-6 py-1 rounded hover:bg-brand-deep transition">
                                 + Tambah Produk
                             </button>
                         </div>
@@ -39,7 +39,7 @@
                                 <i class="fas fa-user mr-2"></i> Data Customer
                             </p>
                             <a href="{{ route('kurir.pesanan.index') }}"
-                                class="px-2 mb-4 font-semibold text-white rounded-full cursor-pointer text-md bg-greenlight hover:bg-green-600">
+                                class="px-2 mb-4 font-semibold text-white rounded-full cursor-pointer text-md bg-brand hover:bg-brand-deep">
                                 <i class="fas fa-caret-left"></i> Back
                             </a>
                         </div>
@@ -179,7 +179,7 @@
                         <div class="hidden w-full max-w-full mt-4 shrink-0 md:w-full md:flex-0 xl:block">
                             <div class="flex justify-end">
                                 <button type="button" onclick="checkout()"
-                                    class="w-full max-w-full bg-[#748c54] text-white px-6 py-2 rounded-xl hover:bg-[#5a6e40] transition shadow-md">
+                                    class="w-full max-w-full bg-brand text-white px-6 py-2 rounded-xl hover:bg-brand-deep transition shadow-md">
                                     Checkout
                                 </button>
                             </div>
@@ -190,12 +190,11 @@
             </div>
         </form>
     </div>
-    </div>
     <div
         class="fixed bottom-0 left-0 z-50 flex items-center justify-between w-full p-4 bg-white border-t border-gray-300 dark:bg-gray-800 xl:hidden">
         <p id="cart-total" class="text-lg font-bold cart-total-display dark:text-white">Total: Rp 0</p>
         <button type="button" onclick="checkout()"
-            class="bg-[#748c54] text-white px-6 py-2 rounded-xl hover:bg-[#5a6e40] transition shadow-md">
+            class="bg-brand text-white px-6 py-2 rounded-xl hover:bg-brand-deep transition shadow-md">
             Checkout
         </button>
     </div>
@@ -219,8 +218,8 @@
             }
             let iconSvg, iconBgColor, iconTextColor;
             if (type === 'success') {
-                iconBgColor = 'bg-green-100 dark:bg-green-800';
-                iconTextColor = 'text-green-500 dark:text-green-200';
+                iconBgColor = 'bg-brand-light dark:bg-brand-deep';
+                iconTextColor = 'text-brand dark:text-brand-light';
                 iconSvg =
                     `<svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"><path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" /></svg>`;
             } else if (type === 'info') {
@@ -579,11 +578,11 @@
                                     <span class="font-bold text-gray-800 text-md">${p.name}</span>
                                     ${v.name ? `<div class="mb-1 text-xs text-gray-600"> ▸ ${v.name} </div>` : ''}
                                 </div>
-                                <div class="font-bold text-green-700">Rp ${v.price.toLocaleString()}</div>
+                                <div class="font-bold text-brand-deep">Rp ${v.price.toLocaleString()}</div>
                             </div>
                             ${sudahDipilih ?
                                 `<button type="button" class="px-2 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600" onclick="hapusDariCart(${p.id}, ${v.id})"><i class="fas fa-trash"></i></button>` :
-                                `<button type="button" class="px-2 py-1 text-xs text-white bg-green-500 rounded hover:bg-green-600" onclick="tambahKeCart(${p.id}, ${v.id})"><i class="fas fa-cart-plus"></i></button>`
+                                `<button type="button" class="px-2 py-1 text-xs text-white bg-brand rounded hover:bg-brand-deep" onclick="tambahKeCart(${p.id}, ${v.id})"><i class="fas fa-cart-plus"></i></button>`
                             }
                         </div>`;
                     });
@@ -594,11 +593,11 @@
                         ${imageUrl ? `<img src="${imageUrl}" alt="${p.name}" class="object-cover w-16 h-16 mr-2 border rounded" />` : ''}
                         <div class="flex-1">
                             <div class="font-semibold">${p.name}</div>
-                            <div class="font-bold text-green-700">Rp ${p.price ? p.price.toLocaleString() : ''}</div>
+                            <div class="font-bold text-brand-deep">Rp ${p.price ? p.price.toLocaleString() : ''}</div>
                         </div>
                         ${sudahDipilih ?
                             `<button type="button" class="px-2 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600" onclick="hapusDariCart(${p.id}, null)"><i class="fas fa-trash"></i></button>` :
-                            `<button type="button" class="px-2 py-1 text-xs text-white bg-green-500 rounded hover:bg-green-600" onclick="tambahKeCart(${p.id}, null)"><i class="fas fa-cart-plus"></i></button>`
+                            `<button type="button" class="px-2 py-1 text-xs text-white bg-brand rounded hover:bg-brand-deep" onclick="tambahKeCart(${p.id}, null)"><i class="fas fa-cart-plus"></i></button>`
                         }
                     </div>`;
                 }

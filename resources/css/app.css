@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design tokens - shared across homepage, admin, and auth */
+:root {
+    --brand: #6f8f5f;
+    --brand-deep: #3f5d3a;
+    --ink: #1f2a33;
+    --mint: #eef3ec;
+}
+
 /* Custom sidebar styles */
 @media (min-width: 1280px) {
     .xl\:ml-16 {
@@ -314,7 +322,11 @@ body.dark #sidebar .sidebar-icon-container i::after {
         min-height: 5rem !important;
         max-height: 5rem !important;
         overflow: hidden !important;
-        background-color: transparent !important; /* Remove green background on mobile */
+        background-color: rgba(255, 255, 255, 0.92) !important; /* Translucent white on mobile (backdrop blur) */
+    }
+
+    .dark #navbar-main {
+        background-color: rgba(15, 23, 42, 0.92) !important; /* slate-900 for dark mode mobile */
     }
 
     /* Mobile navbar container */
@@ -451,7 +463,7 @@ body {
     overflow: hidden !important;
     padding: 0 !important; /* Remove default padding */
     z-index: 30 !important; /* Lower than sidebar z-index (50) */
-    background-color: #97b67d !important; /* Light green for light mode */
+    background-color: rgba(255, 255, 255, 0.92) !important; /* Translucent white for light mode (backdrop blur) */
     height: 5rem !important; /* Fixed height */
     min-height: 5rem !important;
     max-height: 5rem !important;
@@ -459,7 +471,7 @@ body {
 
 /* Dark mode navbar styling */
 .dark #navbar-main {
-    background-color: #0e172a !important; /* slate-900 for dark mode */
+    background-color: rgba(15, 23, 42, 0.92) !important; /* slate-900 for dark mode */
 }
 
 /* Ensure navbar content doesn't scroll */

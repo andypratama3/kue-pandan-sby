@@ -33,7 +33,7 @@
         <td class="px-4 py-2">
             @if ($order->has_return)
                 {{-- Tampilkan total baru dan coret total lama --}}
-                <p class="mb-0 text-xs font-semibold leading-tight text-green-600 dark:text-green-400">
+                <p class="mb-0 text-xs font-semibold leading-tight text-brand-deep dark:text-brand-light">
                     Rp {{ number_format($order->final_total, 0, ',', '.') }}
                 </p>
                 <p class="mb-0 text-xs leading-tight line-through text-slate-400">
@@ -89,7 +89,7 @@
                             <a href="https://wa.me/{{ $wa_number }}?text={{ $wa_message }}" target="_blank"
                                 class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
                                 role="menuitem">
-                                <i class="w-5 mr-2 text-center text-green-500 fab fa-whatsapp"></i>
+                                <i class="w-5 mr-2 text-center text-brand fab fa-whatsapp"></i>
                                 <span>WhatsApp</span>
                             </a>
                         @endif

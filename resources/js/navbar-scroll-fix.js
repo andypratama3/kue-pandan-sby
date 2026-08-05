@@ -10,7 +10,7 @@
         return;
       }
 
-      console.log('Green navbar scroll initialized');
+      console.log('Navbar scroll initialized');
 
       // Add CSS styles for smooth green navbar transition
       const style = document.createElement('style');
@@ -23,15 +23,15 @@
 
         /* Light mode scrolled navbar */
         #navbar-main.scrolled:not(.dark) {
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
-          background-color: #97b67d !important; /* bg-greenlight solid saat scroll */
+          box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08) !important;
+          background-color: #ffffff !important; /* solid white saat scroll */
           /* Removed backdrop-filter to prevent stacking context issues */
         }
 
         /* Dark mode scrolled navbar */
         #navbar-main.scrolled.dark,
         .dark #navbar-main.scrolled {
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3) !important;
           background-color: #0f172a !important; /* dark:bg-slate-900 */
         }
 
@@ -39,8 +39,8 @@
         @media (max-width: 768px) {
           /* Light mode mobile */
           #navbar-main.scrolled:not(.dark) {
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2) !important;
-            background-color: #97b67d !important; /* bg-greenlight solid saat scroll */
+            box-shadow: 0 6px 25px rgba(15, 23, 42, 0.1) !important;
+            background-color: #ffffff !important; /* solid white saat scroll */
           }
           
           /* Dark mode mobile */

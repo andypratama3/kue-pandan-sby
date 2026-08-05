@@ -8,8 +8,6 @@
 .DS_Store
 **/.DS_Store
 
-# Built assets (dihasilkan oleh `npm run build`)
-/public/build
 .env
 .env.backup
 .env.production

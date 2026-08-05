@@ -116,14 +116,14 @@ $isPdf = request()->routeIs('admin.historys.download');
 
         .brand-kue {
             font-size: 12px;
-            color: #97b67d;
+            color: #6f8f5f;
             margin: 0;
             font-weight: normal;
         }
 
         .brand-pandan {
             font-size: 14px;
-            color: #97b67d;
+            color: #6f8f5f;
             font-weight: bold;
             margin: 0;
             letter-spacing: 0.5px;
@@ -227,8 +227,8 @@ $isPdf = request()->routeIs('admin.historys.download');
                 <div class="text-base text-gray-500 font-mono">Tanggal: {{ $order->created_at->setTimezone('Asia/Jakarta')->format('d/m/Y H:i') }} WIB</div>
             </div>
             <div class="flex flex-col items-end text-right">
-                <span class="text-lg font-normal leading-tight" style="color:#97b67d; font-family:serif;">Kue Ijo</span>
-                <span class="text-3xl font-extrabold tracking-wider mt-0 -mb-2" style="color:#97b67d; font-family:serif; letter-spacing:2px;">PANDAN ASLI</span>
+                <span class="text-lg font-normal leading-tight" style="color:#6f8f5f; font-family:serif;">Kue Ijo</span>
+                <span class="text-3xl font-extrabold tracking-wider mt-0 -mb-2" style="color:#6f8f5f; font-family:serif; letter-spacing:2px;">PANDAN ASLI</span>
                 <span class="text-base text-gray-700 mt-2">Kurir: {{ $order->createdBy->name ?? '-' }}</span>
             </div>
         </div>
@@ -301,7 +301,7 @@ $isPdf = request()->routeIs('admin.historys.download');
                     <tfoot>
                         <tr class="bg-gray-100 font-bold">
                             <td colspan="4" class="border px-3 py-2 text-right">Subtotal Final</td>
-                            <td class="border px-3 py-2 text-right text-green-700">
+                            <td class="border px-3 py-2 text-right text-brand-deep">
                                 Rp {{ number_format($order->total_amount - $activeReturn->total_amount_returned, 0, ',', '.') }}
                             </td>
                         </tr>
@@ -393,7 +393,7 @@ $isPdf = request()->routeIs('admin.historys.download');
         @if(!$isPdf)
         <div class="mt-8 flex justify-between items-center">
             <div class="no-print flex gap-2">
-                <button onclick="window.print()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Print Invoice</button>
+                <button onclick="window.print()" class="px-4 py-2 bg-brand-deep text-white rounded hover:bg-brand-deep">Print Invoice</button>
                 <button onclick="window.close()" class="px-4 py-2 bg-red-400 text-white rounded hover:bg-gray-600">Tutup</button>
             </div>
         </div>

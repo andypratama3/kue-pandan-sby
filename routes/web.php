@@ -52,6 +52,12 @@ Route::get('privacy-policy', function () {
     return view('privacy-policy');
 })->name('privacy-policy');
 
+// Alias untuk register (Jetstream) agar link Terms & Privacy tidak 500
+Route::view('terms-of-service', 'terms')->name('terms.show');
+Route::get('privacy-policy', function () {
+    return view('privacy-policy');
+})->name('policy.show');
+
 
 // Rute Logout manual
 Route::post('/logout', function (Request $request) {

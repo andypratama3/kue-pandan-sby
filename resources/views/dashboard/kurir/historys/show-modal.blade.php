@@ -62,7 +62,7 @@
                     <div id="returnedTotalContainer" class="hidden">
                         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Tagihan</label>
                         <p id="initialTotalAmount" class="text-sm font-bold text-gray-400 line-through dark:text-gray-500"></p>
-                        <p id="latestTotalAmount" class="text-2xl font-extrabold text-green-600 dark:text-green-500"></p>
+                        <p id="latestTotalAmount" class="text-2xl font-extrabold text-brand-deep dark:text-brand"></p>
                     </div>
                     <div id="returnTotalValueContainer" class="hidden pt-4 mt-4 border-t border-gray-200 dark:border-gray-600">
                         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Nilai Retur</label>
@@ -110,14 +110,14 @@
                 <div data-role="return-info">
                     <span>Awal: <b class="text-gray-800 dark:text-gray-100" data-role="initial-qty"></b></span> |
                     <span class="text-red-600 dark:text-red-400">Retur: <b data-role="returned-qty"></b></span> |
-                    <span class="text-green-600 dark:text-green-400">Sisa: <b data-role="remaining-qty"></b></span>
+                    <span class="text-brand-deep dark:text-brand-light">Sisa: <b data-role="remaining-qty"></b></span>
                 </div>
                 <div data-role="normal-info">
                     Jumlah: <b class="text-gray-800 dark:text-gray-100" data-role="quantity"></b>
                 </div>
             </div>
             <p class="mt-1 text-sm font-medium text-gray-800 dark:text-gray-200">
-                <span data-role="price"></span> &rarr; <span data-role="subtotal" class="text-green-600"></span>
+                <span data-role="price"></span> &rarr; <span data-role="subtotal" class="text-brand-deep"></span>
             </p>
         </div>
     </div>

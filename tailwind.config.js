@@ -15,12 +15,18 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ["Figtree", ...defaultTheme.fontFamily.sans],
+                sans: ["Plus Jakarta Sans", ...defaultTheme.fontFamily.sans],
+                display: ["Sora", "Plus Jakarta Sans", ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 greenlight: "#97b67d",
                 greendark: "#2e5d32",
                 bluedark: "#111c43",
+                brand: "#6f8f5f",
+                "brand-deep": "#3f5d3a",
+                "brand-light": "#a9c19a",
+                ink: "#1f2a33",
+                mint: "#eef3ec",
             },
         },
     },

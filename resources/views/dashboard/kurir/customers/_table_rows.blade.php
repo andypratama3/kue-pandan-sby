@@ -33,7 +33,7 @@
 
         {{-- NOMOR TELEPON --}}
         <td class="px-4 py-3 text-center">
-            <a href="https://wa.me/{{ $customer->phone }}" target="_blank" class="text-green-600 hover:text-green-700">
+            <a href="https://wa.me/{{ $customer->phone }}" target="_blank" class="text-brand hover:text-brand-deep">
                 <i class="fab fa-whatsapp"></i> +{{ $customer->phone }}
             </a>
         </td>

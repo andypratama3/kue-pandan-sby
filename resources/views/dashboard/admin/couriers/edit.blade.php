@@ -52,7 +52,7 @@
             </div>
         </div>
         <button type="submit"
-            class="text-white inline-flex items-center bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800">
+            class="text-white inline-flex items-center bg-brand hover:bg-brand-deep focus:ring-4 focus:outline-none focus:ring-brand-light font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-brand dark:hover:bg-brand-deep dark:focus:ring-brand-deep">
             <i class="fas fa-save me-1"></i>
             Simpan Perubahan
         </button>

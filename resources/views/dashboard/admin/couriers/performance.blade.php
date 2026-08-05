@@ -21,7 +21,7 @@
                     <span id="total-orders-{{ $courier->id }}" class="text-sm font-bold text-gray-800 dark:text-white"></span>
                 </div>
                 <div class="flex items-center">
-                    <span class="w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
+                    <span class="w-3 h-3 mr-2 bg-brand rounded-full"></span>
                     <span class="mr-1 text-sm font-medium text-gray-600 dark:text-gray-300">Selesai</span>
                     <span id="total-completed-{{ $courier->id }}" class="text-sm font-bold text-gray-800 dark:text-white"></span>
                 </div>

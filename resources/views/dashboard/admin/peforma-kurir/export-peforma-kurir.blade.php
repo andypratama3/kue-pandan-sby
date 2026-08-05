@@ -181,7 +181,7 @@
         @if (!$loop->last)
             <div class="page-break"></div>
         @endif
-    @endforeach
+    @endforelse
 </body>
 
 </html>

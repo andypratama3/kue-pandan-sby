@@ -10,7 +10,7 @@
                                         @switch($order->status)
                                             @case('selesai') bg-blue-100 text-blue-800 @break
                                             @case('menunggu_verifikasi_admin') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 @break
-                                            @case('diverifikasi_admin') bg-green-100 text-green-800 @break
+                                            @case('diverifikasi_admin') bg-brand-light text-brand-deep @break
                                             @default bg-gray-100 text-gray-800
                                         @endswitch">
                 {{ $labelStatus($order->status) }}
@@ -26,7 +26,7 @@
             @if ($activeReturn && $returnedAmount > 0)
                 <span class="block text-xs text-gray-500 line-through">Rp
                     {{ number_format($order->total_amount, 0, ',', '.') }}</span>
-                <span class="block font-bold text-green-600">Rp
+                <span class="block font-bold text-brand-deep">Rp
                     {{ number_format($afterReturn, 0, ',', '.') }}</span>
             @else
                 Rp {{ number_format($order->total_amount, 0, ',', '.') }}

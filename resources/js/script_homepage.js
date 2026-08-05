@@ -413,22 +413,24 @@ function setOutlet(key) {
 // ===== Active button state =====
 function setActive(btn) {
     document.querySelectorAll(".outlet-btn").forEach((b) => {
-        b.classList.remove("bg-[#8BA870]", "text-white");
+        b.classList.remove("bg-brand-deep", "text-white");
         b.classList.add(
             "bg-white",
-            "text-[#8BA870]",
+            "text-brand-deep",
             "border",
-            "border-[#8BA870]"
+            "border-brand/30",
+            "hover:border-brand"
         );
         b.style.transform = "scale(1)";
         b.style.transition = "all 0.3s ease-in-out";
     });
-    btn.classList.add("bg-[#8BA870]", "text-white");
+    btn.classList.add("bg-brand-deep", "text-white");
     btn.classList.remove(
         "bg-white",
-        "text-[#8BA870]",
+        "text-brand-deep",
         "border",
-        "border-[#8BA870]"
+        "border-brand/30",
+        "hover:border-brand"
     );
     btn.style.transform = "scale(1.05)";
     btn.style.transition = "all 0.3s ease-in-out";

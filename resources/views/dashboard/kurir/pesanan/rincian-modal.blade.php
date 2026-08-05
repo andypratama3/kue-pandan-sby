@@ -97,7 +97,7 @@
                             <p id="modalInitialTotalAmount"
                                 class="text-sm font-bold text-gray-400 line-through dark:text-gray-500"></p>
                             <p id="modalLatestTotalAmount"
-                                class="text-2xl font-extrabold text-green-600 dark:text-green-500"></p>
+                                class="text-2xl font-extrabold text-brand-deep dark:text-brand"></p>
                         </div>
                     </div>
                 </div>

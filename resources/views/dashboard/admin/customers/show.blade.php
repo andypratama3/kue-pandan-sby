@@ -42,7 +42,7 @@
                             @if ($customer->is_flagged)
                                 <span class="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full">Bermasalah</span>
                             @else
-                                <span class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">Normal</span>
+                                <span class="px-2 py-1 text-xs font-medium text-brand-deep bg-brand-light rounded-full">Normal</span>
                             @endif
                         </dd>
                     </div>

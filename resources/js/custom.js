@@ -3,8 +3,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const tabContent = document.getElementById("tab-content");
     if (tabContent) {
         setTimeout(() => {
-            tabContent.classList.remove("translate-x-full", "opacity-0");
-            tabContent.classList.add("translate-x-0", "opacity-100");
+            tabContent.classList.remove("translate-x-full", "translate-y-2", "opacity-0");
+            tabContent.classList.add("translate-x-0", "translate-y-0", "opacity-100");
         }, 100);
     }
 

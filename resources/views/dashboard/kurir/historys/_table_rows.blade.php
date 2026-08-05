@@ -31,7 +31,7 @@
     </td>
     <td class="px-4 py-2">
         @if ($order->has_return) <p
-            class="mb-0 font-semibold leading-tight text-green-600 text-md dark:text-green-400">
+            class="mb-0 font-semibold leading-tight text-brand-deep text-md dark:text-brand-light">
             Rp {{ number_format($order->final_total, 0, ',', '.') }}
         </p>
         <p class="mb-0 text-xs leading-tight line-through text-slate-400">
