@@ -1,0 +1,639 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom sidebar styles */
+@media (min-width: 1280px) {
+    .xl\:ml-16 {
+        margin-left: 4rem; /* 64px */
+    }
+
+    .xl\:ml-68 {
+        margin-left: 17rem; /* 272px */
+    }
+
+    /* Desktop sidebar should always be visible */
+    #sidebar {
+        transform: translateX(0) !important;
+        position: fixed;
+        left: 1.5rem; /* xl:ml-6 equivalent */
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 40;
+    }
+
+/* Ensure main content has proper margin and padding for fixed navbar */
+.main-content {
+    margin-left: 18rem; /* Default expanded sidebar width (256px + 24px margin) */
+    padding-top: 5rem !important; /* Space for fixed navbar */
+    transition: margin-left 0.3s ease-in-out;
+    width: calc(100vw - 17rem);
+    max-width: calc(100vw - 17rem);
+    padding-left: 1.5rem; /* 24px to align with content */
+    padding-right: 1.5rem;
+    min-height: calc(100vh - 5rem); /* Full height minus navbar */
+    position: relative !important;
+}
+
+    .main-content.sidebar-collapsed {
+        margin-left: 5.5rem; /* Collapsed sidebar width (64px + 24px margin) */
+        width: calc(100vw - 5.5rem);
+        max-width: calc(100vw - 5.5rem);
+    }
+}
+
+/* Sidebar transition improvements */
+#sidebar {
+    transition: width 0.3s ease-in-out;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+.sidenav-text {
+    transition: opacity 0.3s ease-in-out;
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Sidebar icon container fixes - PREVENT SQUISHING */
+.sidebar-icon-container {
+    min-width: 2rem !important; /* 32px minimum width */
+    min-height: 2rem !important; /* 32px minimum height */
+    width: 2rem !important;
+    height: 2rem !important;
+    flex-shrink: 0 !important; /* Prevent shrinking */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 0 !important; /* Remove border radius that might cause background issues */
+    transition: all 0.3s ease-in-out;
+    background-color: transparent !important; /* Ensure transparent background */
+    background-image: none !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Ensure icons inside containers maintain size */
+.sidebar-icon-container i {
+    font-size: 1rem !important; /* 16px */
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: transparent !important; /* Ensure icons have transparent background */
+}
+
+/* Dark mode specific fixes for sidebar icons */
+.dark .sidebar-icon-container {
+    background-color: transparent !important;
+}
+
+.dark .sidebar-icon-container i {
+    background-color: transparent !important;
+}
+
+/* Additional fixes for FontAwesome icons in dark mode */
+.dark .sidebar-icon-container i.fas,
+.dark .sidebar-icon-container i.far,
+.dark .sidebar-icon-container i.fab,
+.dark .sidebar-icon-container i[class*="fa-"] {
+    background-color: transparent !important;
+    background-image: none !important;
+    background: transparent !important;
+}
+
+/* Force transparent background for all icon elements in sidebar */
+.dark #sidebar .sidebar-icon-container,
+.dark #sidebar .sidebar-icon-container *,
+.dark #sidebar .sidebar-icon-container i,
+.dark #sidebar .sidebar-icon-container i::before,
+.dark #sidebar .sidebar-icon-container i::after {
+    background-color: transparent !important;
+    background-image: none !important;
+    background: transparent !important;
+}
+
+/* Ultra-specific override for dark mode sidebar icons - nuclear option */
+html.dark #sidebar .sidebar-icon-container,
+html.dark #sidebar .sidebar-icon-container *,
+html.dark #sidebar .sidebar-icon-container i,
+html.dark #sidebar .sidebar-icon-container i.fas,
+html.dark #sidebar .sidebar-icon-container i.far,
+html.dark #sidebar .sidebar-icon-container i.fab,
+html.dark #sidebar .sidebar-icon-container i[class*="fa-"],
+html.dark #sidebar .sidebar-icon-container i::before,
+html.dark #sidebar .sidebar-icon-container i::after,
+body.dark #sidebar .sidebar-icon-container,
+body.dark #sidebar .sidebar-icon-container *,
+body.dark #sidebar .sidebar-icon-container i,
+body.dark #sidebar .sidebar-icon-container i.fas,
+body.dark #sidebar .sidebar-icon-container i.far,
+body.dark #sidebar .sidebar-icon-container i.fab,
+body.dark #sidebar .sidebar-icon-container i[class*="fa-"],
+body.dark #sidebar .sidebar-icon-container i::before,
+body.dark #sidebar .sidebar-icon-container i::after {
+    background-color: transparent !important;
+    background-image: none !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
+/* Collapsed sidebar specific styles */
+#sidebar.w-16 .sidebar-icon-container {
+    min-width: 2rem !important;
+    min-height: 2rem !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    margin: 0 auto !important; /* Center the icon in collapsed state */
+}
+
+#sidebar.w-16 .sidebar-icon-container i {
+    font-size: 1rem !important;
+    margin: 0 !important;
+}
+
+/* Menu item styling for collapsed state */
+#sidebar.w-16 .sidebar-menu-item {
+    justify-content: center !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+}
+
+/* Logo container fixes */
+.sidebar-logo-container {
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 5rem; /* h-20 */
+    flex-shrink: 0;
+    background-color: transparent !important;
+}
+
+/* Dark mode logo fixes */
+.dark .sidebar-logo-container {
+    background-color: transparent !important;
+}
+
+.dark #sidebar-logo-img {
+    background-color: transparent !important;
+    background: transparent !important;
+    filter: brightness(0.9) contrast(1.1); /* Slightly adjust for dark mode visibility */
+}
+
+#sidebar.w-16 .sidebar-logo-container {
+    padding: 0.5rem;
+}
+
+#sidebar.w-16 #sidebar-logo-img {
+    width: 2.5rem !important; /* 40px */
+    height: 2.5rem !important; /* 40px */
+    min-width: 2.5rem !important;
+    min-height: 2.5rem !important;
+}
+
+/* Section headers in collapsed state */
+#sidebar.w-16 .sidebar-section-header {
+    display: none !important;
+}
+
+/* Hide all dropdowns when sidebar is collapsed */
+#sidebar.w-16 .dropdown,
+#sidebar.w-16 .dropdown-menu,
+#sidebar.w-16 [data-dropdown],
+#sidebar.w-16 .group:hover .absolute,
+#sidebar.w-16 .relative .absolute {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Hide profile dropdown specifically when sidebar collapsed */
+#sidebar.w-16 .group-hover\:opacity-100,
+#sidebar.w-16 .group-hover\:scale-100,
+#sidebar.w-16 .group-hover\:pointer-events-auto {
+    opacity: 0 !important;
+    transform: scale(0.95) !important;
+    pointer-events: none !important;
+}
+
+/* Hide CTA dropdown specifically when sidebar collapsed */
+#sidebar.w-16 #dropdown-cta {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Menu item hover effects */
+.sidebar-menu-item {
+    transition: all 0.3s ease-in-out;
+    border-radius: 0.5rem;
+    margin: 0.125rem 0.5rem;
+    position: relative;
+}
+
+.sidebar-menu-item:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Tooltip for collapsed sidebar */
+#sidebar.w-16 .sidebar-menu-item {
+    position: relative;
+}
+
+#sidebar.w-16 .sidebar-menu-item:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-left: 0.5rem;
+    opacity: 1;
+    pointer-events: none;
+}
+
+#sidebar.w-16 .sidebar-menu-item::before {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 4px 4px 4px 0;
+    border-color: transparent rgba(0, 0, 0, 0.8) transparent transparent;
+    z-index: 1001;
+    margin-left: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+#sidebar.w-16 .sidebar-menu-item:hover::before {
+    opacity: 1;
+}
+
+/* Mobile sidebar behavior */
+@media (max-width: 1279px) {
+    #sidebar {
+        transform: translateX(-100%);
+    }
+
+    #sidebar.translate-x-0 {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding-top: 5rem !important; /* Keep space for fixed navbar on mobile */
+    }
+
+    /* Mobile navbar positioning */
+    #navbar-main {
+        left: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        position: fixed !important;
+        top: 0 !important;
+        z-index: 50 !important;
+        height: 5rem !important;
+        min-height: 5rem !important;
+        max-height: 5rem !important;
+        overflow: hidden !important;
+        background-color: transparent !important; /* Remove green background on mobile */
+    }
+
+    /* Mobile navbar container */
+    #navbar-main > div {
+        padding-left: 1.5rem !important; /* Slightly increased for mobile */
+        padding-right: 1.5rem !important; /* Increased right padding for mobile */
+        height: 5rem !important;
+        min-height: 5rem !important;
+        max-height: 5rem !important;
+    }
+
+    /* Mobile profile section positioning */
+    #navbar-main .flex.items-center.justify-end {
+        padding-right: 0.1rem !important; /* Reduced right padding to move profile more to the right */
+    }
+
+    /* Mobile profile avatar container */
+    #navbar-main .relative.flex.items-center.px-3 {
+        margin-right: 0.01rem !important; /* Reduced margin to move profile picture more to the right within red box */
+    }
+
+    /* Reset icon containers for mobile */
+    .sidebar-icon-container {
+        width: 2rem !important;
+        height: 2rem !important;
+        min-width: 2rem !important;
+        min-height: 2rem !important;
+    }
+
+    /* Ensure profile section is visible on mobile/tablet */
+    #navbar-main .flex.items-center.justify-end {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Profile avatar on mobile/tablet */
+    #navbar-main .w-8.h-8.overflow-hidden {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 2rem !important;
+        height: 2rem !important;
+    }
+
+    /* Profile list on mobile/tablet */
+    #navbar-main ul.flex.flex-row {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Profile image inside avatar container */
+    #navbar-main .w-8.h-8.overflow-hidden img {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+
+    /* Profile dropdown modal on mobile - ensure it appears above content */
+    #navbar-main .group .absolute,
+    #navbar-main.scrolled .group .absolute {
+        z-index: 99999 !important; /* Ultra high z-index to appear above all content including scrolled navbar */
+        position: fixed !important; /* Use fixed positioning to prevent clipping */
+        top: 5rem !important; /* Position below navbar */
+        right: 1rem !important; /* Right margin from edge */
+        left: 1rem !important; /* Left margin to prevent overflow */
+        width: auto !important; /* Auto width */
+        max-width: calc(100vw - 2rem) !important; /* Prevent overflow */
+        transform: none !important; /* Remove transform */
+        margin-top: 0 !important; /* Remove margin-top */
+    }
+
+    /* Ensure hover functionality works in scrolled state on mobile */
+    #navbar-main.scrolled .group:hover .absolute {
+        opacity: 1 !important;
+        transform: scale(1) !important;
+        pointer-events: auto !important;
+    }
+
+    /* Profile dropdown styling improvements for mobile */
+    #navbar-main .group .absolute.bg-white {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        border-radius: 0.5rem !important;
+    }
+
+    /* Last Activity text styling for mobile */
+    #navbar-main .group .absolute .text-xs.text-gray-500 {
+        color: #6b7280 !important; /* Ensure text is visible */
+        font-weight: 500 !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Last Activity value styling for mobile */
+    #navbar-main .group .absolute .block.mt-1 {
+        color: #374151 !important; /* Darker color for better visibility */
+        font-weight: 600 !important;
+        font-size: 0.875rem !important; /* Slightly larger text */
+    }
+}
+
+/* Prevent horizontal scroll on body and html */
+html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+/* Ensure navbar stays fixed and doesn't scroll with content */
+body {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Main content should not affect navbar positioning */
+.main-content {
+    position: relative !important;
+}
+
+/* Additional fixes for content width */
+@media (min-width: 1280px) {
+/* Fixed navbar styling */
+#navbar-main {
+    position: fixed !important;
+    top: 0 !important;
+    left: 18rem !important; /* Align with sidebar */
+    right: 0 !important;
+    width: calc(100vw - 17rem) !important;
+    max-width: calc(100vw - 17rem) !important;
+    transition: left 0.3s ease-in-out, width 0.3s ease-in-out;
+    overflow: hidden !important;
+    padding: 0 !important; /* Remove default padding */
+    z-index: 30 !important; /* Lower than sidebar z-index (50) */
+    background-color: #97b67d !important; /* Light green for light mode */
+    height: 5rem !important; /* Fixed height */
+    min-height: 5rem !important;
+    max-height: 5rem !important;
+}
+
+/* Dark mode navbar styling */
+.dark #navbar-main {
+    background-color: #0e172a !important; /* slate-900 for dark mode */
+}
+
+/* Ensure navbar content doesn't scroll */
+#navbar-main * {
+    overflow: visible !important;
+}
+
+/* Navbar container styling */
+#navbar-main > div {
+    height: 5rem !important;
+    min-height: 5rem !important;
+    max-height: 5rem !important;
+    padding-left: 2.5rem !important; /* Increased left padding to move breadcrumb right */
+    padding-right: 2rem !important; /* Increased right padding to prevent profile from reaching edge */
+}
+
+/* Profile section positioning - ensure it stays within bounds */
+#navbar-main .flex.items-center.justify-end {
+    padding-right: 1rem !important; /* Additional right padding for profile section */
+}
+
+/* Profile avatar container - prevent edge positioning */
+#navbar-main .relative.flex.items-center.px-3 {
+    margin-right: 0.5rem !important; /* Additional margin to keep profile away from edge */
+}
+
+/* Sidebar toggle button styling */
+#sidebar-toggle-bottom {
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Rotate arrow when sidebar is collapsed */
+#sidebar.w-16 #sidebar-toggle-bottom i {
+    transform: rotate(180deg);
+}
+
+    .main-content.sidebar-collapsed #navbar-main {
+        left: 5.5rem !important; /* Adjust navbar position when sidebar collapsed */
+        width: calc(100vw - 5.5rem) !important;
+        max-width: calc(100vw - 5.5rem) !important;
+        overflow-x: hidden;
+    }
+
+    /* Ensure profile image in navbar is visible on all devices */
+    #navbar-main .relative.flex.items-center.px-2 {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Ensure profile section is visible on all screen sizes */
+    #navbar-main ul li {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Profile avatar styling for all devices */
+    #navbar-main .w-8.h-8 {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Profile dropdown modal - ensure it appears above content */
+    #navbar-main .group .absolute,
+    #navbar-main.scrolled .group .absolute {
+        z-index: 99999 !important; /* Ultra high z-index to appear above all content including scrolled navbar */
+        position: fixed !important; /* Use fixed positioning to prevent clipping */
+        top: 5rem !important; /* Position below navbar */
+        right: 2rem !important; /* Right margin from edge */
+        width: 20rem !important; /* Fixed width for desktop */
+        max-width: 20rem !important; /* Max width */
+        transform: none !important; /* Remove transform */
+        margin-top: 0 !important; /* Remove margin-top */
+    }
+
+    /* Ensure hover functionality works in scrolled state on desktop */
+    #navbar-main.scrolled .group:hover .absolute {
+        opacity: 1 !important;
+        transform: scale(1) !important;
+        pointer-events: auto !important;
+    }
+
+    /* Profile dropdown styling improvements */
+    #navbar-main .group .absolute.bg-white {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        min-width: 280px !important; /* Wider modal for better readability */
+        max-width: 320px !important;
+    }
+
+    /* Last Activity text styling */
+    #navbar-main .group .absolute .text-xs.text-gray-500 {
+        color: #6b7280 !important; /* Ensure text is visible */
+        font-weight: 500 !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Last Activity value styling */
+    #navbar-main .group .absolute .block.mt-1 {
+        color: #374151 !important; /* Darker color for better visibility */
+        font-weight: 600 !important;
+        font-size: 0.875rem !important; /* Slightly larger text */
+    }
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+@keyframes slidein {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* Modal backdrop styling */
+[modal-backdrop] {
+    display: none !important;
+    /* z-index: 60; */
+}
+
+/* Untuk Chrome, Safari, dan Edge */
+.custom-modal-wrapper [class*="overflow-y-auto"]::-webkit-scrollbar {
+    display: none;
+}
+
+/* Untuk Firefox */
+.custom-modal-wrapper [class*="overflow-y-auto"] {
+    scrollbar-width: none;
+}
+
+/* ===== Hide Sidebar Scrollbar ===== */
+/* Menargetkan elemen scroll di dalam #sidebar secara spesifik */
+#sidebar .overflow-y-auto::-webkit-scrollbar {
+    display: none; /* Untuk browser WebKit (Chrome, Safari, Edge) */
+}
+
+#sidebar .overflow-y-auto {
+    -ms-overflow-style: none;  /* Untuk Internet Explorer dan Edge (versi lama) */
+    scrollbar-width: none;  /* Untuk Firefox */
+}
+
+/* ===== Hide Main Content Scrollbar ===== */
+#main-content::-webkit-scrollbar {
+    display: none; /* Untuk browser WebKit (Chrome, Safari, Edge) */
+}
+
+#main-content {
+    -ms-overflow-style: none;  /* Untuk Internet Explorer dan Edge (versi lama) */
+    scrollbar-width: none;  /* Untuk Firefox */
+}
+
+/* --- Main Content Scrollbar --- */
+#main-content::-webkit-scrollbar {
+    display: none;
+}
+#main-content {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* [!code focus:start] */
+/* --- Global/Body Scrollbar --- */
+html::-webkit-scrollbar {
+    display: none; /* Untuk browser WebKit (Chrome, Safari, Edge) */
+}
+
+html {
+    -ms-overflow-style: none;  /* Untuk Internet Explorer dan Edge (versi lama) */
+    scrollbar-width: none;  /* Untuk Firefox */
+}
