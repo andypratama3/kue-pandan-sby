@@ -3,14 +3,20 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\RoleAndUserSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class AdminSmokeTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_admin_pages_render(): void
     {
+        $this->seed(RoleAndUserSeeder::class);
+
         $admin = User::role('admin')->first();
-        $this->assertNotNull($admin, 'No admin user found in database.');
+        $this->assertNotNull($admin, 'No admin user found after seeding.');
 
         $routes = [
             '/admin/orders',
