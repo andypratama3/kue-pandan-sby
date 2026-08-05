@@ -11,7 +11,7 @@
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div class="space-y-1">
                     <h2 class="text-xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
-                        <div class="w-9 h-9 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                        <div class="w-9 h-9 rounded-2xl bg-brand/10 text-brand-deep dark:text-brand-light flex items-center justify-center">
                             <i class="fas fa-users text-base"></i>
                         </div>
                         <span>Data Master Customer & Reseller</span>
@@ -28,13 +28,13 @@
                             <i class="fas fa-search text-xs text-slate-400"></i>
                         </div>
                         <input type="text" id="live-search-input" name="search" value="{{ request('search') }}"
-                            class="block w-full p-2.5 pl-10 text-xs text-slate-900 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-slate-800 dark:border-slate-700 dark:placeholder-slate-400 dark:text-white transition-all"
+                            class="block w-full p-2.5 pl-10 text-xs text-slate-900 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-brand focus:border-brand dark:bg-slate-800 dark:border-slate-700 dark:placeholder-slate-400 dark:text-white transition-all"
                             placeholder="Cari nama customer atau alamat...">
                     </div>
 
                     <!-- Add Button -->
                     <button type="button" data-target-modal="create-customer-modal"
-                        class="js-open-modal-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 rounded-2xl shadow-lg shadow-amber-500/25 transition-all hover:scale-105 active:scale-95">
+                        class="js-open-modal-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-brand to-brand-deep hover:from-brand-deep hover:to-brand-deep rounded-2xl shadow-lg shadow-brand-deep/25 transition-all hover:scale-105 active:scale-95">
                         <i class="fas fa-plus"></i>
                         <span>Tambah Customer Baru</span>
                     </button>

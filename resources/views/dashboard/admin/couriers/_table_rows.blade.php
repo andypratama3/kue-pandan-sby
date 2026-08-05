@@ -12,7 +12,7 @@
         <td class="px-4 py-3 text-right">
             <div class="relative inline-block">
                 <button data-target-dropdown="courier-actions-dropdown-{{ $courier->id }}"
-                    class="px-2 py-1 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg js-dropdown-toggle hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-2 focus:ring-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                    class="px-2 py-1 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg js-dropdown-toggle hover:bg-gray-100 hover:text-brand-deep focus:z-10 focus:ring-2 focus:ring-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
                     <i class="fas fa-ellipsis-v"></i>
                 </button>
                 <div id="courier-actions-dropdown-{{ $courier->id }}"

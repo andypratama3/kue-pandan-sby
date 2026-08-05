@@ -1,7 +1,7 @@
 <x-modal-custom id="showOrderModal" title="Rincian Pesanan" size="4xl">
     {{-- Loader saat data dimuat --}}
     <div id="showOrderModalLoader" class="p-8 text-center">
-        <svg class="w-8 h-8 mx-auto text-blue-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <svg class="w-8 h-8 mx-auto text-brand-deep animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         <p class="mt-4 text-lg font-medium text-gray-700 dark:text-gray-300">Memuat Detail Pesanan...</p>
     </div>
 
@@ -69,7 +69,7 @@
                 <div class="p-5 bg-white border border-gray-200 shadow-md dark:bg-gray-800 rounded-xl dark:border-gray-700">
                     <div id="singleTotalContainer-admin">
                         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Tagihan</label>
-                        <p id="showOrderModalTotalAmount-admin" class="text-2xl font-extrabold text-blue-600 dark:text-blue-500"></p>
+                        <p id="showOrderModalTotalAmount-admin" class="text-2xl font-extrabold text-brand-deep dark:text-brand tabular-nums"></p>
                     </div>
                     <div id="returnedTotalContainer-admin" class="hidden">
                         <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Tagihan</label>

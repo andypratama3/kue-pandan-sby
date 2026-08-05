@@ -29,7 +29,7 @@
             $iconClass = 'fas fa-cloud-sun text-amber-500';
         } else {
             $greeting = 'Selamat Malam';
-            $iconClass = 'fas fa-moon text-indigo-300';
+            $iconClass = 'fas fa-moon text-brand-light';
         }
     @endphp
 
@@ -119,7 +119,7 @@
                 <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Penjualan</span>
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center shadow-lg shadow-amber-500/20">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-light to-brand text-white flex items-center justify-center shadow-lg shadow-brand/20">
                             <i class="fas fa-shopping-cart text-sm"></i>
                         </div>
                     </div>
@@ -146,7 +146,7 @@
                 <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Rata-Rata/Bln</span>
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand-deep/20">
                             <i class="fas fa-chart-line text-sm"></i>
                         </div>
                     </div>
@@ -173,7 +173,7 @@
                 <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Customer</span>
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/20">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-light to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand-deep/20">
                             <i class="fas fa-users text-sm"></i>
                         </div>
                     </div>
@@ -200,7 +200,7 @@
                 <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">New Customer</span>
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand to-cyan-600 text-white flex items-center justify-center shadow-lg shadow-brand/20">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand-deep/20">
                             <i class="fas fa-user-plus text-sm"></i>
                         </div>
                     </div>
@@ -233,7 +233,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
                     <div>
                         <h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                            <div class="w-8 h-8 rounded-xl bg-brand/10 text-brand-deep dark:text-brand-light flex items-center justify-center">
                                 <i class="fas fa-chart-line text-sm"></i>
                             </div>
                             <span>Grafik Penjualan Pesanan</span>
@@ -245,14 +245,14 @@
 
                     <div class="flex items-center gap-3">
                         <div class="flex items-center gap-3 text-xs font-semibold">
-                            <span class="inline-flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
-                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Total: {{ $totalOrdersInRange }}
+                            <span class="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                                <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span> Total: {{ $totalOrdersInRange }}
                             </span>
                             <span class="inline-flex items-center gap-1.5 text-brand-deep dark:text-brand-light">
                                 <span class="w-2.5 h-2.5 rounded-full bg-brand"></span> Verif: {{ $totalVerifiedInRange }}
                             </span>
-                            <span class="inline-flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Retur: {{ $totalVerifiedWithReturnInRange }}
+                            <span class="inline-flex items-center gap-1.5 text-rose-600 dark:text-rose-400">
+                                <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Retur: {{ $totalVerifiedWithReturnInRange }}
                             </span>
                         </div>
 
@@ -265,13 +265,13 @@
                             <div x-show="openFilter" @click.away="openFilter = false" x-transition
                                 class="absolute right-0 z-30 w-44 mt-2 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 py-1 text-xs">
                                 <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'filter' => 'last_7_days'])) }}"
-                                    class="block px-4 py-2 font-medium {{ $filter === 'last_7_days' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">7 Hari Terakhir</a>
+                                    class="block px-4 py-2 font-medium {{ $filter === 'last_7_days' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">7 Hari Terakhir</a>
                                 <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'filter' => 'daily'])) }}"
-                                    class="block px-4 py-2 font-medium {{ $filter === 'daily' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Harian</a>
+                                    class="block px-4 py-2 font-medium {{ $filter === 'daily' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Harian</a>
                                 <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'filter' => 'weekly'])) }}"
-                                    class="block px-4 py-2 font-medium {{ $filter === 'weekly' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Mingguan</a>
+                                    class="block px-4 py-2 font-medium {{ $filter === 'weekly' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Mingguan</a>
                                 <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'filter' => 'monthly'])) }}"
-                                    class="block px-4 py-2 font-medium {{ $filter === 'monthly' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Bulanan</a>
+                                    class="block px-4 py-2 font-medium {{ $filter === 'monthly' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Bulanan</a>
                             </div>
                         </div>
                     </div>
@@ -287,7 +287,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
                     <div>
                         <h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                            <div class="w-8 h-8 rounded-xl bg-brand/10 text-brand-deep dark:text-brand-light flex items-center justify-center">
                                 <i class="fas fa-users text-sm"></i>
                             </div>
                             <span>Grafik Kunjungan Web</span>
@@ -298,8 +298,8 @@
                     </div>
 
                     <div class="flex items-center gap-3">
-                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-600 dark:text-purple-400">
-                            <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Total Kunjungan: {{ $totalVisitsInRange }}
+                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-deep dark:text-brand-light">
+                            <span class="w-2.5 h-2.5 rounded-full bg-brand"></span> Total Kunjungan: {{ $totalVisitsInRange }}
                         </span>
 
                         <div class="relative" x-data="{ openVisitFilter: false }">
@@ -310,13 +310,13 @@
                             <div x-show="openVisitFilter" @click.away="openVisitFilter = false" x-transition
                                 class="absolute right-0 z-30 w-44 mt-2 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 py-1 text-xs">
                                 <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'visit_filter' => 'last_7_days'])) }}"
-                                    class="block px-4 py-2 font-medium {{ $visitFilter === 'last_7_days' ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">7 Hari Terakhir</a>
+                                    class="block px-4 py-2 font-medium {{ $visitFilter === 'last_7_days' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">7 Hari Terakhir</a>
                                 <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'visit_filter' => 'daily'])) }}"
-                                    class="block px-4 py-2 font-medium {{ $visitFilter === 'daily' ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Harian</a>
+                                    class="block px-4 py-2 font-medium {{ $visitFilter === 'daily' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Harian</a>
                                 <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'visit_filter' => 'weekly'])) }}"
-                                    class="block px-4 py-2 font-medium {{ $visitFilter === 'weekly' ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Mingguan</a>
+                                    class="block px-4 py-2 font-medium {{ $visitFilter === 'weekly' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Mingguan</a>
                                 <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'visit_filter' => 'monthly'])) }}"
-                                    class="block px-4 py-2 font-medium {{ $visitFilter === 'monthly' ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Bulanan</a>
+                                    class="block px-4 py-2 font-medium {{ $visitFilter === 'monthly' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Bulanan</a>
                             </div>
                         </div>
                     </div>
@@ -426,8 +426,8 @@
                             {
                                 label: 'Total Pesanan',
                                 data: @json($chartDataTotal),
-                                borderColor: '#3b82f6',
-                                backgroundColor: 'rgba(59, 130, 246, 0.12)',
+                                borderColor: '#64748b',
+                                backgroundColor: 'rgba(100, 116, 139, 0.12)',
                                 fill: true,
                                 tension: 0.4,
                                 borderWidth: 2.5,
@@ -446,8 +446,8 @@
                             {
                                 label: 'Retur',
                                 data: @json($chartDataVerifiedWithReturn),
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.12)',
+                                borderColor: '#f43f5e',
+                                backgroundColor: 'rgba(244, 63, 94, 0.12)',
                                 fill: true,
                                 tension: 0.4,
                                 borderWidth: 2.5,
@@ -490,8 +490,8 @@
                         datasets: [{
                             label: 'Kunjungan Web',
                             data: @json($visitChartData),
-                            borderColor: '#8b5cf6',
-                            backgroundColor: 'rgba(139, 92, 246, 0.12)',
+                            borderColor: '#6f8f5f',
+                            backgroundColor: 'rgba(111, 143, 95, 0.12)',
                             borderWidth: 3,
                             tension: 0.4,
                             fill: true,

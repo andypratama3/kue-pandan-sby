@@ -6,7 +6,7 @@
         <div class="p-4 md:p-5">
             <label for="rejection_note" class="sr-only">Alasan Penolakan</label>
             <textarea id="rejection_note" name="rejection_note" rows="4"
-                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-brand focus:border-brand dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                 placeholder="Tuliskan alasan mengapa verifikasi pesanan ini ditolak..."></textarea> {{-- Atribut required dihapus --}}
         </div>
         <x-slot name="footer">

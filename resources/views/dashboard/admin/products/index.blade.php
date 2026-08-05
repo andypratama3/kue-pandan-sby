@@ -106,7 +106,7 @@
                                         <!-- Action Buttons -->
                                         <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700/80">
                                             <button type="button" data-target-modal="edit-product-modal-{{ $product->id }}"
-                                                class="js-open-modal-btn inline-flex items-center px-3 py-1.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 rounded-xl transition-colors">
+                                                class="js-open-modal-btn inline-flex items-center px-3 py-1.5 text-xs font-bold text-brand-deep bg-mint hover:bg-brand-light dark:bg-brand-deep/50 dark:text-brand-light rounded-xl transition-colors">
                                                 <i class="fas fa-edit mr-1.5"></i>Edit
                                             </button>
                                             <button type="button" data-target-modal="delete-product-modal-{{ $product->id }}"

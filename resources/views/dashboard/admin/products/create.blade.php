@@ -11,14 +11,14 @@
                     <div class="col-span-2">
                         <label for="create-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama Produk</label>
                         <input type="text" name="name" id="create-name" value="{{ old('name') }}"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5"
                             placeholder="Nama Produk (e.g., Kue Ijo)" required>
                     </div>
                     {{-- Kategori --}}
                     <div class="col-span-2 sm:col-span-1">
                         <label for="create-category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kategori</label>
                         <select id="create-category" name="category_id"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5">
                             @foreach ($categories as $category)
                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                             @endforeach
@@ -28,7 +28,7 @@
                     <div class="col-span-2 sm:col-span-1">
                         <label for="create-tag" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tag (Opsional)</label>
                         <input type="text" name="tag" id="create-tag" value="{{ old('tag') }}"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5"
                             placeholder="Tag (e.g., Ala Carte)">
                     </div>
                     {{-- Deskripsi --}}
@@ -59,7 +59,7 @@
                                 @endforeach
                             @endif
                         </div>
-                        <button type="button" id="add-create-variant-btn" class="w-full mt-2 text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Tambah Varian</button>
+                        <button type="button" id="add-create-variant-btn" class="w-full mt-2 text-white bg-brand hover:bg-brand-deep font-medium rounded-lg text-sm px-5 py-2.5 text-center">Tambah Varian</button>
                     </div>
                 </div>
             </div>

@@ -8,7 +8,7 @@
             <span
                 class="inline-block px-2 py-1 text-xs font-semibold rounded-full
                                         @switch($order->status)
-                                            @case('selesai') bg-blue-100 text-blue-800 @break
+                                            @case('selesai') bg-brand-light text-brand-deep @break
                                             @case('menunggu_verifikasi_admin') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 @break
                                             @case('diverifikasi_admin') bg-brand-light text-brand-deep @break
                                             @default bg-gray-100 text-gray-800
@@ -35,7 +35,7 @@
         <td class="px-4 py-2 text-center">
             @if ($order->note)
                 <button type="button"
-                    class="text-gray-500 js-open-modal-btn hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+                    class="text-gray-500 js-open-modal-btn hover:text-brand-deep dark:text-gray-400 dark:hover:text-brand-light"
                     data-target-modal="viewNoteModal" data-note="{{ $order->note }}" title="Lihat Catatan">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd"
@@ -51,7 +51,7 @@
             {{-- Tombol ini akan membuka modal verifikasi --}}
             @if ($order->status == 'selesai' || $order->status == 'menunggu_verifikasi_admin')
                 <button
-                    class="px-3 py-1 text-xs font-bold text-white bg-blue-600 rounded js-open-modal-btn hover:bg-blue-700"
+                    class="px-3 py-1 text-xs font-bold text-white bg-brand-deep rounded js-open-modal-btn hover:bg-brand"
                     data-target-modal="verifyOrderModal" data-order-id="{{ $order->id }}">
                     Verifikasi
                 </button>

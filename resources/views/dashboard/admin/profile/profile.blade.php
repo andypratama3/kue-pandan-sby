@@ -55,7 +55,7 @@
             <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm space-y-4">
                 <div>
                     <h3 class="text-base font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
-                        <i class="fas fa-lock text-amber-500"></i>
+                        <i class="fas fa-lock text-brand-deep"></i>
                         <span>Perbarui Kata Sandi</span>
                     </h3>
                     <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Gunakan kata sandi yang kuat dan unik demi keamanan akses admin.</p>
@@ -70,7 +70,7 @@
         <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm space-y-4">
             <div>
                 <h3 class="text-base font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
-                    <i class="fas fa-desktop text-blue-500"></i>
+                    <i class="fas fa-desktop text-brand"></i>
                     <span>Sesi Perangkat Terhubung</span>
                 </h3>
                 <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Kelola dan keluar dari sesi login perangkat lain jika diperlukan.</p>

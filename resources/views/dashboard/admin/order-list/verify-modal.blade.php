@@ -1,7 +1,7 @@
 <x-modal-custom id="verifyOrderModal" title="Verifikasi Rincian Pesanan" size="4xl">
     {{-- Loader saat data dimuat --}}
     <div id="verifyModalLoader" class="p-8 text-center">
-        <svg class="w-8 h-8 mx-auto text-blue-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+        <svg class="w-8 h-8 mx-auto text-brand-deep animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
             viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
             </circle>
@@ -85,7 +85,7 @@
                 <div
                     class="p-5 bg-white border border-gray-200 shadow-md dark:bg-gray-800 rounded-xl dark:border-gray-700">
                     <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Tagihan</label>
-                    <p id="verifyModalTotalAmount" class="text-2xl font-extrabold text-blue-600 dark:text-blue-500">
+                    <p id="verifyModalTotalAmount" class="text-2xl font-extrabold text-brand-deep dark:text-brand tabular-nums">
                     </p>
                 </div>
 
@@ -124,11 +124,11 @@
         <div
             class="flex items-center justify-end p-4 space-x-3 border-t border-gray-200 rounded-b md:p-5 dark:border-gray-600">
             <button id="btnOpenRejectModal" type="button"
-                class="px-5 py-2.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-red-600 dark:text-white dark:border-gray-600">
+                class="px-5 py-2.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-brand-deep focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-red-600 dark:text-white dark:border-gray-600">
                 Tolak
             </button>
             <button id="btnVerifyOrder" type="button"
-                class="px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                class="px-5 py-2.5 text-sm font-medium text-center text-white bg-brand-deep rounded-lg hover:bg-brand focus:ring-4 focus:outline-none focus:ring-brand-light dark:bg-brand dark:hover:bg-brand-deep dark:focus:ring-brand-light">
                 Verifikasi Pesanan
             </button>
         </div>

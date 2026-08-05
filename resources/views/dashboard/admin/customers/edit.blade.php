@@ -12,7 +12,7 @@
                         class="text-red-500">*</span></label>
                 <input type="text" name="company_name" id="edit-company_name-{{ $customer->id }}"
                     value="{{ old('company_name', $customer->company_name) }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
                     required>
             </div>
             {{-- Nama Customer --}}
@@ -22,7 +22,7 @@
                         class="text-red-500">*</span></label>
                 <input type="text" name="name" id="edit-name-{{ $customer->id }}"
                     value="{{ old('name', $customer->name) }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
                     required>
             </div>
             {{-- Kategori Customer --}}
@@ -31,7 +31,7 @@
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kategori <span
                         class="text-red-500">*</span></label>
                 <select name="customer_category_id" id="edit-customer_category_id-{{ $customer->id }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
                     required>
                     <option value="">Pilih Kategori</option>
                     @foreach ($customerCategories as $category)
@@ -45,7 +45,7 @@
             <div>
                 <label for="edit-added_by_user_id-{{ $customer->id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ditambahkan Oleh (Kurir) <span
                         class="text-red-500">*</span></label>
-                <select name="added_by_user_id" id="edit-added_by_user_id-{{ $customer->id }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500" required>
+                <select name="added_by_user_id" id="edit-added_by_user_id-{{ $customer->id }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500" required>
                     {{-- Opsi default bisa jadi Admin yang sedang login atau null jika tidak ada --}}
                     <option value="{{ Auth::user()->hasRole('admin') ? Auth::id() : '' }}">Pilih Penanggung Jawab</option>
                     @foreach ($couriers as $courier)
@@ -59,7 +59,7 @@
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Alamat <span
                         class="text-red-500">*</span></label>
                 <textarea name="address" id="edit-address-{{ $customer->id }}" rows="2"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
                     required>{{ old('address', $customer->address) }}</textarea>
             </div>
             {{-- Patokan Tempat --}}
@@ -69,7 +69,7 @@
                     (Opsional)</label>
                 <input type="text" name="landmark" id="edit-landmark-{{ $customer->id }}"
                     value="{{ old('landmark', $customer->landmark) }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500">
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500">
             </div>
             {{-- Nomor HP --}}
             <div>
@@ -93,7 +93,7 @@
                         class="text-red-500">*</span></label>
                 <input type="text" name="payment_type" id="edit-payment_type-{{ $customer->id }}"
                     value="{{ old('payment_type', $customer->payment_type) }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
                     required>
             </div>
             {{-- Jam Buka --}}
@@ -103,7 +103,7 @@
                         class="text-red-500">*</span></label>
                 <input type="text" name="opening_hours" id="edit-opening_hours-{{ $customer->id }}"
                     value="{{ old('opening_hours', $customer->opening_hours) }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500"
                     required>
             </div>
         </div>

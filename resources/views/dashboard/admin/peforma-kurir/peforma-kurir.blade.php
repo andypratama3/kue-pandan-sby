@@ -11,7 +11,7 @@
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div class="space-y-1">
                     <h2 class="text-xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
-                        <div class="w-9 h-9 rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center">
+                        <div class="w-9 h-9 rounded-2xl bg-brand/10 text-brand-deep dark:text-brand-light flex items-center justify-center">
                             <i class="fas fa-chart-bar text-base"></i>
                         </div>
                         <span>Peringkat Performa Pengiriman Kurir</span>
@@ -25,10 +25,10 @@
                     <div class="relative w-full sm:w-64">
                         <input type="text" name="daterange" id="daterange" value="{{ request('daterange') }}"
                             placeholder="Pilih Rentang Tanggal..."
-                            class="w-full px-3.5 py-2 text-xs font-semibold border border-slate-200 rounded-2xl bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-cyan-500"
+                            class="w-full px-3.5 py-2 text-xs font-semibold border border-slate-200 rounded-2xl bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-brand"
                             autocomplete="off">
                     </div>
-                    <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-700 rounded-2xl shadow-md transition-all">
+                    <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-brand hover:bg-brand-deep rounded-2xl shadow-md transition-all">
                         <i class="fas fa-filter"></i> Lihat
                     </button>
                 </form>
@@ -90,7 +90,7 @@
                                     </td>
                                     <td class="px-5 py-3.5 font-bold text-slate-800 dark:text-white">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-7 h-7 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 font-extrabold flex items-center justify-center text-[11px]">
+                                            <div class="w-7 h-7 rounded-full bg-brand-light dark:bg-brand-deep text-brand-deep dark:text-brand-light font-extrabold flex items-center justify-center text-[11px]">
                                                 {{ strtoupper(substr($row['nama_kurir'], 0, 1)) }}
                                             </div>
                                             <span>{{ $row['nama_kurir'] }}</span>

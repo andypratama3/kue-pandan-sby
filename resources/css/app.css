@@ -649,3 +649,9 @@ html {
     -ms-overflow-style: none;  /* Untuk Internet Explorer dan Edge (versi lama) */
     scrollbar-width: none;  /* Untuk Firefox */
 }
+
+/* Tabular numerals for data-dense admin tables */
+#main-content table {
+    font-variant-numeric: tabular-nums;
+}
+

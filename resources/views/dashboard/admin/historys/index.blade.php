@@ -18,7 +18,7 @@
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div class="space-y-1">
                     <h2 class="text-xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
-                        <div class="w-9 h-9 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                        <div class="w-9 h-9 rounded-2xl bg-brand/10 text-brand-deep dark:text-brand-light flex items-center justify-center">
                             <i class="fas fa-file-invoice text-base"></i>
                         </div>
                         <span>Riwayat Transaksi & Laporan PDF</span>
@@ -32,7 +32,7 @@
                     <div class="relative" x-data="{ openFilterDropdown: false }">
                         <button @click="openFilterDropdown = !openFilterDropdown" type="button"
                             class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 rounded-2xl transition-colors">
-                            <i class="fas fa-filter text-purple-500"></i>
+                            <i class="fas fa-filter text-brand"></i>
                             <span>Filter Periode</span>
                             <i class="fas fa-chevron-down text-[10px] opacity-70"></i>
                         </button>
@@ -42,7 +42,7 @@
                             <div>
                                 <label class="block mb-1 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase">Bulan</label>
                                 <select name="month"
-                                    class="w-full px-3 py-2 text-xs border rounded-xl focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                                    class="w-full px-3 py-2 text-xs border rounded-xl focus:ring-2 focus:ring-brand dark:bg-slate-700 dark:border-slate-600 dark:text-white">
                                     @foreach ($months as $num => $name)
                                         <option value="{{ $num }}" @if ($selectedMonth == $num) selected @endif>
                                             {{ $name }}
@@ -53,7 +53,7 @@
                             <div>
                                 <label class="block mb-1 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase">Kurir</label>
                                 <select name="courier"
-                                    class="w-full px-3 py-2 text-xs border rounded-xl focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                                    class="w-full px-3 py-2 text-xs border rounded-xl focus:ring-2 focus:ring-brand dark:bg-slate-700 dark:border-slate-600 dark:text-white">
                                     <option value="">Semua Kurir</option>
                                     @foreach ($couriers as $courier)
                                         <option value="{{ $courier['id'] }}" @if ($selectedCourier == $courier['id']) selected @endif>
@@ -65,7 +65,7 @@
                             <div>
                                 <label class="block mb-1 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase">Tahun</label>
                                 <select name="year"
-                                    class="w-full px-3 py-2 text-xs border rounded-xl focus:ring-2 focus:ring-purple-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                                    class="w-full px-3 py-2 text-xs border rounded-xl focus:ring-2 focus:ring-brand dark:bg-slate-700 dark:border-slate-600 dark:text-white">
                                     @foreach ($years as $year)
                                         <option value="{{ $year }}" @if ($selectedYear == $year) selected @endif>
                                             {{ $year }}
@@ -96,7 +96,7 @@
                             <i class="fas fa-search text-xs text-slate-400"></i>
                         </div>
                         <input type="text" id="live-search-input" name="search" value="{{ request('search') }}"
-                            class="block w-full p-2.5 pl-10 text-xs text-slate-900 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-slate-800 dark:border-slate-700 dark:placeholder-slate-400 dark:text-white transition-all"
+                            class="block w-full p-2.5 pl-10 text-xs text-slate-900 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-brand focus:border-brand dark:bg-slate-800 dark:border-slate-700 dark:placeholder-slate-400 dark:text-white transition-all"
                             placeholder="Cari invoice atau nama customer...">
                     </div>
                 </form>

@@ -12,7 +12,7 @@
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama Kurir</label>
                 <input type="text" name="name" id="name-{{ $courier->id }}"
                     value="{{ old('name', $courier->name) }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-brand dark:focus:border-brand"
                     required="">
             </div>
             <div class="col-span-2">
@@ -20,7 +20,7 @@
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
                 <input type="email" name="email" id="email-{{ $courier->id }}"
                     value="{{ old('email', $courier->email) }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-brand dark:focus:border-brand"
                     required="">
             </div>
             <div class="col-span-2 sm:col-span-1">
@@ -29,7 +29,7 @@
                     (Opsional)</label>
                 <div class="relative">
                     <input type="password" name="password" id="password-{{ $courier->id }}"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-brand dark:focus:border-brand">
                     <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 toggle-password">
                         <i class="text-gray-400 fas fa-eye"></i>
                     </button>
@@ -42,7 +42,7 @@
                     Password</label>
                 <div class="relative">
                     <input type="password" name="password_confirmation" id="password_confirmation-{{ $courier->id }}"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-brand dark:focus:border-brand">
                     <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 toggle-password">
                         <i class="text-gray-400 fas fa-eye"></i>
                     </button>

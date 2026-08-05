@@ -6,7 +6,7 @@
         @method('PUT')
         <div class="p-4 md:p-5">
             {{-- Area utama yang bisa di-scroll --}}
-            <div class.blade.php"overflow-y-auto max-h-[70vh] p-1">
+            <div class="overflow-y-auto max-h-[70vh] p-1">
                 <div class="grid grid-cols-2 gap-4">
                     {{-- Nama Produk, Kategori, Tag --}}
                     <div class="col-span-2"><label for="name-{{ $product->id }}" class="block mb-2 text-sm font-medium">Nama Produk</label><input type="text" name="name" value="{{ old('name', $product->name) }}" id="name-{{ $product->id }}" class="w-full p-2.5 text-sm bg-gray-50 rounded-lg border border-gray-300" required></div>
@@ -35,7 +35,7 @@
                                 <label class="block mb-2 text-sm font-medium">Status Produk</label>
                                 <label class="inline-flex items-center cursor-pointer">
                                     <input type="checkbox" name="is_active" value="1" class="sr-only peer" @checked(old('is_active', $product->is_active))>
-                                    <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand"></div>
                                     <span class="text-sm font-medium ms-3">Produk Aktif</span>
                                 </label>
                             </div>
@@ -65,7 +65,7 @@
                                 @endforeach
                             @endif
                         </div>
-                        <button type="button" class="w-full mt-2 text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 add-edit-variant-btn" data-product-id="{{ $product->id }}">Tambah Varian</button>
+                        <button type="button" class="w-full mt-2 text-white bg-brand hover:bg-brand-deep font-medium rounded-lg text-sm px-5 py-2.5 add-edit-variant-btn" data-product-id="{{ $product->id }}">Tambah Varian</button>
                     </div>
                 </div>
             </div>

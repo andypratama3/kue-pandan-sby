@@ -8,7 +8,7 @@
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama Toko <span
                         class="text-red-500">*</span></label>
                 <input type="text" name="company_name" id="create-company_name" value="{{ old('company_name') }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Contoh: Toko Kue Pandan Asli" required>
             </div>
             {{-- Nama Customer --}}
@@ -16,7 +16,7 @@
                 <label for="create-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama
                     Customer <span class="text-red-500">*</span></label>
                 <input type="text" name="name" id="create-name" value="{{ old('name') }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Masukkan nama customer" required>
             </div>
             {{-- Kategori Customer --}}
@@ -25,7 +25,7 @@
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kategori <span
                         class="text-red-500">*</span></label>
                 <select name="customer_category_id" id="create-customer_category_id"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                     required>
                     <option value="">Pilih Kategori</option>
                     @foreach ($customerCategories as $category)
@@ -38,7 +38,7 @@
             {{-- Ditambahkan Oleh (Kurir) --}}
             <div>
                 <label for="create-added_by_user_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ditambahkan Oleh (Kurir) <span class="text-red-500">*</span></label>
-                <select name="added_by_user_id" id="create-added_by_user_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500" required>
+                <select name="added_by_user_id" id="create-added_by_user_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500" required>
                     <option value="{{ Auth::id() }}">Saya Sendiri (Admin)</option>
                     @foreach ($couriers as $courier)
                         <option value="{{ $courier->id }}" {{ old('added_by_user_id') == $courier->id ? 'selected' : '' }}>{{ $courier->name }}</option>
@@ -50,7 +50,7 @@
                 <label for="create-address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Alamat
                     <span class="text-red-500">*</span></label>
                 <textarea name="address" id="create-address" rows="2"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Masukkan alamat lengkap" required>{{ old('address') }}</textarea>
             </div>
             {{-- Patokan Tempat --}}
@@ -59,7 +59,7 @@
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Patokan Tempat
                     (Opsional)</label>
                 <input type="text" name="landmark" id="create-landmark" value="{{ old('landmark') }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Contoh: Sebelah Indomaret, depan gang">
             </div>
             {{-- Nomor HP --}}
@@ -81,7 +81,7 @@
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jenis Pembayaran <span
                         class="text-red-500">*</span></label>
                 <input type="text" name="payment_type" id="create-payment_type" value="{{ old('payment_type') }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Contoh: Harian, Mingguan" required>
             </div>
             {{-- Jam Buka --}}
@@ -90,7 +90,7 @@
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jam Buka <span
                         class="text-red-500">*</span></label>
                 <input type="text" name="opening_hours" id="create-opening_hours" value="{{ old('opening_hours') }}"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Contoh: 08:00 - 17:00" required>
             </div>
             {{-- Note --}}
@@ -98,7 +98,7 @@
                 <label for="create-note" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Note
                     (Opsional)</label>
                 <textarea name="note" id="create-note" rows="3"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Catatan tambahan...">{{ old('note') }}</textarea>
             </div>
         </div>

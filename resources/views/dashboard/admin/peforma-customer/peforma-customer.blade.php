@@ -11,7 +11,7 @@
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div class="space-y-1">
                     <h2 class="text-xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
-                        <div class="w-9 h-9 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                        <div class="w-9 h-9 rounded-2xl bg-brand/10 text-brand-deep dark:text-brand-light flex items-center justify-center">
                             <i class="fas fa-chart-line text-base"></i>
                         </div>
                         <span>Peringkat & Performa Reseller</span>
@@ -22,17 +22,17 @@
                 </div>
 
                 <form method="GET" class="flex flex-wrap items-center gap-2.5">
-                    <select name="month" class="px-3 py-2 text-xs border border-slate-200 rounded-2xl bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 font-semibold">
+                    <select name="month" class="px-3 py-2 text-xs border border-slate-200 rounded-2xl bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-brand font-semibold">
                         @foreach($months as $num => $name)
                             <option value="{{ $num }}" @if($selectedMonth==$num) selected @endif>{{ $name }}</option>
                         @endforeach
                     </select>
-                    <select name="year" class="px-3 py-2 text-xs border border-slate-200 rounded-2xl bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 font-semibold">
+                    <select name="year" class="px-3 py-2 text-xs border border-slate-200 rounded-2xl bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:ring-2 focus:ring-brand font-semibold">
                         @foreach($years as $year)
                             <option value="{{ $year }}" @if($selectedYear==$year) selected @endif>{{ $year }}</option>
                         @endforeach
                     </select>
-                    <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-2xl shadow-md transition-all">
+                    <button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-brand hover:bg-brand-deep rounded-2xl shadow-md transition-all">
                         <i class="fas fa-filter"></i> Lihat
                     </button>
                     <a href="{{ route('admin.peforma-customer.export.pdf', ['month' => $selectedMonth, 'year' => $selectedYear]) }}" target="_blank"
@@ -105,7 +105,7 @@
                                         Rp {{ number_format($row->total_retur, 0, ',', '.') }}
                                     </td>
                                     <td class="px-5 py-3.5 text-center">
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-brand-light text-brand-deep dark:bg-brand-deep dark:text-brand-light">
                                             {{ $row->skor_akhir }}
                                         </span>
                                     </td>

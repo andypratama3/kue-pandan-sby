@@ -139,8 +139,8 @@
                                 datasets: [{
                                     label: 'Total Pesanan',
                                     data: data.chartData,
-                                    borderColor: '#3b82f6',
-                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    borderColor: '#64748b',
+                                    backgroundColor: 'rgba(100, 116, 139, 0.1)',
                                     fill: true,
                                     tension: 0.4,
                                 }, {

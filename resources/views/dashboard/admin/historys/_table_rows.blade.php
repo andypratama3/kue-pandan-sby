@@ -52,7 +52,7 @@
             <div class="relative inline-block text-left">
                 {{-- Tombol untuk membuka dropdown --}}
                 <button type="button"
-                    class="flex items-center justify-center w-8 h-8 text-gray-500 rounded-full js-dropdown-toggle hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:text-gray-400 dark:hover:bg-gray-700"
+                    class="flex items-center justify-center w-8 h-8 text-gray-500 rounded-full js-dropdown-toggle hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand dark:text-gray-400 dark:hover:bg-gray-700"
                     data-target-dropdown="actions-dropdown-{{ $order->id }}">
                     <span class="sr-only">Buka menu aksi</span>
                     <i class="fas fa-ellipsis-v"></i>
