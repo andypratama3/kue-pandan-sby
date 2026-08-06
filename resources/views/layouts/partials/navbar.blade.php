@@ -143,13 +143,20 @@
 
             {{-- Toggle Lightmode / Darkmode with Enhanced Design --}}
             <label id="theme-toggle-label-navbar" for="theme-toggle-checkbox-navbar"
-                class="relative z-40 inline-flex items-center cursor-pointer group shrink-0">
+                class="relative z-40 inline-flex items-center cursor-pointer group shrink-0" title="Mode gelap / terang">
                 <input type="checkbox" value="" id="theme-toggle-checkbox-navbar" class="sr-only peer">
-                <div class="h-[26px] bg-slate-200 dark:bg-slate-700 rounded-full w-12 peer dark:peer-checked:bg-slate-700 peer-checked:bg-brand-deep transition-colors border border-slate-300 dark:border-slate-600 shadow-inner"></div>
+                <div class="w-12 h-[26px] bg-slate-200 dark:bg-slate-700 rounded-full peer-checked:bg-brand-deep dark:peer-checked:bg-brand transition-colors duration-300 border border-slate-300 dark:border-slate-600 shadow-inner"></div>
                 <div
-                    class="absolute top-[2px] left-[2px] bg-white rounded-full h-[22px] w-[22px] transition-all peer-checked:translate-x-[22px] flex items-center justify-center shadow-md group-hover:scale-105">
-                    <i class="text-[10px] text-amber-500 peer-checked:hidden fas fa-sun group-hover:rotate-180 transition-transform duration-300"></i>
-                    <i class="text-[10px] text-brand-deep hidden peer-checked:block fas fa-moon"></i>
+                    class="absolute top-[2px] left-[2px] w-[22px] h-[22px] bg-white rounded-full flex items-center justify-center shadow-md transition-transform duration-300 ease-out peer-checked:translate-x-[22px] group-hover:scale-105">
+                    <div class="relative w-3.5 h-3.5">
+                        <svg class="absolute inset-0 w-full h-full text-amber-500 transition-all duration-300 rotate-0 scale-100 dark:rotate-90 dark:scale-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                            <circle cx="12" cy="12" r="4.5"></circle>
+                            <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"></path>
+                        </svg>
+                        <svg class="absolute inset-0 w-full h-full text-brand-deep dark:text-indigo-300 transition-all duration-300 rotate-90 scale-0 dark:rotate-0 dark:scale-100" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12.9 2.6a8.4 8.4 0 1 0 8.5 8.5 6.6 6.6 0 0 1-8.5-8.5Z"></path>
+                        </svg>
+                    </div>
                 </div>
             </label>
 
