@@ -9,7 +9,8 @@
 **Kue Pandan Asli** adalah aplikasi web berbasis **Laravel 10 + Livewire 3 + Tailwind CSS** yang digunakan untuk mendigitalisasi proses bisnis toko kue tradisional yang beroperasi dengan model **Reseller** (toko/kios yang menjual kembali) dan **Kurir** (tenaga pengantar sekaligus penagih pembayaran).
 
 Aplikasi ini berfungsi sebagai:
-- **Pusat data operasional** bagi Admin untuk memantau penjualan, mengelola master data, dan membuat laporan.
+- **Pusat kendali multi-cabang** bagi **Owner** untuk memantau & berpindah antar cabang (branch switcher), serta melihat ringkasan semua cabang dalam satu dashboard.
+- **Pusat data operasional** bagi Admin untuk memantau penjualan cabangnya, mengelola master data, dan membuat laporan.
 - **Platform pelaporan real-time** bagi Kurir untuk menginput pesanan dan memperbarui status pengiriman.
 
 ### 🔄 Alur Bisnis Unik
@@ -32,7 +33,7 @@ Pelanggan ──pesan via WhatsApp──▶ Kurir
 2. **Aksi Kurir** — Kurir menerima pesanan, mengelola pembayaran, lalu menginput data pesanan + bukti pengiriman/pembayaran ke aplikasi web.
 3. **Aksi Admin** — Admin mengkonfirmasi pesanan, mengelola master data (Kurir, Customer, Produk), membuat laporan harian (PDF), dan mengirim invoice ke tiap Reseller.
 
-### 🌏 Multi-Cabang (Multi-Region)
+### 🌏 Multi-Cabang (Multi-Region) & Owner
 
 Sistem mendukung **3 cabang/region** yang terisolasi data:
 | Region | Slug | Zona Waktu |
@@ -41,7 +42,10 @@ Sistem mendukung **3 cabang/region** yang terisolasi data:
 | Malang | `malang` | Asia/Jakarta (WIB) |
 | Denpasar | `denpasar` | Asia/Makassar (WITA) |
 
-Setiap user (admin & kurir) terikat ke satu `region_id`; semua data (produk, customer, order, laporan) difilter berdasarkan region.
+- Setiap user terikat ke satu `region_id` — **kecuali Owner** (`region_id = NULL`).
+- **Owner** dapat **berpindah cabang** lewat branch switcher di navbar (disimpan di session `selected_region_id`) dan melihat **ringkasan semua cabang** di dashboard (income hari ini, order, menunggu verifikasi, jumlah customer/kurir per cabang).
+- **Admin** selalu terisolasi di cabangnya sendiri — parameter slug di URL diabaikan (anti bocor data lintas cabang) dan **tidak bisa** menggunakan branch switcher.
+- **Isolasi data diperkuat**: semua tabel bisnis (users, customers, products, orders, order_returns, chatbot_conversations) memiliki `region_id` + index pendukung; harga pesanan diambil dari database cabang, bukan dari input klien.
 
 ---
 
@@ -56,7 +60,7 @@ Setiap user (admin & kurir) terikat ke satu `region_id`; semua data (produk, cus
 | Laravel Jetstream | ^4.3 | UI autentikasi + profile |
 | Laravel Sanctum | ^3.3 | API tokens / session auth |
 | Livewire | ^3.0 | Komponen interaktif (halaman homepage) |
-| Spatie Laravel Permission | ^6.21 | Role-based access control (`admin`, `kurir`) |
+| Spatie Laravel Permission | ^6.21 | Role-based access control (`owner`, `admin`, `kurir`) |
 | Barryvdh Laravel DomPDF | ^3.1 | Generate PDF (invoice, rekap, laporan) |
 | Intervention Image | ^3.11 | Kompresi gambar bukti pembayaran (JPG) |
 | Guzzle HTTP | ^7.2 | HTTP client (untuk webhook Meta/WhatsApp) |
@@ -94,15 +98,18 @@ web-app-toko-kue/
 │   │   ├── Controllers/
 │   │   │   ├── Admin/              # Courier, Order, PeformaKurir, PeformaCustomer, OldCustomer (legacy)
 │   │   │   ├── Kurir/              # Pesanan, OldKurirCustomer (legacy)
-│   │   │   ├── Chatbot/            # WebhookController (Meta WhatsApp)
-│   │   │   ├── AdminDashboardController.php
+│   │   │   ├── Chatbot/            # WebhookController (legacy) + WhatsAppWebhookController (aktif)
+│   │   │   ├── AdminDashboardController.php  # Dashboard admin/owner + switchRegion + branchSummary
 │   │   │   ├── KurirDashboardController.php
-│   │   │   ├── CustomerController.php      # CRUD customer (dipakai admin & kurir)
+│   │   │   ├── CustomerController.php      # CRUD customer (dipakai admin, owner & kurir)
 │   │   │   ├── HistoryOrderController.php  # History + invoice + export PDF
-│   │   │   ├── ProductController.php       # CRUD produk (admin)
+│   │   │   ├── ProductController.php       # CRUD produk (admin/owner) + katalog (kurir read-only)
 │   │   │   └── ReturnController.php        # Flow retur (kurir)
 │   │   ├── Middleware/             # Middleware bawaan Laravel
-│   │   └── Responses/LoginResponse.php     # Redirect post-login berdasarkan role
+│   │   ├── Responses/LoginResponse.php     # Redirect post-login berdasarkan role (incl. owner)
+│   │   └── Support/RegionContext.php       # Resolver cabang aktif per role (owner = session)
+│   ├── Services/WhatsApp/          # FonnteProvider, MetaCloudProvider, WhatsAppReplyService + DeepSeekService
+│   ├── Contracts/                  # WhatsAppProviderInterface
 │   ├── Livewire/Homepage.php       # Komponen homepage (toggle menu mobile)
 │   ├── Models/                     # 10 model Eloquent
 │   ├── Policies/DashboardPolicy.php # Kosong (belum diimplementasi)
@@ -110,8 +117,8 @@ web-app-toko-kue/
 │   └── View/Components/            # AppLayout, GuestLayout
 ├── config/                         # Konfigurasi Laravel + fortify/jetstream/permission
 ├── database/
-│   ├── migrations/                 # 28 file migrasi (Jul 2025 – Jan 2026)
-│   └── seeders/                    # RoleAndUser, Product, CustomerCategory, DatabaseSeeder
+│   ├── migrations/                 # 29 file migrasi (Jul 2025 – Agu 2026)
+│   └── seeders/                    # RoleAndUser (idempotent), Product, CustomerCategory, DatabaseSeeder
 ├── public/
 │   ├── assets/argon/               # Aset template Argon Dashboard
 │   └── assets/icon/                # Ikon admin/kurir + ikon notifikasi
@@ -139,22 +146,25 @@ web-app-toko-kue/
 
 | Tabel | Migrasi | Kolom Penting |
 |-------|---------|---------------|
-| `users` | 2014_10_12_000000 + update | name, email, password, region_id (FK), note, two_factor |
-| `roles` / `permissions` / `model_has_roles` | 2025_07_22_004736 (spatie) | Permission tables |
-| `regions` | 2025_08_01_082606 | name, slug |
-| `customers` | 2025_08_01_094446 + 3 update | name, company_name, address, landmark, phone, opening_hours, payment_type, note, region_id, customer_category_id, added_by_user_id (kurir penambah), is_flagged |
+| `users` | 2014_10_12_000000 + update | name, email, password, region_id (FK, index), note, two_factor |
+| `roles` / `permissions` / `model_has_roles` | 2025_07_22_004736 (spatie) | Permission tables (`owner`, `admin`, `kurir`) |
+| `regions` | 2025_08_01_082606 + 2026_08_07 | name, slug, **is_active** (flag cabang beroperasi) |
+| `customers` | 2025_08_01_094446 + 3 update | name, company_name, address, landmark, phone, opening_hours, payment_type, note, region_id (FK, index), customer_category_id, added_by_user_id (index), is_flagged |
 | `customer_categories` | (seeder) | name: `Reseller`, `Supermarket` |
 | `categories` | 2025_08_13_082903 | name, slug (`Produk`, `Hampers`, `Tumpeng`) |
-| `products` | 2025_07_28_035358 + 2 update | name, description, image_path, tag, is_active, category_id, region_id (kolom `price` asli dihapus — harga dipindah ke `product_variants`) |
-| `product_variants` | 2025_08_13_083055 + update | name, price, is_active (FK product_id) |
-| `orders` | 2025_08_15_050259 + 5 update | invoice_number (unique), customer_id, phone, address, payment_method, payment_proof, note, rejection_note, total_amount, status, created_by_user_id, region_id, paid_at, picked_up_at, delivered_at, received_by_buyer_at |
-| `order_items` | 2025_08_20_060447 | product_id, product_name, variant_id, variant_name, quantity, price, subtotal |
-| `order_returns` | 2025_08_31_150451 | order_id, courier_id, region_id, status, total_amount_returned, return_proof, reason, admin_notes |
-| `order_return_products` | 2025_08_31_150709 | product_id, product_variant_id, quantity, price, subtotal |
+| `products` | 2025_07_28_035358 + 2 update | name, description, image_path, tag, is_active (index), category_id, region_id (FK, index) |
+| `product_variants` | 2025_08_13_083055 + update | name, price, is_active (index, FK product_id) |
+| `orders` | 2025_08_15_050259 + 5 update | invoice_number (unique), customer_id (index), phone, address, payment_method, payment_proof, note, rejection_note, total_amount, status (index), created_by_user_id (index), region_id (index + komposit region_id,status), paid_at, picked_up_at, delivered_at, received_by_buyer_at |
+| `order_items` | 2025_08_20_060447 | product_id, product_name, variant_id, variant_name, quantity, price, subtotal (index order_id) |
+| `order_returns` | 2025_08_31_150451 | order_id (index), courier_id, region_id (index), status (index), total_amount_returned, return_proof, reason, admin_notes |
+| `order_return_products` | 2025_08_31_150709 | product_id, product_variant_id, quantity, price, subtotal (index order_return_id) |
 | `visit_logs` | 2026_01_07_103455 | ip_address, created_at (tracking visitor homepage) |
+| `chatbot_conversations` | 2026_08_06_000001 | provider, sender_number (index), sender_name, region_id (FK nullable, index), incoming_message, detected_intent, bot_reply, handled_by_ai |
 | `sessions` | 2025_07_14_094928 | Session database |
 | `personal_access_tokens` | 2019_12_14_000001 | Sanctum tokens |
 | `password_reset_tokens`, `failed_jobs` | Bawaan | — |
+
+> Migrasi **2026_08_07_000001_multi_branch_owner_support** menambah `regions.is_active` + index pendukung multi-cabang.
 
 ### Diagram Relasi Eloquent
 
@@ -193,17 +203,29 @@ Contoh: INV/050826/01/003/007/012
 ## 5. Manajemen Role & Autentikasi
 
 ### Role (Spatie Permission)
-- **`admin`** — Akses penuh modul admin di region-nya.
-- **`kurir`** — Akses modul kurir (pesanan, customer miliknya, history).
-- User tanpa region valid → `403 AKSES DITOLAK`.
+- **`owner`** — Akses penuh modul admin **tanpa terikat region**: berpindah cabang via branch switcher (session `selected_region_id`), dashboard berisi **Pantauan Semua Cabang**, semua data difilter sesuai cabang yang dipilih.
+- **`admin`** — Akses penuh modul admin **di region-nya sendiri** (slug URL diabaikan → anti bocor data antar cabang).
+- **`kurir`** — Akses modul kurir (pesanan, customer miliknya, history, katalog produk read-only).
+- User tanpa region valid → `403 AKSES DITOLAK` (kecuali owner).
+
+### Resolver Cabang (`app/Support/RegionContext.php`)
+Satu sumber kebenaran untuk menentukan cabang aktif:
+| Role | Cabang Aktif |
+|------|--------------|
+| admin | `user.region_id` (selalu) |
+| kurir | `user.region_id` (selalu) |
+| owner | `session('selected_region_id')` → fallback region aktif pertama |
+
+Digunakan oleh: dashboard, order, customer, produk, laporan, history, badge sidenav.
 
 ### Alur Login (custom `LoginResponse`)
 1. User login melalui halaman Jetstream/Fortify (`/login`).
 2. `LoginResponse` memeriksa `region` dan `role` user:
+   - Owner → `admin/dashboard/{slug-cabang-aktif}`
    - Admin → `admin/dashboard/{region-slug}`
    - Kurir → `kurir/dashboard/{region-slug}`
    - Tidak valid → fallback ke `fortify.home`
-3. Middleware protection: `auth:sanctum`, `jetstream.auth_session`, `verified`, lalu `role:admin` / `role:kurir` per group route.
+3. Middleware protection: `auth:sanctum`, `jetstream.auth_session`, `verified`, lalu `role:admin|owner` / `role:kurir` per group route.
 
 ### Autentikasi 2FA
 User model menggunakan `TwoFactorAuthenticatable` (Fortify) — 2FA tersedia.
@@ -222,12 +244,13 @@ User model menggunakan `TwoFactorAuthenticatable` (Fortify) — 2FA tersedia.
 ### Autentikasi
 | GET | `/dashboard` | Redirect berdasarkan role + region |
 
-### Admin (`/admin/*`, middleware `role:admin`)
+### Admin (`/admin/*`, middleware `role:admin|owner`)
 | Method | URI | Fungsi |
 |--------|-----|--------|
-| GET | `dashboard/{region}` | Dashboard dengan grafik penjualan & visitor |
-| GET/PUT | `profile` , `profile/password` | Kelola profil admin |
-| Resource | `products` | CRUD produk + varian |
+| GET | `switch-region/{region}` | **Ganti cabang (khusus owner)** — simpan `selected_region_id` di session |
+| GET | `dashboard/{region}` | Dashboard + grafik penjualan & visitor (+ **Pantauan Semua Cabang** untuk owner) |
+| GET/PUT | `profile` , `profile/password` | Kelola profil admin/owner |
+| Resource | `products` | CRUD produk + varian (admin/owner) |
 | Resource | `couriers` | CRUD kurir + `note` + `performance-data` (JSON chart) |
 | PUT/POST/Resource | `customers/...` | CRUD customer, update note, toggle flag |
 | GET | `customers/{customer}/rekap/download` | **Rekap order customer PDF** |
@@ -245,7 +268,7 @@ User model menggunakan `TwoFactorAuthenticatable` (Fortify) — 2FA tersedia.
 |--------|-----|--------|
 | GET | `dashboard/{region}` | Dashboard kurir (chart pesanan, kategori customer) |
 | GET/PUT | `profile`, `profile/password` | Profil kurir |
-| GET | `products` | Lihat produk (read-only) |
+| GET | `products` | **Katalog produk read-only** (harga resmi per cabang) |
 | Resource | `customers` | CRUD customer (hanya miliknya sendiri) |
 | GET | `pesanan` | Order tracking (filter status, search, warning belum bayar) |
 | GET | `pesanan/create` | Form pesanan baru |
@@ -264,8 +287,9 @@ User model menggunakan `TwoFactorAuthenticatable` (Fortify) — 2FA tersedia.
 | Method | URI | Fungsi |
 |--------|-----|--------|
 | GET | `/api/user` | User saat ini (Sanctum) |
-| GET | `/api/webhook/meta` | **Verifikasi webhook Meta (WhatsApp)** — `hub_challenge` |
-| POST | `/api/webhook/meta` | **Terima pesan webhook WhatsApp** (echo balasan sederhana) |
+| POST | `/api/webhook/whatsapp` | **Webhook WhatsApp generik (Fonnte)** — terima pesan + balas |
+| GET | `/api/webhook/whatsapp/meta` | **Verifikasi webhook Meta** — `hub_challenge` |
+| POST | `/api/webhook/whatsapp/meta` | **Terima pesan webhook Meta** + balas (throttle 60/menit) |
 
 ---
 
@@ -285,8 +309,9 @@ User model menggunakan `TwoFactorAuthenticatable` (Fortify) — 2FA tersedia.
 - **Perbandingan % change**: income hari ini vs kemarin; sales bulan ini vs bulan lalu; avg bulan ini vs bulan lalu; customer minggu ini vs minggu lalu.
 - **Grafik 1 (Penjualan)** — Chart.js: total order, order terverifikasi, order terverifikasi + retur. Filter: `daily`, `weekly`, `monthly`, `last_month`, `last_7_days`.
 - **Grafik 2 (Visitor)** — Chart.js: jumlah kunjungan homepage. Filter sama.
-- Income dihitung dengan pengurangan otomatis jika ada retur berstatus `selesai`.
+- Income dihitung dengan pengurangan otomatis jika ada retur berstatus `selesai` (`!= ditolak`).
 - Daftar kurir region (pagination terpisah).
+- **Owner**: section **"Pantauan Semua Cabang"** — ringkasan income/order/pending/customer/kurir per cabang + tombol buka cabang; semua statistik mengikuti cabang aktif (`RegionContext`), slug URL diabaikan untuk admin.
 
 ### 7.3 Dashboard Kurir (`KurirDashboardController`)
 - Statistik order kurir (total, selesai, retur) dengan chart per periode (`last_7_days`, `daily`, `weekly`, `monthly`).
@@ -378,11 +403,11 @@ Aturan:
   - **Admin** → jumlah pesanan berstatus `baru` di region-nya.
   - **Kurir** → jumlah pesanan miliknya yang memiliki `rejection_note` (ditolak admin) dan belum berstatus final (`selesai`/`diverifikasi_admin`).
 
-### 7.13 Chatbot WhatsApp (Meta Webhook)
-- `GET /api/webhook/meta` — verifikasi token (`META_VERIFY_TOKEN`) saat setup Meta.
-- `POST /api/webhook/meta` — menerima pesan masuk, log, membalas echo sederhana ("Halo, pesan kamu diterima: ...").
-- Helper `typeMessage()` mendukung payload: typing, reading, text, image, interactive button, location request, carousel (masih template dengan placeholder).
-- `detectIntent()` belum diimplementasi (kosong).
+### 7.13 Chatbot WhatsApp (Provider + Webhook)
+- **Arsitektur provider** (`Contracts/WhatsAppProviderInterface`): `FonnteProvider` (default, header token) & `MetaCloudProvider` (Graph API).
+- `POST /api/webhook/whatsapp` (generik; Fonnte) & `GET|POST /api/webhook/whatsapp/meta` — verifikasi `hub_challenge` + terima pesan masuk → simpan ke `chatbot_conversations` (region dideteksi dari `sender_number`) → deteksi intent → balas via `WhatsAppReplyService` (opsional DeepSeek untuk AI).
+- Helper `typeMessage()` mendukung payload: typing, reading, text, image, interactive button, location request, carousel.
+- **Legacy** `Chatbot/WebhookController` (Meta echo) sudah dinonaktifkan (route di-comment).
 
 ---
 
@@ -451,16 +476,19 @@ Berikut seluruh alur proses di dalam aplikasi, diurutkan dari alur bisnis tingka
 ```
 Login (/login) → Fortify autentikasi → LoginResponse (custom)
    │
+   ├── Role = owner → GET /admin/dashboard/{slug-cabang-aktif}
+   │       (session selected_region_id → fallback region aktif pertama;
+   │        navbar menampilkan branch switcher + Pantauan Semua Cabang)
    ├── Apakah user punya region (region.name tidak kosong)?
    │       │
    │       └─ TIDAK → redirect ke /dashboard (fortify.home)
    │
-   ├── Role = admin  → GET /admin/dashboard/{slug-region}
+   ├── Role = admin  → GET /admin/dashboard/{slug-region}   (slug diabaikan, pakai user.region_id)
    ├── Role = kurir  → GET /kurir/dashboard/{slug-region}
    └── Role lain / tak dikenal → fallback fortify.home
 ```
 
-- setiap halaman dashboard di-guard middleware `auth:sanctum`, `jetstream.auth_session`, `verified`, lalu per-group `role:admin` / `role:kurir`.
+- Setiap halaman dashboard di-guard middleware `auth:sanctum`, `jetstream.auth_session`, `verified`, lalu per-group `role:admin|owner` / `role:kurir`.
 - Logout manual: `POST /logout` → invalidate session → redirect `/login`.
 
 ### 8.3 Flow Checkout Pemesanan (Kurir)
@@ -469,19 +497,23 @@ Login (/login) → Fortify autentikasi → LoginResponse (custom)
 POST /kurir/orders/checkout  (PesananController::checkout)
    │
    1. Validasi request (customer, phone, address, payment_method, products JSON, bukti opsional)
-   2. Ambil kategori customer → hitung batas order aktif:
+   2. CEK KEPEMILIKAN: customer wajib milik kurir + region_id cocok → selain itu 404
+   3. Ambil kategori customer → hitung batas order aktif:
         • Reseller   → max 7 order aktif
         • Supermarket→ max 30 order aktif
         (order aktif = status != 'diverifikasi_admin')
         → jika melebihi batas → 422 & pesanan ditolak
-   3. DB::beginTransaction
-   4. Upload bukti bayar opsional → storage/public/payment_proofs
-   5. Buat Order (status default 'baru', total_amount = 0)
-   6. Generate nomor invoice:
+   4. HARGA & NAMA DARI DB (anti spoofing): tiap produk ditarik ulang —
+        ProductVariant::with('product')->where('is_active', true) + product.region_id = region kurir;
+        harga/varian/nama tidak pernah diambil dari payload klien (bukti test: 9000 vs 999)
+   5. DB::beginTransaction
+   6. Upload bukti bayar opsional → storage/public/payment_proofs
+   7. Buat Order (status default 'baru', total_amount = 0)
+   8. Generate nomor invoice:
         INV/{tanggal dmy}/{region2d}/{kurir3d}/{customer3d}/{urutan-harian3d}
-   7. Loop produk → buat OrderItem + hitung subtotal
-   8. Simpan items + update total_amount
-   9. DB::commit → JSON sukses {order_id, invoice_number}
+   9. Loop produk → buat OrderItem + hitung subtotal (round 2 desimal)
+   10. Simpan items + update total_amount
+   11. DB::commit → JSON sukses {order_id, invoice_number}
 ```
 
 ### 8.4 Flow Tracking / Update Status Pengiriman
@@ -595,15 +627,25 @@ History bulanan  : bulan + tahun → seluruh order diverifikasi_admin → PDF
                    (final_total sudah dikurangi retur)
 ```
 
-### 8.11 Flow Webhook Meta WhatsApp (Prototipe)
+### 8.11 Flow WhatsApp (Provider + Webhook Aktif)
 
 ```
-GET  /api/webhook/meta  → Meta memverifikasi hub_challenge (META_VERIFY_TOKEN)
-POST /api/webhook/meta  → terima payload pesan
-   → log, ekstrak from + text
-   → balas echo: "Halo, pesan kamu diterima: 'Halo...'"
-   (intent/parser masih kosong — prototipe)
+Pilihan provider via .env  (WA_DRIVER: fonnte | meta)
+   │
+   ├── FONNTE (default, header auth token): WhatsAppReplyService::send
+   │      → POST https://api.fonnte.com/send (WHATSAPP_FONNTE_TOKEN)
+   ├── META: Graph API (META_PHONE_NUMBER_ID, META_ACCESS_TOKEN)
+   │      → GET  /api/webhook/meta → hub_challenge (META_VERIFY_TOKEN)
+   │      → POST /api/webhook/meta → payload pesan
+   │
+   └── Webhook: POST /api/webhook/meta (Meta) / api/webhook/fonnte (Fonnte)
+       1. Validasi provider + simpan chatbot_conversations (region via sender_number)
+       2. deteksi intent → ChatbotReplyService / DeepSeekService (ai, opsional)
+       3. balas otomatis via provider aktif
+       4. WhatsAppReplyService (Fonnte): send_message(message, target, type: reply)
 ```
+
+> Implementasi: `Contracts/WhatsAppProviderInterface.php`, `Services/WhatsApp/{FonnteProvider,MetaCloudProvider,WhatsAppReplyService}.php` + `DeepSeekService.php`; webhook Meta dikontrak via `Chatbot/WhatsAppWebhookController.php`.
 
 > **Catatan**: Diagram menggunakan balok ASCII agar kompatibel di semua viewer; untuk render grafis (GitHub/GitLab) bagian `1. Alur Bisnis Unik` dan `7.8 Status Workflow` dapat diubah ke sintaks **Mermaid** (`stateDiagram-v2` / `flowchart TD`) jika diperlukan.
 
@@ -638,7 +680,9 @@ File disimpan sebagai `payment_proofs/{INV-dengan-dash}.jpg`.
 - `formatPhoneNumber()` — bersihkan non-digit, awalan `0`/`+62` → `62...`.
 
 ### Keamanan
-- RBAC via Spatie (`role:admin` / `role:kurir` middleware).
+- RBAC via Spatie (`role:admin|owner` — **wajib pipe `|`, bukan koma** (koma memicu error "Auth guard [owner] is not defined") — dan `role:kurir`).
+- **Isolasi cabang sentral** via `RegionContext::regionId()` — slug URL diabaikan untuk admin/kurir (anti bocor data antar cabang); owner hanya via session `selected_region_id`.
+- **Checkout anti spoofing**: harga/nama produk & varian diambil ulang dari DB per region; varian non-aktif / produk cabang lain ditolak; customer harus milik kurir yang sama.
 - Check kepemilikan data berlapis: region admin, `added_by_user_id` kurir, `created_by_user_id` order.
 - Validasi dengan FormRequest manual / Validator di controller.
 - File upload divalidasi (image, mime, max 2MB) & disimpan di `storage/app/public`.
@@ -655,16 +699,17 @@ File disimpan sebagai `payment_proofs/{INV-dengan-dash}.jpg`.
 
 ## 10. Seeder & Data Awal
 
-### `RoleAndUserSeeder`
-- Roles: `admin`, `kurir`.
-- Regions: Surabaya, Malang, Denpasar (dengan slug).
-- 6 akun default (password semua: `password`):
+### `RoleAndUserSeeder` (idempotent — `firstOrCreate`)
+- Roles: `owner`, `admin`, `kurir`.
+- Regions: Surabaya, Malang, Denpasar (slug + `is_active = true`).
+- 7 akun default (password semua: `password`):
 
 | Role | Email |
 |------|-------|
+| Owner | owner@kuepandanasli.com |
 | Admin Surabaya | pandanaslisbyadm@gmail.com |
 | Admin Malang | pandanaslimalangadm@gmail.com |
-| Admin Denpasar | pandanaslibaliadm@hmail.com (perhatikan typo `hmail`) |
+| Admin Denpasar | pandanaslibaliadm@gmail.com (typo `hmail` sebelumnya sudah diperbaiki) |
 | Kurir Surabaya | kurir.surabaya@example.com |
 | Kurir Malang | kurir.malang@example.com |
 | Kurir Denpasar | kurir.denpasar@example.com |
@@ -686,10 +731,14 @@ File disimpan sebagai `payment_proofs/{INV-dengan-dash}.jpg`.
 
 Variabel khusus aplikasi (selain Laravel standar):
 ```
-META_VERIFY_TOKEN=          # Token verifikasi webhook Meta
-META_PHONE_NUMBER_ID=       # ID nomor WhatsApp Business
-META_ACCESS_TOKEN=          # Access token Graph API
-META_VERSION=               # Versi Graph API (dibaca di WebhookController)
+WA_DRIVER=                 # fonnte | meta (provider WhatsApp aktif)
+WHATSAPP_FONNTE_TOKEN=     # token header Fonnte
+WHATSAPP_TOKEN=            # fallback token WhatsApp (reply service)
+META_VERIFY_TOKEN=         # Token verifikasi webhook Meta
+META_PHONE_NUMBER_ID=      # ID nomor WhatsApp Business
+META_ACCESS_TOKEN=         # Access token Graph API
+META_VERSION=              # Versi Graph API
+DEEPSEEK_API_KEY=          # (opsional) AI untuk balasan bot
 ```
 
 Konfigurasi utama lainnya: database MySQL, session database, mail (mailpit default), filesystem local/public.
@@ -720,7 +769,12 @@ php artisan storage:link
 
 ## 13. Testing
 
-- `tests/Feature/*` — test bawaan Jetstream: Authentication, Registration, TwoFactor, ApiToken, Profile, PasswordReset, dll. (tidak ada test khusus modul bisnis).
+- `tests/Feature/*` — test bawaan Jetstream (Authentication, Registration, TwoFactor, ApiToken, Profile, PasswordReset) + **test modul bisnis**:
+  - `AdminSmokeTest.php` — login admin + akses semua halaman admin region (response 200).
+  - `OwnerMultiBranchTest.php` — owner switch branch & scope data, admin tidak bisa switch & tetap terisolasi, katalog kurir read-only, checkout menolak customer lintas cabang, **harga checkout dihitung dari DB** (payload 999 → total aktual 18000).
+  - `IsolationRegressionTest.php` — owner verify/reject/destroy order & history, invoice lintas cabang 403, admin view untuk owner, flag/rekap lintas cabang 403, last-order lintas cabang kosong, retur order kurir lain 403.
+  - `WhatsAppProviderParseTest.php`, `WhatsAppWebhookTest.php` — parsing & webhook WhatsApp provider.
+- Status saat ini: **62 passed / 7 skipped**, `npm run build` sukses, Pint sudah dijalankan di file yang berubah.
 - `phpunit.xml` sudah dikonfigurasi.
 - `barryvdh/laravel-debugbar` tersedia di dev untuk debugging.
 
@@ -728,27 +782,35 @@ php artisan storage:link
 
 ## 14. Catatan, Kelemahan & Potensi Perbaikan
 
+> **Sudah diperbaiki di sesi ini** (tidak lagi menjadi temuan aktif): kebocoran data antar cabang via slug URL; `ProductController` memblokir akses kurir ke katalog (403); logika income admin yang salah (tidak mengurangkan retur `selesai`); filter `PeformaCustomer`/`PeformaKurir` yang menampilkan data non-verifikasi / retur ditolak; modal detail history admin yang tidak kompatibel dengan template; `paid_at` yang tidak konsisten saat reject; duplikat nama produk per cabang; typo email admin Denpasar (`hmail`); seeder yang tidak idempotent.
+
+> **Cross-check lebih dalam (sesi lanjutan)** — isolasi owner/kurir diperkuat:
+> - `Admin/OrderController` (verify/reject/destroy, previously pakai `$admin->region_id` = NULL untuk owner → kini `RegionContext::regionId()`, owner bisa memverifikasi/tolak/hapus di cabang aktif); `destroy` kini return 404 utk order di luar region.
+> - `HistoryOrderController::destroy` ikut di-scope region; `invoice` & `downloadInvoice` kini di-guard `assertRegionAccess` (sebelumnya boleh diakses lintas cabang); route detail fix dari `admin.admin.historys.details` → `admin.historys.details`.
+> - `CustomerController`: helper `isAdminLike()` (admin|owner) dipakai utk pilih **view & route redirect** (sebelumnya owner dapat view/redirect kurir → 403 pasca CRUD); `toggleFlag` kini cek region; `downloadRekap` precedence fix `&&`.
+> - `Kurir/PesananController::getLastOrder` kini di-scope `region_id + created_by_user_id` (sebelumnya bocor item order customer cabang lain).
+> - `ReturnController` (requestReturn/uploadReturnProof/editReturn) kini `assertOwnOrder()` — sebelumnya kurir mana pun bisa retur order kurir lain.
+> - `destroy` di Order/History replacement 404; Tests: `IsolationRegressionTest.php` (7 test) untuk seluruh celah tersebut (owner verify/reject/destroy, invoice lintas cabang 403, customer view owner, flag/rekap lintas cabang 403, last-order lintas cabang kosong, retur order kurir lain 403).
+
 | No | Temuan |
 |----|--------|
 | 1 | **Kode legacy duplikat**: `Admin/OldCustomerController.php` & `Kurir/OldKurirCustomerController.php` tidak terpakai (route memakai `CustomerController` root) — bisa dihapus. |
 | 2 | **Komentar artifact** `[!code ...]` dari editor (VS Code highlight) tersebar di banyak file. |
 | 3 | `Policies/DashboardPolicy.php` kosong; otorisasi di-handle manual via `hasRole` checks + middleware. |
-| 4 | `WebhookController` masih prototipe: balasan echo saja, `detectIntent()` kosong, payload carousel berisi placeholder (`<URL_BUTTON_LABEL>`). |
+| 4 | `Chatbot/WebhookController.php` (legacy Meta) masih prototipe: balasan echo, `detectIntent()` kosong, payload carousel placeholder — **kode aktif ada di `WhatsAppWebhookController` + `WhatsAppReplyService`**. |
 | 5 | `app/Http/Controllers/Admin/OldCustomerController.php` didefinisikan dengan namespace `App\Http\Controllers\Admin` tapi kelas bernama `CustomerController` (konflik potensial naming). |
 | 6 | Route `request-return/edit` punya dua definisi (POST + GET) dengan nama route sama (`requestReturn`) — GET hanya me-render view edit tanpa data. |
-| 7 | `RoleAndUserSeeder` email admin Denpasar mengandung typo (`hmail.com`). |
-| 8 | Seeder produk tidak menyertakan `region_id` (produk seeder tidak terikat region tertentu). |
-| 9 | `Homepage.php` mereferensi properti `$this->testimonials` yang tidak didefinisikan (tidak error fatal karena view menangani fallback). |
-| 10 | Penggunaan `env()` langsung di `WebhookController::__construct` (sebaiknya `config()`). |
-| 11 | Grafik visitor & statistik lain tidak difilter region (visitor log global, bukan per region). |
-| 12 | Fitur `peforma-kurir/{kurir}` dan `peforma-customer/{customer}` (show detail) masih stub kosong. |
-| 13 | Tidak ada soft deletes untuk Order/Product (penghapusan permanen, dilindungi constraint). |
-| 14 | Tidak ada integrasi email/notification — invoice & laporan hanya via **download PDF** (kontras dengan klaim README "kirim invoice"). |
-| 15 | Badge notifikasi sidenav (AppServiceProvider) hanya menghitung dari kolom status `baru`/`rejection_note`, bukan sistem notifikasi terpisah. |
-| 16 | Konfigurasi `config/app.php` masih default: `timezone => UTC`, `locale => en`. Zona waktu per-cabang hanya di-handle manual via helper Carbon di controller (nama bulan Indonesia di view dibuat manual via array, bukan localization). |
+| 7 | Seeder produk tidak menyertakan `region_id` (produk seeder tidak terikat region tertentu). |
+| 8 | `Homepage.php` mereferensi properti `$this->testimonials` yang tidak didefinisikan (tidak error fatal karena view menangani fallback). |
+| 9 | Grafik visitor tidak difilter region (visitor log global, bukan per region). |
+| 10 | Fitur `peforma-kurir/{kurir}` dan `peforma-customer/{customer}` (show detail) masih stub kosong. |
+| 11 | Tidak ada soft deletes untuk Order/Product (penghapusan permanen, dilindungi constraint). |
+| 12 | Tidak ada integrasi email/notification — invoice & laporan hanya via **download PDF** (kontras dengan klaim README "kirim invoice"). |
+| 13 | Badge notifikasi sidenav (AppServiceProvider) hanya menghitung dari kolom status `baru`/`rejection_note`, bukan sistem notifikasi terpisah. |
+| 14 | Konfigurasi `config/app.php` masih default: `timezone => UTC`, `locale => en`. Zona waktu per-cabang hanya di-handle manual via helper Carbon di controller (nama bulan Indonesia di view dibuat manual via array, bukan localization). |
 
 ---
 
 ## 15. Ringkasan Eksekutif
 
-**Kue Pandan Asli** adalah sistem ERP ringan berbasis Laravel 10 untuk toko kue tradisional multi-cabang (Surabaya, Malang, Denpasar) dengan model bisnis **reseller + kurir**. Kurir bertindak sebagai ujung tombak (input pesanan, terima pembayaran, tracking status, retur), sementara admin melakukan verifikasi, mengelola master data, dan menghasilkan laporan PDF (history bulanan, invoice per order, rekap per customer, ranking performa kurir, dan skoring performa reseller). Aplikasi sudah memiliki: RBAC dua role, isolasi data per region, timezone handling per cabang, kompresi gambar bukti pembayaran, fitur retur lengkap, pelacakan visitor homepage, integrasi awal webhook WhatsApp (Meta), dan dashboard analitik berbasis Chart.js. Beberapa area masih prototipe (chatbot, detail performa) dan ada kode legacy yang bisa dibersihkan.
+**Kue Pandan Asli** adalah sistem ERP ringan berbasis Laravel 10 untuk toko kue tradisional multi-cabang (Surabaya, Malang, Denpasar) dengan model bisnis **reseller + kurir**. Kurir bertindak sebagai ujung tombak (input pesanan, terima pembayaran, tracking status, retur), sementara admin melakukan verifikasi, mengelola master data, dan menghasilkan laporan PDF (history bulanan, invoice per order, rekap per customer, ranking performa kurir, dan skoring performa reseller). Aplikasi sudah memiliki: **RBAC tiga role (`owner`, `admin`, `kurir`)**, **branch switcher owner + ringkasan semua cabang**, **isolasi data per region yang diperkuat** (`RegionContext`, harga checkout anti-spoofing dari DB), timezone handling per cabang, kompresi gambar bukti pembayaran, fitur retur lengkap, pelacakan visitor homepage, integrasi WhatsApp dua provider (Fonnte default + Meta Cloud) dengan balasan otomatis/DeepSeek, dan dashboard analitik berbasis Chart.js. Beberapa area masih prototipe (detail performa, kode legacy) yang bisa dibersihkan; semua temuan kritis terkait multi-cabang sudah diperbaiki dan diuji (55 test pass).
