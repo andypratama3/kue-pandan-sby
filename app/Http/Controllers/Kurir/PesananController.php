@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderReturn;
 use App\Models\OrderReturnProduct;
+use App\Models\ProductVariant;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -40,7 +41,7 @@ class PesananController extends Controller
     {
         $user = Auth::user();
         // Fallback ke timezone default jika user tidak memiliki region_id
-        if (!$user || is_null($user->region_id)) {
+        if (! $user || is_null($user->region_id)) {
             return config('app.timezone', 'UTC');
         }
 
@@ -57,8 +58,6 @@ class PesananController extends Controller
 
     /**
      * Mendapatkan objek Carbon dengan waktu saat ini sesuai zona waktu pengguna.
-     *
-     * @return \Carbon\Carbon
      */
     private function nowInUserTimezone(): Carbon
     {
@@ -71,7 +70,6 @@ class PesananController extends Controller
      * Menampilkan halaman daftar pesanan (Order Tracking) dengan fitur pencarian dan filter status.
      * Fungsi ini menangani permintaan GET awal dan permintaan AJAX untuk pencarian.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
@@ -107,9 +105,10 @@ class PesananController extends Controller
 
         // Validasi jika kurir tidak memiliki region
         if (is_null($loggedInUser->region_id)) {
-            Log::warning('User ' . $loggedInUser->id . ' does not have a region_id.');
+            Log::warning('User '.$loggedInUser->id.' does not have a region_id.');
             $error = 'Region Anda tidak terdaftar. Silakan hubungi administrator.';
             $orders = new LengthAwarePaginator([], 0, 10);
+
             return view('dashboard.kurir.pesanan.index', compact('orders', 'error', 'statusLabelMap', 'filterableStatuses', 'activeStatus'));
         }
 
@@ -153,12 +152,14 @@ class PesananController extends Controller
                 $viewData = compact('orders', 'statusLabelMap');
                 $desktopHtml = view('dashboard.kurir.pesanan._table_rows', $viewData)->render();
                 $mobileHtml = view('dashboard.kurir.pesanan._card_view', $viewData)->render();
+
                 return response()->json(['desktop_html' => $desktopHtml, 'mobile_html' => $mobileHtml]);
             }
         } catch (\Exception $e) {
-            Log::error('Error fetching orders for courier ' . $loggedInUser->id . ': ' . $e->getMessage());
+            Log::error('Error fetching orders for courier '.$loggedInUser->id.': '.$e->getMessage());
             $error = 'Gagal memuat pesanan. Terjadi kesalahan pada server.';
             $orders = new LengthAwarePaginator([], 0, 10);
+
             return view('dashboard.kurir.pesanan.index', compact('orders', 'error', 'statusLabelMap', 'filterableStatuses', 'activeStatus'));
         }
 
@@ -186,7 +187,6 @@ class PesananController extends Controller
     /**
      * Memproses dan menyimpan data pesanan baru yang dikirim dari formulir checkout.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function checkout(Request $request)
@@ -206,16 +206,25 @@ class PesananController extends Controller
             return response()->json(['message' => 'Validasi gagal', 'errors' => $e->errors()], 422);
         }
 
-        $customer = Customer::with('category')->find($validated['customer_id']);
-        if (!$customer) {
-            return response()->json(['message' => 'Customer tidak ditemukan.'], 404);
+        $loggedInUser = Auth::user();
+
+        // Cek kepemilikan customer: kurir hanya bisa menginput untuk customer di cabangnya
+        $customer = Customer::with('category')
+            ->where('id', $validated['customer_id'])
+            ->where('region_id', $loggedInUser->region_id)
+            ->first();
+        if (! $customer) {
+            return response()->json(['message' => 'Customer tidak ditemukan. Customer bukan milik cabang Anda.'], 404);
         }
 
         // Cek batas maksimal pesanan aktif berdasarkan kategori customer
         $categoryName = strtolower($customer->category->name ?? '');
         $maxOrder = 0;
-        if ($categoryName === 'reseller') $maxOrder = 7;
-        elseif ($categoryName === 'supermarket') $maxOrder = 30;
+        if ($categoryName === 'reseller') {
+            $maxOrder = 7;
+        } elseif ($categoryName === 'supermarket') {
+            $maxOrder = 30;
+        }
 
         if ($maxOrder > 0) {
             $activeOrderCount = Order::where('customer_id', $customer->id)
@@ -225,6 +234,7 @@ class PesananController extends Controller
 
             if ($activeOrderCount >= $maxOrder) {
                 $message = "Batas maksimal pesanan aktif untuk customer kategori {$categoryName} adalah {$maxOrder}. Pesanan sebelumnya harus diverifikasi admin terlebih dahulu.";
+
                 return response()->json(['message' => $message], 422);
             }
         }
@@ -239,7 +249,6 @@ class PesananController extends Controller
 
             $loggedInUser = Auth::user();
             $currentTime = $this->nowInUserTimezone();
-
             // Buat instance Order baru
             $order = new Order([
                 'customer_id' => $validated['customer_id'],
@@ -270,21 +279,43 @@ class PesananController extends Controller
             $order->invoice_number = $invoiceNumber;
 
             // Proses produk/item yang dipesan
+            // Harga, nama produk, dan varian DIAMBIL DARI DATABASE (cabang kurir),
+            // bukan dari input klien, agar total pesanan selalu akurat.
             $products = json_decode($validated['products'], true);
             $totalAmount = 0;
             $orderItems = [];
 
             foreach ($products as $product) {
-                $subtotal = $product['quantity'] * $product['price'];
+                $productId = (int) ($product['product_id'] ?? 0);
+                $variantId = isset($product['variant_id']) && $product['variant_id'] !== '' && $product['variant_id'] !== null
+                    ? (int) $product['variant_id']
+                    : null;
+                $quantity = max(1, (int) ($product['quantity'] ?? 0));
+
+                $variantQuery = ProductVariant::with('product')
+                    ->where('is_active', true)
+                    ->whereHas('product', function ($q) use ($loggedInUser, $productId) {
+                        $q->where('id', $productId)
+                            ->where('region_id', $loggedInUser->region_id);
+                    });
+
+                $variant = $variantQuery->when($variantId, fn ($q) => $q->where('id', $variantId))->first();
+
+                if (! $variant) {
+                    throw new \Exception('Produk atau varian tidak valid untuk cabang ini.');
+                }
+
+                $price = (float) $variant->price;
+                $subtotal = $quantity * $price;
                 $totalAmount += $subtotal;
 
                 $orderItems[] = new OrderItem([
-                    'product_id' => $product['product_id'],
-                    'product_name' => $product['product_name'],
-                    'variant_id' => $product['variant_id'] ?? null,
-                    'variant_name' => $product['variant_name'] ?? null,
-                    'quantity' => $product['quantity'],
-                    'price' => $product['price'],
+                    'product_id' => $variant->product_id,
+                    'product_name' => $variant->product->name,
+                    'variant_id' => $variant->id,
+                    'variant_name' => $variant->name,
+                    'quantity' => $quantity,
+                    'price' => $price,
                     'subtotal' => $subtotal,
                 ]);
             }
@@ -303,7 +334,8 @@ class PesananController extends Controller
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Checkout failed: ' . $e->getMessage());
+            Log::error('Checkout failed: '.$e->getMessage());
+
             return response()->json(['message' => 'Gagal menyimpan pesanan. Terjadi kesalahan internal.'], 500);
         }
     }
@@ -311,12 +343,12 @@ class PesananController extends Controller
     /**
      * Mengambil dan menampilkan detail lengkap dari sebuah pesanan.
      *
-     * @param  int  $id ID Pesanan
+     * @param  int  $id  ID Pesanan
      * @return \Illuminate\Http\JsonResponse
      */
     public function getOrderDetails($id)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['message' => 'Tidak terautentikasi'], 401);
         }
 
@@ -337,8 +369,11 @@ class PesananController extends Controller
                 $paidAtLocal = $order->paid_at->copy()->setTimezone($timezone)->startOfDay();
                 $diffInDays = $createdAtLocal->diffInDays($paidAtLocal);
 
-                if ($diffInDays == 1) $paidAtLabel = ' (Harian)';
-                elseif ($diffInDays >= 2 && $diffInDays <= 7) $paidAtLabel = ' (Mingguan)';
+                if ($diffInDays == 1) {
+                    $paidAtLabel = ' (Harian)';
+                } elseif ($diffInDays >= 2 && $diffInDays <= 7) {
+                    $paidAtLabel = ' (Mingguan)';
+                }
 
                 $paidAtFormatted = $order->paid_at->isoFormat('D MMMM YYYY, HH:mm');
             }
@@ -403,7 +438,8 @@ class PesananController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'Pesanan tidak ditemukan.'], 404);
         } catch (\Exception $e) {
-            Log::error('Error fetching order details for order ID ' . $id . ': ' . $e->getMessage());
+            Log::error('Error fetching order details for order ID '.$id.': '.$e->getMessage());
+
             return response()->json(['message' => 'Terjadi kesalahan internal.'], 500);
         }
     }
@@ -411,13 +447,12 @@ class PesananController extends Controller
     /**
      * Memproses pengajuan pengembalian barang (retur) untuk sebuah pesanan.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id ID Pesanan
+     * @param  int  $id  ID Pesanan
      * @return \Illuminate\Http\JsonResponse
      */
     public function requestReturn(Request $request, $id)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['message' => 'Tidak terautentikasi'], 401);
         }
 
@@ -440,7 +475,7 @@ class PesananController extends Controller
             $currentTime = $this->nowInUserTimezone();
 
             // Buat record OrderReturn baru
-            $orderReturn = new OrderReturn();
+            $orderReturn = new OrderReturn;
             $orderReturn->order_id = $order->id;
             $orderReturn->status = 'menunggu_verifikasi_admin';
             $orderReturn->created_at = $currentTime;
@@ -450,7 +485,7 @@ class PesananController extends Controller
             $totalReturnValue = 0;
             // Loop melalui setiap produk yang ingin diretur
             foreach ($validated['return_quantities'] as $key => $returnQty) {
-                list($productId, $variantId) = explode('-', $key);
+                [$productId, $variantId] = explode('-', $key);
                 $variantId = ($variantId == 0) ? null : $variantId;
 
                 $orderItem = $order->items()
@@ -458,8 +493,8 @@ class PesananController extends Controller
                     ->where('variant_id', $variantId)
                     ->first();
 
-                if (!$orderItem || $returnQty > $orderItem->quantity) {
-                    throw new \Exception("Kuantitas retur tidak valid untuk produk: " . ($orderItem->product_name ?? 'N/A'));
+                if (! $orderItem || $returnQty > $orderItem->quantity) {
+                    throw new \Exception('Kuantitas retur tidak valid untuk produk: '.($orderItem->product_name ?? 'N/A'));
                 }
 
                 $subtotalReturn = $returnQty * $orderItem->price;
@@ -488,43 +523,44 @@ class PesananController extends Controller
 
             return response()->json([
                 'message' => 'Permintaan retur berhasil diajukan.',
-                'order' => ['status' => 'menunggu_retur']
+                'order' => ['status' => 'menunggu_retur'],
             ], 200);
         } catch (ValidationException $e) {
             DB::rollBack();
+
             return response()->json(['message' => 'Data tidak valid.', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error processing return request for order ID ' . $id . ': ' . $e->getMessage());
-            return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            Log::error('Error processing return request for order ID '.$id.': '.$e->getMessage());
+
+            return response()->json(['message' => 'Terjadi kesalahan: '.$e->getMessage()], 500);
         }
     }
 
     /**
      * Mengunggah bukti pembayaran untuk sebuah pesanan.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id ID Pesanan
+     * @param  int  $id  ID Pesanan
      * @return \Illuminate\Http\JsonResponse
      */
     public function uploadPaymentProof(Request $request, $id)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['message' => 'Tidak terautentikasi'], 401);
         }
 
         try {
             $request->validate([
-                'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+                'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             ]);
 
             $order = Order::where('id', $id)
                 ->where('created_by_user_id', Auth::id())
                 ->firstOrFail();
 
-            if (!in_array($order->status, ['diterima_pembeli', 'selesai'])) {
+            if (! in_array($order->status, ['diterima_pembeli', 'selesai'])) {
                 return response()->json([
-                    'message' => 'Bukti pembayaran hanya bisa diunggah setelah pesanan diterima oleh pembeli.'
+                    'message' => 'Bukti pembayaran hanya bisa diunggah setelah pesanan diterima oleh pembeli.',
                 ], 403);
             }
 
@@ -541,10 +577,10 @@ class PesananController extends Controller
             $quality = 60;
 
             // Paksa output JPG agar konsisten & ringan
-            $fileName = $sanitizedInvoiceNumber . '.jpg';
-            $path = 'payment_proofs/' . $fileName;
+            $fileName = $sanitizedInvoiceNumber.'.jpg';
+            $path = 'payment_proofs/'.$fileName;
 
-            $manager = new ImageManager(new Driver());
+            $manager = new ImageManager(new Driver);
 
             $image = $manager
                 ->read($file)
@@ -561,20 +597,21 @@ class PesananController extends Controller
             ]);
 
             return response()->json([
-                'message' => 'Bukti pembayaran berhasil diunggah & dikompres.'
+                'message' => 'Bukti pembayaran berhasil diunggah & dikompres.',
             ], 200);
 
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validasi gagal.',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'Pesanan tidak ditemukan.'], 404);
 
         } catch (\Exception $e) {
-            Log::error('Upload payment proof error: ' . $e->getMessage());
+            Log::error('Upload payment proof error: '.$e->getMessage());
+
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
@@ -582,13 +619,12 @@ class PesananController extends Controller
     /**
      * Memperbarui status pengiriman pesanan (diambil, diantar, diterima).
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id ID Pesanan
+     * @param  int  $id  ID Pesanan
      * @return \Illuminate\Http\JsonResponse
      */
     public function updateOrderStatus(Request $request, $id)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['message' => 'Tidak terautentikasi'], 401);
         }
 
@@ -607,22 +643,34 @@ class PesananController extends Controller
                     if (in_array($order->status, ['diantar', 'diterima_pembeli', 'selesai'])) {
                         return response()->json(['message' => 'Status tidak dapat diubah kembali ke "Diambil".'], 400);
                     }
-                    if (is_null($order->picked_up_at)) $updateData['picked_up_at'] = $currentTime;
+                    if (is_null($order->picked_up_at)) {
+                        $updateData['picked_up_at'] = $currentTime;
+                    }
                     break;
                 case 'diantar':
                     if (in_array($order->status, ['diterima_pembeli', 'selesai'])) {
                         return response()->json(['message' => 'Status tidak dapat diubah kembali ke "Diantar".'], 400);
                     }
-                    if (is_null($order->picked_up_at)) $updateData['picked_up_at'] = $currentTime;
-                    if (is_null($order->delivered_at)) $updateData['delivered_at'] = $currentTime;
+                    if (is_null($order->picked_up_at)) {
+                        $updateData['picked_up_at'] = $currentTime;
+                    }
+                    if (is_null($order->delivered_at)) {
+                        $updateData['delivered_at'] = $currentTime;
+                    }
                     break;
                 case 'diterima_pembeli':
                     if ($order->status === 'selesai') {
                         return response()->json(['message' => 'Status sudah "Selesai".'], 400);
                     }
-                    if (is_null($order->picked_up_at)) $updateData['picked_up_at'] = $currentTime;
-                    if (is_null($order->delivered_at)) $updateData['delivered_at'] = $currentTime;
-                    if (is_null($order->received_by_buyer_at)) $updateData['received_by_buyer_at'] = $currentTime;
+                    if (is_null($order->picked_up_at)) {
+                        $updateData['picked_up_at'] = $currentTime;
+                    }
+                    if (is_null($order->delivered_at)) {
+                        $updateData['delivered_at'] = $currentTime;
+                    }
+                    if (is_null($order->received_by_buyer_at)) {
+                        $updateData['received_by_buyer_at'] = $currentTime;
+                    }
                     break;
             }
 
@@ -640,14 +688,15 @@ class PesananController extends Controller
                     'picked_up_at' => $updatedOrder->picked_up_at ? $updatedOrder->picked_up_at->isoFormat('D MMMM YYYY, HH:mm') : null,
                     'delivered_at' => $updatedOrder->delivered_at ? $updatedOrder->delivered_at->isoFormat('D MMMM YYYY, HH:mm') : null,
                     'received_by_buyer_at' => $updatedOrder->received_by_buyer_at ? $updatedOrder->received_by_buyer_at->isoFormat('D MMMM YYYY, HH:mm') : null,
-                ]
+                ],
             ], 200);
         } catch (ValidationException $e) {
             return response()->json(['message' => 'Validasi gagal.', 'errors' => $e->errors()], 422);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'Pesanan tidak ditemukan.'], 404);
         } catch (\Exception $e) {
-            Log::error('Error updating order status for order ID ' . $id . ': ' . $e->getMessage());
+            Log::error('Error updating order status for order ID '.$id.': '.$e->getMessage());
+
             return response()->json(['message' => 'Terjadi kesalahan internal.'], 500);
         }
     }
@@ -656,15 +705,20 @@ class PesananController extends Controller
      * Mengambil item dari pesanan terakhir seorang customer.
      * Berguna untuk fitur 'pesan ulang' (re-order).
      *
-     * @param  int  $id ID Customer
+     * @param  int  $id  ID Customer
      * @return \Illuminate\Http\JsonResponse
      */
     public function getLastOrder($id)
     {
-        // Cari pesanan terakhir berdasarkan customer ID
-        $lastOrder = Order::where('customer_id', $id)->latest()->first();
+        // Cari pesanan terakhir berdasarkan customer ID, terbatas pada
+        // customer milik kurir di cabangnya (isolasi data lintas cabang/kurir).
+        $lastOrder = Order::where('customer_id', $id)
+            ->where('region_id', Auth::user()->region_id)
+            ->where('created_by_user_id', Auth::id())
+            ->latest()
+            ->first();
 
-        if (!$lastOrder) {
+        if (! $lastOrder) {
             return response()->json(['items' => []]);
         }
 
@@ -674,12 +728,12 @@ class PesananController extends Controller
         // Format data item untuk dimasukkan ke keranjang (cart)
         $cartItems = $lastOrder->items->map(function ($item) {
             return [
-                'product_id'   => $item->product_id,
+                'product_id' => $item->product_id,
                 'product_name' => $item->product_name,
-                'variant_id'   => $item->variant_id,
+                'variant_id' => $item->variant_id,
                 'variant_name' => $item->variant_name,
-                'price'        => $item->price,
-                'qty'          => $item->quantity,
+                'price' => $item->price,
+                'qty' => $item->quantity,
             ];
         });
 

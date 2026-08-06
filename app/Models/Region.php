@@ -9,10 +9,22 @@ class Region extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug'];
+    protected $fillable = ['name', 'slug', 'is_active'];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    /**
+     * Scope untuk hanya mengambil cabang yang masih beroperasi.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

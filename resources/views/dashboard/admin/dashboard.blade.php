@@ -36,23 +36,24 @@
     <div class="space-y-6">
 
         <!-- 1. Hero Welcome Card with Quick Actions -->
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-deep via-brand-deep to-brand-deep p-6 sm:p-8 text-white shadow-xl shadow-brand-deep/10">
-            <!-- Background Decorative Ornaments -->
-            <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-            <div class="absolute right-40 -top-10 w-48 h-48 bg-brand-light/20 rounded-full blur-xl pointer-events-none"></div>
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-deep via-brand to-brand-deep p-6 sm:p-8 text-white shadow-2xl shadow-brand-deep/30 border border-white/10">
+            <!-- Animated Background Decorative Ornaments -->
+            <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+            <div class="absolute right-40 -top-10 w-48 h-48 bg-brand-light/30 rounded-full blur-2xl pointer-events-none animate-pulse" style="animation-delay: 1s;"></div>
+            <div class="absolute left-20 top-1/2 w-32 h-32 bg-brand/20 rounded-full blur-xl pointer-events-none animate-pulse" style="animation-delay: 0.5s;"></div>
 
             <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-                <div class="space-y-2">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-xs font-semibold tracking-wide text-brand-light border border-white/20">
+                <div class="space-y-3">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xl text-xs font-bold tracking-wide text-brand-light border border-white/30 shadow-lg">
                         <i class="{{ $iconClass }}"></i>
                         <span>{{ date('l, d F Y') }}</span>
                         <span class="opacity-60">&bull;</span>
-                        <span>Region {{ $user->region->name ?? 'Cabang' }}</span>
+                        <span>Region {{ \App\Support\RegionContext::name() }}</span>
                     </div>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                        {{ $greeting }}, <span class="underline decoration-brand-light underline-offset-4">{{ $user->name ?? 'Admin' }}</span>!
+                    <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                        {{ $greeting }}, <span class="underline decoration-2 decoration-brand-light underline-offset-8">{{ $user->name ?? 'Admin' }}</span>!
                     </h1>
-                    <p class="text-xs sm:text-sm text-brand-light/90 max-w-xl">
+                    <p class="text-sm sm:text-base text-brand-light/95 max-w-xl leading-relaxed">
                         Selamat datang di pusat kendali operasional toko kue. Berikut ringkasan performa penjualan dan aktivitas terkini hari ini.
                     </p>
                 </div>
@@ -60,17 +61,17 @@
                 <!-- Quick Shortcut Buttons -->
                 <div class="flex flex-wrap items-center gap-3">
                     <a href="{{ route('admin.orders.index') }}"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white text-brand-deep hover:bg-mint text-xs font-bold transition-all shadow-md hover:scale-105 active:scale-95">
+                        class="inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-white text-brand-deep hover:bg-mint hover:shadow-xl text-xs font-bold transition-all duration-300 shadow-lg hover:scale-105 active:scale-95 border border-white/20">
                         <i class="fas fa-shopping-bag text-brand-deep"></i>
                         <span>Verifikasi Pesanan</span>
                     </a>
                     <a href="{{ route('admin.products.index') }}"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-brand/30 hover:bg-brand/40 text-white backdrop-blur-md border border-white/20 text-xs font-bold transition-all hover:scale-105 active:scale-95">
+                        class="inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-white/20 hover:bg-white/30 text-white backdrop-blur-xl border border-white/30 text-xs font-bold transition-all duration-300 shadow-lg hover:scale-105 active:scale-95">
                         <i class="fas fa-plus"></i>
                         <span>Katalog Produk</span>
                     </a>
                     <a href="{{ route('admin.historys.index') }}"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-brand/30 hover:bg-brand/40 text-white backdrop-blur-md border border-white/20 text-xs font-bold transition-all hover:scale-105 active:scale-95">
+                        class="inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-white/20 hover:bg-white/30 text-white backdrop-blur-xl border border-white/30 text-xs font-bold transition-all duration-300 shadow-lg hover:scale-105 active:scale-95">
                         <i class="fas fa-file-pdf"></i>
                         <span>Rekap Transaksi</span>
                     </a>
@@ -78,26 +79,86 @@
             </div>
         </div>
 
-        <!-- 2. Modern 5-KPI Stats Section -->
+        <!-- 2. Ringkasan Per Cabang (khusus Owner) -->
+        @if ($user->hasRole('owner') && isset($branchSummary) && $branchSummary->isNotEmpty())
+            <div class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <i class="fas fa-store text-brand"></i>
+                        <span>Pantauan Semua Cabang</span>
+                    </h2>
+                    <a href="{{ route('admin.switch-region', ['region' => \App\Support\RegionContext::slug()]) }}"
+                        class="text-[11px] font-bold text-brand-deep dark:text-brand hover:underline">
+                        Lihat detail per cabang dengan mengganti cabang di atas
+                    </a>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-{{ min($branchSummary->count(), 4) }} gap-4">
+                    @foreach ($branchSummary as $branch)
+                        <div class="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 transition-all hover:shadow-lg {{ $branch['region']->id === \App\Support\RegionContext::regionId() ? 'bg-mint/50 dark:bg-brand-deep/30 border-brand/30' : 'bg-slate-50/70 dark:bg-slate-800/40' }}">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-9 h-9 rounded-xl bg-brand-deep text-white flex items-center justify-center">
+                                        <i class="fas fa-store text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-extrabold text-slate-800 dark:text-white">{{ $branch['region']->name }}</p>
+                                        <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
+                                            {{ $branch['region']->id === \App\Support\RegionContext::regionId() ? 'Cabang Aktif' : 'Cabang Lain' }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <a href="{{ route('admin.switch-region', ['region' => $branch['region']->slug]) }}"
+                                    class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-brand-deep dark:text-brand hover:bg-mint transition-colors">
+                                    Buka <i class="fas fa-arrow-right text-[9px] ml-0.5"></i>
+                                </a>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-center">
+                                <div class="rounded-xl bg-white dark:bg-slate-800 p-2.5">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Income Hari Ini</p>
+                                    <p class="text-sm font-extrabold text-brand-deep dark:text-brand">Rp {{ number_format($branch['income_today'], 0, ',', '.') }}</p>
+                                </div>
+                                <div class="rounded-xl bg-white dark:bg-slate-800 p-2.5">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Order Hari Ini</p>
+                                    <p class="text-sm font-extrabold text-slate-800 dark:text-white">{{ $branch['orders_today'] }}</p>
+                                </div>
+                                <div class="rounded-xl bg-white dark:bg-slate-800 p-2.5">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Menunggu Verifikasi</p>
+                                    <p class="text-sm font-extrabold text-amber-600 dark:text-amber-400">{{ $branch['pending_verify'] }}</p>
+                                </div>
+                                <div class="rounded-xl bg-white dark:bg-slate-800 p-2.5">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Customer / Kurir</p>
+                                    <p class="text-sm font-extrabold text-slate-800 dark:text-white">{{ $branch['customers'] }} / {{ $branch['couriers'] }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        <!-- 3. Modern 5-KPI Stats Section -->
         <div>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <i class="fas fa-chart-pie text-brand"></i>
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand/20">
+                        <i class="fas fa-chart-pie text-sm"></i>
+                    </div>
                     <span>Resume Aktivitas Hari Ini</span>
                 </h2>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
                 <!-- Card 1: Income -->
-                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-brand/5 to-brand-deep/5 rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Total Income</span>
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand/20">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand/20 group-hover:scale-110 transition-transform duration-300">
                             <i class="fas fa-wallet text-sm"></i>
                         </div>
                     </div>
                     <div class="space-y-1">
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white">
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white">
                             Rp {{ number_format($incomeToday, 0, ',', '.') }}
                         </h3>
                         <div class="flex items-center gap-1.5 text-xs font-semibold">
@@ -116,15 +177,16 @@
                 </div>
 
                 <!-- Card 2: Total Sales Today -->
-                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-brand-light/5 to-brand/5 rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Penjualan</span>
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-light to-brand text-white flex items-center justify-center shadow-lg shadow-brand/20">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-light to-brand text-white flex items-center justify-center shadow-lg shadow-brand/20 group-hover:scale-110 transition-transform duration-300">
                             <i class="fas fa-shopping-cart text-sm"></i>
                         </div>
                     </div>
                     <div class="space-y-1">
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white">
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white">
                             {{ number_format($totalSalesToday, 0, ',', '.') }} <span class="text-xs font-normal text-slate-400">Order</span>
                         </h3>
                         <div class="flex items-center gap-1.5 text-xs font-semibold">
@@ -143,42 +205,44 @@
                 </div>
 
                 <!-- Card 3: Avg Sales -->
-                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-brand/5 to-brand-deep/5 rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Rata-Rata/Bln</span>
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand-deep/20">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand-deep/20 group-hover:scale-110 transition-transform duration-300">
                             <i class="fas fa-chart-line text-sm"></i>
                         </div>
                     </div>
                     <div class="space-y-1">
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white">
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white">
                             {{ number_format($avgSalesPerMonth, 0, ',', '.') }}
                         </h3>
                         <div class="flex items-center gap-1.5 text-xs font-semibold">
                             @if ($avgSalesPercentageChange >= 0)
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-brand-light dark:bg-brand-deep/60 text-brand-deep dark:text-brand-light text-[11px]">
-                                    <i class="fas fa-arrow-up text-[9px] mr-1"></i>+{{ number_format($salesPercentageChange, 1) }}%
+                                    <i class="fas fa-arrow-up text-[9px] mr-1"></i>+{{ number_format($avgSalesPercentageChange, 1) }}%
                                 </span>
                             @else
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 text-[11px]">
-                                    <i class="fas fa-arrow-down text-[9px] mr-1"></i>{{ number_format($salesPercentageChange, 1) }}%
+                                    <i class="fas fa-arrow-down text-[9px] mr-1"></i>{{ number_format($avgSalesPercentageChange, 1) }}%
                                 </span>
                             @endif
-                            <span class="text-slate-400 dark:text-slate-500 text-[11px]">vs thn lalu</span>
+                            <span class="text-slate-400 dark:text-slate-500 text-[11px]">vs bln lalu</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Card 4: Customers in Region -->
-                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-brand-light/5 to-brand-deep/5 rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Customer</span>
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-light to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand-deep/20">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-light to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand-deep/20 group-hover:scale-110 transition-transform duration-300">
                             <i class="fas fa-users text-sm"></i>
                         </div>
                     </div>
                     <div class="space-y-1">
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white">
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white">
                             {{ number_format($totalCustomersInRegion, 0, ',', '.') }}
                         </h3>
                         <div class="flex items-center gap-1.5 text-xs font-semibold">
@@ -197,15 +261,16 @@
                 </div>
 
                 <!-- Card 5: New Customers Today -->
-                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-brand/5 to-brand-deep/5 rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="flex items-center justify-between mb-3">
                         <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">New Customer</span>
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand-deep/20">
+                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand-deep/20 group-hover:scale-110 transition-transform duration-300">
                             <i class="fas fa-user-plus text-sm"></i>
                         </div>
                     </div>
                     <div class="space-y-1">
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white">
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white">
                             +{{ number_format($newCustomersToday, 0, ',', '.') }}
                         </h3>
                         <div class="flex items-center gap-1.5 text-xs font-semibold">
@@ -264,13 +329,13 @@
                             </button>
                             <div x-show="openFilter" @click.away="openFilter = false" x-transition
                                 class="absolute right-0 z-30 w-44 mt-2 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 py-1 text-xs">
-                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'filter' => 'last_7_days'])) }}"
+                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => \App\Support\RegionContext::slug(), 'filter' => 'last_7_days'])) }}"
                                     class="block px-4 py-2 font-medium {{ $filter === 'last_7_days' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">7 Hari Terakhir</a>
-                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'filter' => 'daily'])) }}"
+                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => \App\Support\RegionContext::slug(), 'filter' => 'daily'])) }}"
                                     class="block px-4 py-2 font-medium {{ $filter === 'daily' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Harian</a>
-                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'filter' => 'weekly'])) }}"
+                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => \App\Support\RegionContext::slug(), 'filter' => 'weekly'])) }}"
                                     class="block px-4 py-2 font-medium {{ $filter === 'weekly' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Mingguan</a>
-                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'filter' => 'monthly'])) }}"
+                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => \App\Support\RegionContext::slug(), 'filter' => 'monthly'])) }}"
                                     class="block px-4 py-2 font-medium {{ $filter === 'monthly' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Bulanan</a>
                             </div>
                         </div>
@@ -309,13 +374,13 @@
                             </button>
                             <div x-show="openVisitFilter" @click.away="openVisitFilter = false" x-transition
                                 class="absolute right-0 z-30 w-44 mt-2 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 py-1 text-xs">
-                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'visit_filter' => 'last_7_days'])) }}"
+                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => \App\Support\RegionContext::slug(), 'visit_filter' => 'last_7_days'])) }}"
                                     class="block px-4 py-2 font-medium {{ $visitFilter === 'last_7_days' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">7 Hari Terakhir</a>
-                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'visit_filter' => 'daily'])) }}"
+                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => \App\Support\RegionContext::slug(), 'visit_filter' => 'daily'])) }}"
                                     class="block px-4 py-2 font-medium {{ $visitFilter === 'daily' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Harian</a>
-                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'visit_filter' => 'weekly'])) }}"
+                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => \App\Support\RegionContext::slug(), 'visit_filter' => 'weekly'])) }}"
                                     class="block px-4 py-2 font-medium {{ $visitFilter === 'weekly' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Mingguan</a>
-                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => Auth::user()->region->slug, 'visit_filter' => 'monthly'])) }}"
+                                <a href="{{ route('admin.dashboard', array_merge(request()->query(), ['region' => \App\Support\RegionContext::slug(), 'visit_filter' => 'monthly'])) }}"
                                     class="block px-4 py-2 font-medium {{ $visitFilter === 'monthly' ? 'bg-brand-light/60 text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light font-bold' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60' }}">Bulanan</a>
                             </div>
                         </div>
@@ -339,7 +404,7 @@
                         <span>Monitoring Tim Kurir</span>
                     </h3>
                     <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-                        Daftar kurir aktif terdaftar di Cabang {{ Auth::user()->region->name ?? 'Region' }}
+                        Daftar kurir aktif terdaftar di Cabang {{ \App\Support\RegionContext::name() }}
                     </p>
                 </div>
 

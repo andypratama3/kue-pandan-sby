@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rules;
-use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\OrderReturn;
+use App\Models\User;
+use App\Support\RegionContext;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules;
 
 class CourierController extends Controller
 {
@@ -25,8 +25,8 @@ class CourierController extends Controller
         $user = Auth::user();
 
         $couriersQuery = User::with('customers')
-            ->where('region_id', $user->region_id)
-            ->whereHas('roles', fn($query) => $query->where('name', 'kurir'))
+            ->where('region_id', RegionContext::regionId())
+            ->whereHas('roles', fn ($query) => $query->where('name', 'kurir'))
             ->when($search, function ($query, $searchTerm) {
                 $query->where(function ($q) use ($searchTerm) {
                     $q->where('name', 'like', "%{$searchTerm}%")
@@ -60,7 +60,7 @@ class CourierController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -68,19 +68,19 @@ class CourierController extends Controller
             return redirect()->route('admin.couriers.index')
                 ->withErrors($validator, 'create')
                 ->withInput()
-                ->with('error', 'Gagal menambahkan kurir. ' . $validator->errors()->first());
+                ->with('error', 'Gagal menambahkan kurir. '.$validator->errors()->first());
         }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'region_id' => Auth::user()->region_id,
+            'region_id' => RegionContext::regionId(),
         ]);
 
         $user->assignRole('kurir');
 
-        return redirect()->route('admin.couriers.index')->with('success', 'Kurir "' . $user->name . '" berhasil ditambahkan.');
+        return redirect()->route('admin.couriers.index')->with('success', 'Kurir "'.$user->name.'" berhasil ditambahkan.');
     }
 
     /**
@@ -88,21 +88,21 @@ class CourierController extends Controller
      */
     public function update(Request $request, User $courier)
     {
-        if ($courier->region_id !== Auth::user()->region_id) {
+        if ($courier->region_id !== RegionContext::regionId()) {
             abort(403, 'AKSES DITOLAK');
         }
 
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class . ',email,' . $courier->id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class.',email,'.$courier->id],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
 
         if ($validator->fails()) {
             return redirect()->route('admin.couriers.index')
-                ->withErrors($validator, 'edit_' . $courier->id)
+                ->withErrors($validator, 'edit_'.$courier->id)
                 ->withInput()
-                ->with('error_modal_id', 'edit-courier-modal-' . $courier->id);
+                ->with('error_modal_id', 'edit-courier-modal-'.$courier->id);
         }
 
         $courier->name = $request->name;
@@ -114,7 +114,7 @@ class CourierController extends Controller
 
         $courier->save();
 
-        return redirect()->route('admin.couriers.index')->with('success', 'Data kurir "' . $courier->name . '" berhasil diperbarui.');
+        return redirect()->route('admin.couriers.index')->with('success', 'Data kurir "'.$courier->name.'" berhasil diperbarui.');
     }
 
     /**
@@ -122,7 +122,7 @@ class CourierController extends Controller
      */
     public function updateNote(Request $request, User $courier)
     {
-        if ($courier->region_id !== Auth::user()->region_id) {
+        if ($courier->region_id !== RegionContext::regionId()) {
             abort(403, 'AKSES DITOLAK');
         }
 
@@ -134,7 +134,7 @@ class CourierController extends Controller
         $courier->save();
 
         return redirect()->route('admin.couriers.index')
-            ->with('success', 'Catatan untuk kurir "' . $courier->name . '" berhasil diperbarui.');
+            ->with('success', 'Catatan untuk kurir "'.$courier->name.'" berhasil diperbarui.');
     }
 
     /**
@@ -142,14 +142,14 @@ class CourierController extends Controller
      */
     public function destroy(User $courier)
     {
-        if ($courier->region_id !== Auth::user()->region_id) {
+        if ($courier->region_id !== RegionContext::regionId()) {
             abort(403, 'AKSES DITOLAK');
         }
 
         $courierName = $courier->name;
         $courier->delete();
 
-        return redirect()->route('admin.couriers.index')->with('success', 'Kurir "' . $courierName . '" berhasil dihapus.');
+        return redirect()->route('admin.couriers.index')->with('success', 'Kurir "'.$courierName.'" berhasil dihapus.');
     }
 
     /**
@@ -158,7 +158,7 @@ class CourierController extends Controller
      */
     public function performanceData(Request $request, User $courier)
     {
-        if ($courier->region_id !== Auth::user()->region_id) {
+        if ($courier->region_id !== RegionContext::regionId()) {
             abort(403, 'AKSES DITOLAK');
         }
 
@@ -182,7 +182,7 @@ class CourierController extends Controller
                     $chartLabels[] = $date->format('d');
                     $chartData[] = Order::where('created_by_user_id', $courierId)->whereDate('created_at', $date)->count();
                     $chartDataCompleted[] = Order::where('created_by_user_id', $courierId)->whereDate('updated_at', $date)->where('status', 'selesai')->count();
-                    $chartDataReturned[] = OrderReturn::whereHas('order', fn($q) => $q->where('created_by_user_id', $courierId))->whereDate('created_at', $date)->count();
+                    $chartDataReturned[] = OrderReturn::whereHas('order', fn ($q) => $q->where('created_by_user_id', $courierId))->whereDate('created_at', $date)->count();
                 }
                 $dateRangeText = Carbon::now()->isoFormat('MMMM YYYY');
                 break;
@@ -192,11 +192,13 @@ class CourierController extends Controller
                 $weekNumber = 1;
                 while ($startDate->lte($endDate)) {
                     $weekEndDate = $startDate->copy()->endOfWeek(Carbon::SATURDAY);
-                    if ($weekEndDate->gt($endDate)) $weekEndDate = $endDate;
-                    $chartLabels[] = 'Minggu Ke-' . $weekNumber;
+                    if ($weekEndDate->gt($endDate)) {
+                        $weekEndDate = $endDate;
+                    }
+                    $chartLabels[] = 'Minggu Ke-'.$weekNumber;
                     $chartData[] = Order::where('created_by_user_id', $courierId)->whereBetween('created_at', [$startDate, $weekEndDate])->count();
                     $chartDataCompleted[] = Order::where('created_by_user_id', $courierId)->whereBetween('updated_at', [$startDate, $weekEndDate])->where('status', 'selesai')->count();
-                    $chartDataReturned[] = OrderReturn::whereHas('order', fn($q) => $q->where('created_by_user_id', $courierId))->whereBetween('created_at', [$startDate, $weekEndDate])->count();
+                    $chartDataReturned[] = OrderReturn::whereHas('order', fn ($q) => $q->where('created_by_user_id', $courierId))->whereBetween('created_at', [$startDate, $weekEndDate])->count();
                     $startDate = $weekEndDate->copy()->addDay();
                     $weekNumber++;
                 }
@@ -208,7 +210,7 @@ class CourierController extends Controller
                     $chartLabels[] = $date->isoFormat('MMM');
                     $chartData[] = Order::where('created_by_user_id', $courierId)->whereYear('created_at', $currentYear)->whereMonth('created_at', $month)->count();
                     $chartDataCompleted[] = Order::where('created_by_user_id', $courierId)->whereYear('updated_at', $currentYear)->whereMonth('updated_at', $month)->where('status', 'selesai')->count();
-                    $chartDataReturned[] = OrderReturn::whereHas('order', fn($q) => $q->where('created_by_user_id', $courierId))->whereYear('created_at', $currentYear)->whereMonth('created_at', $month)->count();
+                    $chartDataReturned[] = OrderReturn::whereHas('order', fn ($q) => $q->where('created_by_user_id', $courierId))->whereYear('created_at', $currentYear)->whereMonth('created_at', $month)->count();
                 }
                 $dateRangeText = $currentYear;
                 break;
@@ -221,9 +223,9 @@ class CourierController extends Controller
                     $chartLabels[] = $date->format('d M');
                     $chartData[] = Order::where('created_by_user_id', $courierId)->whereDate('created_at', $date)->count();
                     $chartDataCompleted[] = Order::where('created_by_user_id', $courierId)->whereDate('updated_at', $date)->where('status', 'selesai')->count();
-                    $chartDataReturned[] = OrderReturn::whereHas('order', fn($q) => $q->where('created_by_user_id', $courierId))->whereDate('created_at', $date)->count();
+                    $chartDataReturned[] = OrderReturn::whereHas('order', fn ($q) => $q->where('created_by_user_id', $courierId))->whereDate('created_at', $date)->count();
                 }
-                $dateRangeText = $startDate->isoFormat('D MMM') . ' - ' . $endDate->isoFormat('D MMM');
+                $dateRangeText = $startDate->isoFormat('D MMM').' - '.$endDate->isoFormat('D MMM');
                 break;
         }
 

@@ -2,25 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Storage;
-
 use App\Models\Order;
-use App\Models\OrderReturn;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth; // Impor Auth
-use Illuminate\Validation\ValidationException;
-
-use Carbon\Carbon; // [!code ++]
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB; // Impor Auth
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException; // [!code ++]
 
 class ReturnController extends Controller
 {
+    // Isolasi data: retur hanya boleh dilakukan oleh kurir pembuat pesanan.
+    private function assertOwnOrder(Order $order): void
+    {
+        $user = Auth::user();
+        if (! $user || $order->created_by_user_id !== $user->id || $order->region_id !== $user->region_id) {
+            abort(403, 'AKSES DITOLAK');
+        }
+    }
+
     // [!code block:start]
     // --- Helper Functions for Timezone ---
     private function getUserTimezone()
     {
         $user = Auth::user();
-        if (!$user || is_null($user->region_id)) {
+        if (! $user || is_null($user->region_id)) {
             return config('app.timezone', 'UTC');
         }
 
@@ -41,9 +47,10 @@ class ReturnController extends Controller
     }
     // [!code block:end]
 
-
     public function requestReturn(Request $request, Order $order)
     {
+        $this->assertOwnOrder($order);
+
         $validated = $request->validate([
             'return_quantities' => 'required|array|min:1',
             'return_quantities.*' => 'required|integer|min:1',
@@ -72,16 +79,18 @@ class ReturnController extends Controller
 
             // DIUBAH: Menggunakan relasi `items()` yang benar dan membuat key
             $orderItems = $order->items()->with('product')->get()->keyBy(function ($item) {
-                return $item->product_id . '-' . ($item->variant_id ?? 0);
+                return $item->product_id.'-'.($item->variant_id ?? 0);
             });
 
             $totalAmountReturned = 0;
 
             // Simpan Detail Produk yang Diretur
             foreach ($validated['return_quantities'] as $key => $quantity) {
-                if ($quantity <= 0) continue;
+                if ($quantity <= 0) {
+                    continue;
+                }
 
-                if (!isset($orderItems[$key])) {
+                if (! isset($orderItems[$key])) {
                     throw ValidationException::withMessages(['return_quantities' => "Produk dengan key '{$key}' tidak ditemukan."]);
                 }
 
@@ -93,7 +102,7 @@ class ReturnController extends Controller
                     throw ValidationException::withMessages(['return_quantities' => "Jumlah retur untuk '{$orderItem->product_name}' melebihi jumlah pembelian."]);
                 }
 
-                list($productId, $variantId) = explode('-', $key);
+                [$productId, $variantId] = explode('-', $key);
 
                 // DIUBAH: Mengambil harga dari $orderItem
                 $price = $orderItem->price;
@@ -122,13 +131,15 @@ class ReturnController extends Controller
             // Siapkan dan Kirim Respon
             // DIUBAH: Memuat relasi 'items' bukan 'products'
             $order->load('customer', 'items.product', 'items.variant');
+
             return response()->json([
                 'message' => 'Pengajuan pengembalian produk berhasil dikirim.',
-                'order' => $this->formatOrderDetails($order)
+                'order' => $this->formatOrderDetails($order),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+
+            return response()->json(['message' => 'Terjadi kesalahan: '.$e->getMessage()], 500);
         }
     }
 
@@ -183,6 +194,8 @@ class ReturnController extends Controller
     // Fungsi untuk mengunggah bukti retur
     public function uploadReturnProof(Request $request, Order $order)
     {
+        $this->assertOwnOrder($order);
+
         $request->validate([
             // Nama 'payment_proof' berasal dari input form HTML, jadi tidak perlu diubah
             'payment_proof' => 'required|file|mimes:jpg,jpeg,png|max:2048',
@@ -193,7 +206,7 @@ class ReturnController extends Controller
             $orderReturn = $order->returns()->where('status', 'menunggu_konfirmasi')->latest()->first();
 
             // Jika tidak ada data retur, kirim error
-            if (!$orderReturn) {
+            if (! $orderReturn) {
                 return response()->json(['message' => 'Tidak ada pengajuan retur aktif untuk pesanan ini.'], 400);
             }
 
@@ -208,7 +221,7 @@ class ReturnController extends Controller
             $sanitizedInvoiceNumber = str_replace('/', '-', $order->invoice_number);
             $timestamp = time(); // Tambahkan timestamp saat ini
             $extension = $file->getClientOriginalExtension();
-            $fileName = 'RETURN-' . $sanitizedInvoiceNumber . '_' . $timestamp . '.' . $extension; // Gabungkan
+            $fileName = 'RETURN-'.$sanitizedInvoiceNumber.'_'.$timestamp.'.'.$extension; // Gabungkan
             $directory = 'return_proofs';
 
             // 3. Simpan file baru menggunakan storeAs
@@ -228,10 +241,10 @@ class ReturnController extends Controller
 
             return response()->json([
                 'message' => 'Bukti retur berhasil diunggah.',
-                'order' => $order
+                'order' => $order,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal mengunggah file: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Gagal mengunggah file: '.$e->getMessage()], 500);
         }
 
         return response()->json(['message' => 'File tidak ditemukan.'], 400);
@@ -239,6 +252,7 @@ class ReturnController extends Controller
 
     public function editReturn(Request $request, Order $order)
     {
+        $this->assertOwnOrder($order);
 
         $validated = $request->validate([
             'order_return_id' => 'required|exists:order_returns,id',
@@ -260,22 +274,24 @@ class ReturnController extends Controller
 
             // Update alasan
             $orderReturn->update([
-                'reason' => $validated['reason']
+                'reason' => $validated['reason'],
             ]);
 
             // ================= AMBIL ITEM PESANAN =================
             $orderItems = $order->items()
                 ->get()
-                ->keyBy(fn($item) => $item->product_id . '-' . ($item->variant_id ?? 0));
+                ->keyBy(fn ($item) => $item->product_id.'-'.($item->variant_id ?? 0));
 
             $totalAmountReturned = 0;
 
             foreach ($validated['return_quantities'] as $key => $quantity) {
-                if ($quantity <= 0) continue;
+                if ($quantity <= 0) {
+                    continue;
+                }
 
-                if (!isset($orderItems[$key])) {
+                if (! isset($orderItems[$key])) {
                     throw ValidationException::withMessages([
-                        'return_quantities' => "Produk dengan key '{$key}' tidak ditemukan."
+                        'return_quantities' => "Produk dengan key '{$key}' tidak ditemukan.",
                     ]);
                 }
 
@@ -283,8 +299,7 @@ class ReturnController extends Controller
 
                 if ($quantity > $orderItem->quantity) {
                     throw ValidationException::withMessages([
-                        'return_quantities' =>
-                        "Jumlah retur untuk '{$orderItem->product_name}' melebihi jumlah pembelian."
+                        'return_quantities' => "Jumlah retur untuk '{$orderItem->product_name}' melebihi jumlah pembelian.",
                     ]);
                 }
 
@@ -310,12 +325,12 @@ class ReturnController extends Controller
 
             // ================= UPDATE TOTAL =================
             $orderReturn->update([
-                'total_amount_returned' => $totalAmountReturned
+                'total_amount_returned' => $totalAmountReturned,
             ]);
 
             // ================= UPDATE STATUS ORDER =================
             $order->update([
-                'status' => 'menunggu_retur'
+                'status' => 'menunggu_retur',
             ]);
 
             DB::commit();
@@ -324,13 +339,13 @@ class ReturnController extends Controller
 
             return response()->json([
                 'message' => 'Pengajuan retur berhasil diperbarui.',
-                'order' => $this->formatOrderDetails($order)
+                'order' => $this->formatOrderDetails($order),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
 
             return response()->json([
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan: '.$e->getMessage(),
             ], 500);
         }
     }

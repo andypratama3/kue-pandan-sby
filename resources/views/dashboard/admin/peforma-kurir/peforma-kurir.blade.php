@@ -17,7 +17,7 @@
                         <span>Peringkat Performa Pengiriman Kurir</span>
                     </h2>
                     <p class="text-xs text-slate-400 dark:text-slate-500">
-                        Pantau produktivitas pengantaran dan omset penagihan kurir di Cabang {{ Auth::user()->region->name ?? 'N/A' }}.
+                        Pantau produktivitas pengantaran dan omset penagihan kurir di Cabang {{ \App\Support\RegionContext::name() ?? 'Cabang Aktif' }}.
                     </p>
                 </div>
 

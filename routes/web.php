@@ -5,7 +5,6 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PeformaCustomerController;
 use App\Http\Controllers\Admin\PeformaKurirController;
 use App\Http\Controllers\AdminDashboardController;
-use App\Http\Controllers\Chatbot\WebhookController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HistoryOrderController;
 use App\Http\Controllers\Kurir\PesananController;
@@ -36,7 +35,7 @@ Route::get('/', function (Request $request) {
         ->whereDate('created_at', $today)
         ->exists();
 
-    if (!$exists) {
+    if (! $exists) {
         DB::table('visit_logs')->insert([
             'ip_address' => $ip,
             'created_at' => $today,
@@ -58,15 +57,14 @@ Route::get('privacy-policy', function () {
     return view('privacy-policy');
 })->name('policy.show');
 
-
 // Rute Logout manual
 Route::post('/logout', function (Request $request) {
     Auth::guard('web')->logout();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
+
     return redirect('/login');
 })->name('logout');
-
 
 // Grup Rute yang Dilindungi (Memerlukan Login)
 Route::middleware([
@@ -75,13 +73,27 @@ Route::middleware([
     'verified',
 ])->group(function () {
 
-    //---------- PENGALIHAN DASHBOARD UTAMA ----------//
+    // ---------- PENGALIHAN DASHBOARD UTAMA ----------//
     Route::get('dashboard', function () {
         $user = auth()->user();
-        if (!$user) return redirect()->route('login');
+        if (! $user) {
+            return redirect()->route('login');
+        }
 
-        $regionSlug = optional($user->region)->name ? strtolower($user->region->name) : null;
-        if (!$regionSlug) abort(403, 'User tidak memiliki region yang valid.');
+        // Owner: arahkan ke admin dashboard pada cabang yang sedang dipilih
+        if ($user->hasRole('owner')) {
+            $regionSlug = \App\Support\RegionContext::slug();
+            if (! $regionSlug) {
+                abort(403, 'Tidak ada cabang yang aktif.');
+            }
+
+            return redirect()->route('admin.dashboard', ['region' => $regionSlug]);
+        }
+
+        $regionSlug = optional($user->region)->slug;
+        if (! $regionSlug) {
+            abort(403, 'User tidak memiliki region yang valid.');
+        }
 
         if ($user->hasRole('admin')) {
             return redirect()->route('admin.dashboard', ['region' => $regionSlug]);
@@ -91,9 +103,9 @@ Route::middleware([
         abort(403, 'User tidak memiliki role yang valid.');
     })->name('dashboard');
 
-
-    //---------- RUTE ADMIN ----------//
-    Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
+    // ---------- RUTE ADMIN (admin & owner) ----------//
+    Route::prefix('admin')->name('admin.')->middleware('role:admin|owner')->group(function () {
+        Route::get('switch-region/{region}', [AdminDashboardController::class, 'switchRegion'])->name('switch-region');
         Route::get('peforma-kurir/export/pdf', [PeformaKurirController::class, 'exportPdf'])->name('peforma-kurir.export.pdf');
         Route::get('peforma-kurir/export/{id}/pdf', [PeformaKurirController::class, 'exportPdfByCourier']);
         Route::get('peforma-customer/export/pdf', [PeformaCustomerController::class, 'exportPdf'])->name('peforma-customer.export.pdf');
@@ -132,7 +144,7 @@ Route::middleware([
         Route::get('historys/{order}/invoice', [HistoryOrderController::class, 'invoice'])->name('historys.invoice');
         Route::get('historys/{order}/download', [HistoryOrderController::class, 'downloadInvoice'])->name('historys.download');
         // Endpoint JSON untuk detail history pesanan (untuk modal show)
-        Route::get('historys/{order}/details', [HistoryOrderController::class, 'details'])->name('admin.historys.details'); // [!code ++]
+        Route::get('historys/{order}/details', [HistoryOrderController::class, 'details'])->name('historys.details');
         Route::get('historys/export-pdf', [HistoryOrderController::class, 'downloadHistoryPdf'])->name('historys.export.pdf');
         Route::delete('historys/{id}', [HistoryOrderController::class, 'destroy'])->name('historys.destroy');
 
@@ -145,7 +157,7 @@ Route::middleware([
         Route::get('peforma-customer/{customer}', [PeformaCustomerController::class, 'show'])->name('peforma-customer.show');
     });
 
-    //---------- RUTE KURIR ----------//
+    // ---------- RUTE KURIR ----------//
     Route::prefix('kurir')->name('kurir.')->middleware('role:kurir')->group(function () {
         Route::get('dashboard/{region}', [KurirDashboardController::class, 'index'])->name('dashboard');
 
@@ -163,7 +175,7 @@ Route::middleware([
 
         // -- MANAJEMEN PESANAN (MENGGUNAKAN GROUP PREFIX) --
         Route::prefix('pesanan')->name('pesanan.')->group(function () {
-            Route::get('/', [PesananController::class, 'index'])->name('index'); //ini sebelumnya showFilteredOrders terus tak ganti index
+            Route::get('/', [PesananController::class, 'index'])->name('index'); // ini sebelumnya showFilteredOrders terus tak ganti index
             Route::get('/create', [PesananController::class, 'create'])->name('create');
             Route::get('/{id}/details', [PesananController::class, 'getOrderDetails'])->name('details');
             Route::post('/{id}/update-status', [PesananController::class, 'updateOrderStatus'])->name('updateStatus');
@@ -172,10 +184,10 @@ Route::middleware([
             // Rute untuk retur, sesuai controller-nya
             Route::post('/{order}/request-return', [ReturnController::class, 'requestReturn'])->name('requestReturn');
             Route::post('/{order}/upload-return-proof', [ReturnController::class, 'uploadReturnProof'])->name('uploadReturnProof');
-            
+
             Route::post('/{order}/request-return/edit', [ReturnController::class, 'editReturn'])->name('requestReturn');
-            Route::get('/{order}/request-return/edit', function(){
-                return view("dashboard.kurir.pesanan.edit");
+            Route::get('/{order}/request-return/edit', function () {
+                return view('dashboard.kurir.pesanan.edit');
             });
         });
 
@@ -190,15 +202,16 @@ Route::middleware([
         // Endpoint JSON untuk data produk di halaman pesanan
         Route::get('produk/json', function () {
             $regionId = Auth::user()->region_id;
+
             return Product::where('is_active', true)->where('region_id', $regionId)
-                ->with(['variants' => fn($q) => $q->where('is_active', true)->select('id', 'product_id', 'name', 'price')])
+                ->with(['variants' => fn ($q) => $q->where('is_active', true)->select('id', 'product_id', 'name', 'price')])
                 ->get(['id', 'name', 'image_path'])
-                ->map(fn($p) => [
+                ->map(fn ($p) => [
                     'id' => $p->id,
                     'name' => $p->name,
                     // PERBAIKAN: Gunakan Storage::url() untuk menghasilkan URL yang benar
                     'image' => $p->image_path ? Storage::url($p->image_path) : null,
-                    'variants' => $p->variants->map(fn($v) => ['id' => $v->id, 'name' => $v->name, 'price' => $v->price]),
+                    'variants' => $p->variants->map(fn ($v) => ['id' => $v->id, 'name' => $v->name, 'price' => $v->price]),
                 ]);
         })->name('produk.json');
     });

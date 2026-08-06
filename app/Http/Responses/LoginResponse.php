@@ -2,8 +2,8 @@
 
 namespace App\Http\Responses;
 
+use App\Support\RegionContext;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 
 class LoginResponse implements LoginResponseContract
@@ -17,21 +17,21 @@ class LoginResponse implements LoginResponseContract
     public function toResponse($request)
     {
         $user = $request->user();
+        $redirectUrl = config('fortify.home');
 
-        // Check if user has a valid region
-        if (!$user->region || !$user->region->name) {
-            // If no region, redirect to a safe fallback
-            $redirectUrl = config('fortify.home');
-        } else {
-            $regionSlug = strtolower($user->region->name);
-            
+        // Owner: tidak terikat region — arahkan ke admin dashboard cabang aktif
+        if ($user && $user->hasRole('owner')) {
+            $regionSlug = RegionContext::slug();
+            if ($regionSlug) {
+                $redirectUrl = route('admin.dashboard', ['region' => $regionSlug]);
+            }
+        } elseif ($user && $user->region && $user->region->name) {
+            $regionSlug = $user->region->slug;
+
             if ($user->hasRole('admin')) {
                 $redirectUrl = route('admin.dashboard', ['region' => $regionSlug]);
             } elseif ($user->hasRole('kurir')) {
                 $redirectUrl = route('kurir.dashboard', ['region' => $regionSlug]);
-            } else {
-                // Fallback ke dashboard default jika role tidak dikenali
-                $redirectUrl = config('fortify.home');
             }
         }
 

@@ -31,4 +31,25 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'whatsapp' => [
+        'provider' => env('WHATSAPP_PROVIDER', 'fonnte'), // 'fonnte' | 'meta'
+    ],
+
+    'fonnte' => [
+        'token' => env('FONNTE_TOKEN'),
+    ],
+
+    'meta_whatsapp' => [
+        'access_token' => env('META_ACCESS_TOKEN'),
+        'phone_number_id' => env('META_PHONE_NUMBER_ID'),
+        'verify_token' => env('META_VERIFY_TOKEN'),
+        'api_version' => env('META_API_VERSION', 'v23.0'),
+    ],
+
+    'deepseek' => [
+        'api_key' => env('DEEPSEEK_API_KEY'),
+        'base_url' => env('DEEPSEEK_BASE_URL', 'https://api.deepseek.com'),
+        'model' => env('DEEPSEEK_MODEL', 'deepseek-v4-flash'),
+    ],
+
 ];

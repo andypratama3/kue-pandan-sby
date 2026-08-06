@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
-use App\Models\Order;
+use App\Support\RegionContext;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 
 class PeformaCustomerController extends Controller
 {
@@ -18,7 +18,7 @@ class PeformaCustomerController extends Controller
     public function exportPdf(Request $request)
     {
         $admin = auth()->user();
-        $regionId = $admin->region_id;
+        $regionId = RegionContext::regionId();
 
         $year = $request->input('year', now()->year);
         $month = $request->input('month', now()->month);
@@ -35,14 +35,16 @@ class PeformaCustomerController extends Controller
         // Ambil data ranking customer untuk rentang bulan/tahun terpilih
         $ranking = $this->calculateCustomerPerformance($startOfMonth, $endOfMonth);
 
-        $bulan = $months[str_pad($month, 2, '0', STR_PAD_LEFT)] . ' ' . $year;
+        $bulan = $months[str_pad($month, 2, '0', STR_PAD_LEFT)].' '.$year;
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('dashboard.admin.peforma-customer.export-peforma-customer', [
             'ranking' => $ranking,
             'bulan' => $bulan,
         ]);
-        return $pdf->download('peforma-customer-' . $bulan . '.pdf');
+
+        return $pdf->download('peforma-customer-'.$bulan.'.pdf');
     }
+
     /**
      * Hitung dan ranking performa semua customer berdasarkan total pembelian dan total retur dalam 1 bulan terakhir.
      *
@@ -51,20 +53,21 @@ class PeformaCustomerController extends Controller
     public function calculateCustomerPerformance($startDate = null, $endDate = null)
     {
         // Jika tidak ada parameter, default ke 1 bulan terakhir
-        if (!$startDate || !$endDate) {
+        if (! $startDate || ! $endDate) {
             $now = now();
             $startDate = $now->copy()->subMonth();
             $endDate = $now;
         }
 
         // Ambil region admin yang sedang login
-        $regionId = auth()->user()->region_id;
+        $regionId = RegionContext::regionId();
 
         // Ambil data total pembelian per customer untuk region tertentu
         $orders = DB::table('orders')
             ->select('customer_id', DB::raw('SUM(total_amount) as total_pembelian'))
             ->whereBetween('created_at', [$startDate, $endDate])
             ->where('region_id', $regionId)
+            ->where('status', 'diverifikasi_admin')
             ->groupBy('customer_id')
             ->get();
 
@@ -74,6 +77,7 @@ class PeformaCustomerController extends Controller
             ->select('orders.customer_id', DB::raw('SUM(order_returns.total_amount_returned) as total_retur'))
             ->whereBetween('order_returns.created_at', [$startDate, $endDate])
             ->where('orders.region_id', $regionId)
+            ->where('order_returns.status', '!=', 'ditolak')
             ->groupBy('orders.customer_id')
             ->get();
 
@@ -92,12 +96,12 @@ class PeformaCustomerController extends Controller
             ->keyBy('id');
 
         // Filter hanya reseller (exclude supermarket) SEKALIGUS dapatkan id reseller
-        $resellerIds = $customers->filter(function($customer) {
+        $resellerIds = $customers->filter(function ($customer) {
             return strtolower($customer->category->name ?? '') === 'reseller';
         })->keys();
 
         // Cari pembelian tertinggi HANYA dari reseller
-        $pembelian_tertinggi = $resellerIds->map(function($id) use ($orderMap) {
+        $pembelian_tertinggi = $resellerIds->map(function ($id) use ($orderMap) {
             return (float) ($orderMap[$id]->total_pembelian ?? 0);
         })->max() ?: 0;
 
@@ -105,7 +109,9 @@ class PeformaCustomerController extends Controller
 
         foreach ($resellerIds as $customer_id) {
             $customer = $customers[$customer_id] ?? null;
-            if (!$customer) continue;
+            if (! $customer) {
+                continue;
+            }
 
             $nama_customer = $customer->name;
             $total_pembelian = (float) ($orderMap[$customer_id]->total_pembelian ?? 0);
@@ -145,6 +151,7 @@ class PeformaCustomerController extends Controller
 
         return $sorted;
     }
+
     /**
      * Display a listing of customer performance.
      */
@@ -187,7 +194,7 @@ class PeformaCustomerController extends Controller
         // [!code focus:end]
 
         // Nama bulan untuk judul
-        $bulan = $months[$selectedMonth] . ' ' . $selectedYear;
+        $bulan = $months[$selectedMonth].' '.$selectedYear;
 
         return view('dashboard.admin.peforma-customer.peforma-customer', compact(
             'paginatedRanking', 'bulan', 'months', 'years', 'selectedMonth', 'selectedYear' // [!code focus]

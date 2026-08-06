@@ -16,25 +16,25 @@
 
     <div class="space-y-6">
         <!-- Main Card Container -->
-        <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm min-h-[700px] space-y-6">
+        <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-lg min-h-[700px] space-y-6">
             
             <!-- Header: Title & Meta -->
-            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-                <div class="space-y-1">
-                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
-                        <div class="w-9 h-9 rounded-2xl bg-brand/10 text-brand-deep dark:text-brand-light flex items-center justify-center">
-                            <i class="fas fa-shopping-bag text-base"></i>
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-6 border-b border-slate-100 dark:border-slate-800">
+                <div class="space-y-2">
+                    <h2 class="text-2xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand/20">
+                            <i class="fas fa-shopping-bag text-lg"></i>
                         </div>
                         <span>Daftar Pesanan Masuk</span>
                     </h2>
-                    <p class="text-xs text-slate-400 dark:text-slate-500">
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
                         Verifikasi pembayaran & kelola status pesanan dari reseller/kurir.
                     </p>
                 </div>
                 
                 <div class="flex items-center gap-3">
-                    <div class="px-3.5 py-1.5 rounded-full bg-mint text-brand-deep dark:bg-brand-deep/50 dark:text-brand-light border border-brand-light dark:border-brand-deep text-xs font-bold flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-brand animate-pulse"></span>
+                    <div class="px-4 py-2 rounded-full bg-mint text-brand-deep dark:bg-brand-deep/50 dark:text-brand-light border border-brand-light dark:border-brand-deep text-sm font-bold flex items-center gap-2 shadow-sm">
+                        <span class="w-2.5 h-2.5 rounded-full bg-brand animate-pulse"></span>
                         <span>Total Pesanan: {{ number_format($orders->total()) }}</span>
                     </div>
                 </div>
@@ -44,18 +44,18 @@
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <form class="flex items-center w-full sm:w-auto" method="GET">
                     <div class="relative w-full sm:w-96">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
-                            <i class="fas fa-search text-xs text-slate-400"></i>
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                            <i class="fas fa-search text-sm text-slate-400"></i>
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}"
-                            class="block w-full p-2.5 pl-10 text-xs text-slate-900 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-brand focus:border-brand dark:bg-slate-800 dark:border-slate-700 dark:placeholder-slate-400 dark:text-white transition-all"
+                            class="block w-full p-3 pl-11 text-sm text-slate-900 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-brand focus:border-brand dark:bg-slate-800 dark:border-slate-700 dark:placeholder-slate-400 dark:text-white transition-all shadow-sm hover:shadow-md"
                             placeholder="Cari nomor invoice atau nama customer...">
                     </div>
                 </form>
             </div>
 
             <!-- Table Container -->
-            <div class="overflow-hidden border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900">
+            <div class="overflow-hidden border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 shadow-sm">
                 <div class="overflow-x-auto min-h-[500px]">
                     @php
                         $statusLabelMap = [
@@ -72,17 +72,17 @@
                             return $statusLabelMap[$status] ?? ucwords(str_replace('_', ' ', $status));
                         };
                     @endphp
-                    <table class="w-full text-xs text-left">
-                        <thead class="text-[11px] font-extrabold text-slate-400 uppercase bg-slate-50/80 dark:bg-slate-800/80">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs font-extrabold text-slate-400 uppercase bg-slate-50/90 dark:bg-slate-800/90">
                             <tr>
-                                <th class="px-5 py-3.5 text-center w-12">No.</th>
-                                <th class="px-5 py-3.5">Invoice</th>
-                                <th class="px-5 py-3.5">Customer</th>
-                                <th class="px-5 py-3.5 text-center">Kurir</th>
-                                <th class="px-5 py-3.5 text-center">Status</th>
-                                <th class="px-5 py-3.5 text-center">Total</th>
-                                <th class="px-5 py-3.5 text-center">Catatan</th>
-                                <th class="px-5 py-3.5 text-center">Aksi</th>
+                                <th class="px-6 py-4 text-center w-14">No.</th>
+                                <th class="px-6 py-4">Invoice</th>
+                                <th class="px-6 py-4">Customer</th>
+                                <th class="px-6 py-4 text-center">Kurir</th>
+                                <th class="px-6 py-4 text-center">Status</th>
+                                <th class="px-6 py-4 text-center">Total</th>
+                                <th class="px-6 py-4 text-center">Catatan</th>
+                                <th class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="order-result-container" class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -93,8 +93,8 @@
             </div>
 
             <!-- Pagination Nav -->
-            <nav class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2" aria-label="Table navigation">
-                <p class="text-xs text-slate-500 dark:text-slate-400">
+            <nav class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4" aria-label="Table navigation">
+                <p class="text-sm text-slate-500 dark:text-slate-400">
                     Menampilkan <span class="font-bold text-slate-800 dark:text-white">{{ $orders->firstItem() ?? 0 }}</span> - <span class="font-bold text-slate-800 dark:text-white">{{ $orders->lastItem() ?? 0 }}</span> dari <span class="font-bold text-slate-800 dark:text-white">{{ $orders->total() }}</span> pesanan
                 </p>
                 {{ $orders->withQueryString()->links() }}

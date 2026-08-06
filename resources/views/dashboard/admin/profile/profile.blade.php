@@ -26,7 +26,7 @@
                     <i class="fas fa-user-shield mr-1"></i> Role: Administrator
                 </span>
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                    <i class="fas fa-map-marker-alt mr-1"></i> Cabang: {{ Auth::user()->region->name ?? 'N/A' }}
+                    <i class="fas fa-map-marker-alt mr-1"></i> Cabang: {{ \App\Support\RegionContext::name() ?? 'N/A' }}
                 </span>
             </div>
         </div>

@@ -5,36 +5,36 @@
 @section('content')
     <div class="space-y-6">
         <!-- Main Card Container -->
-        <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm space-y-6 min-h-[700px]">
+        <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-lg space-y-6 min-h-[700px]">
             
             <!-- Header Section -->
-            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-                <div class="space-y-1">
-                    <h2 class="text-xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
-                        <div class="w-9 h-9 rounded-2xl bg-brand/10 text-brand-deep dark:text-brand-light flex items-center justify-center">
-                            <i class="fas fa-truck text-base"></i>
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-6 border-b border-slate-100 dark:border-slate-800">
+                <div class="space-y-2">
+                    <h2 class="text-2xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand/20">
+                            <i class="fas fa-truck text-lg"></i>
                         </div>
                         <span>Tim & Personel Kurir</span>
                     </h2>
-                    <p class="text-xs text-slate-400 dark:text-slate-500">
-                        Kelola akun pengantar, performa pengiriman, dan wilayah tugas kurir di Cabang {{ Auth::user()->region->name ?? 'N/A' }}.
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                        Kelola akun pengantar, performa pengiriman, dan wilayah tugas kurir di Cabang {{ \App\Support\RegionContext::name() ?? 'Cabang Aktif' }}.
                     </p>
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
                     <!-- Live Search Input -->
                     <div class="relative w-full sm:w-80">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
-                            <i class="fas fa-search text-xs text-slate-400"></i>
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                            <i class="fas fa-search text-sm text-slate-400"></i>
                         </div>
                         <input type="text" id="courier-search-input" name="search"
-                            class="block w-full p-2.5 pl-10 text-xs text-slate-900 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-brand focus:border-brand dark:bg-slate-800 dark:border-slate-700 dark:placeholder-slate-400 dark:text-white transition-all"
+                            class="block w-full p-3 pl-11 text-sm text-slate-900 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-brand focus:border-brand dark:bg-slate-800 dark:border-slate-700 dark:placeholder-slate-400 dark:text-white transition-all shadow-sm hover:shadow-md"
                             placeholder="Cari nama atau email kurir...">
                     </div>
 
                     <!-- Add Button -->
                     <button type="button" data-target-modal="create-courier-modal"
-                        class="js-open-modal-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-brand to-brand-deep hover:from-brand-deep hover:to-brand-deep rounded-2xl shadow-lg shadow-brand-deep/25 transition-all hover:scale-105 active:scale-95">
+                        class="js-open-modal-btn w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-5 py-3 text-sm font-bold text-white bg-gradient-to-r from-brand to-brand-deep hover:from-brand-deep hover:to-brand-deep rounded-2xl shadow-xl shadow-brand-deep/30 transition-all duration-300 hover:scale-105 active:scale-95">
                         <i class="fas fa-plus"></i>
                         <span>Tambah Kurir Baru</span>
                     </button>
@@ -42,18 +42,18 @@
             </div>
 
             <!-- Table Container -->
-            <div class="overflow-hidden border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900">
+            <div class="overflow-hidden border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 shadow-sm">
                 <div class="overflow-x-auto min-h-[500px]">
-                    <table class="w-full text-xs text-left">
-                        <thead class="text-[11px] font-extrabold text-slate-400 uppercase bg-slate-50/80 dark:bg-slate-800/80">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs font-extrabold text-slate-400 uppercase bg-slate-50/90 dark:bg-slate-800/90">
                             <tr>
-                                <th scope="col" class="px-5 py-3.5 text-center w-12">No.</th>
-                                <th scope="col" class="px-5 py-3.5">Nama Kurir</th>
-                                <th scope="col" class="px-5 py-3.5 text-center">Email</th>
-                                <th scope="col" class="px-5 py-3.5 text-center">Region</th>
-                                <th scope="col" class="px-5 py-3.5 text-center">Note</th>
-                                <th scope="col" class="px-5 py-3.5 text-center">Tanggal Bergabung</th>
-                                <th scope="col" class="px-5 py-3.5 text-center">Aksi</th>
+                                <th scope="col" class="px-6 py-4 text-center w-14">No.</th>
+                                <th scope="col" class="px-6 py-4">Nama Kurir</th>
+                                <th scope="col" class="px-6 py-4 text-center">Email</th>
+                                <th scope="col" class="px-6 py-4 text-center">Region</th>
+                                <th scope="col" class="px-6 py-4 text-center">Note</th>
+                                <th scope="col" class="px-6 py-4 text-center">Tanggal Bergabung</th>
+                                <th scope="col" class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="courier-results-container" class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -64,8 +64,8 @@
             </div>
 
             <!-- Pagination Nav -->
-            <nav class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2" aria-label="Table navigation">
-                <p class="text-xs text-slate-500 dark:text-slate-400">
+            <nav class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4" aria-label="Table navigation">
+                <p class="text-sm text-slate-500 dark:text-slate-400">
                     Menampilkan <span class="font-bold text-slate-800 dark:text-white">{{ $couriers->firstItem() ?? 0 }}</span> - <span class="font-bold text-slate-800 dark:text-white">{{ $couriers->lastItem() ?? 0 }}</span> dari <span class="font-bold text-slate-800 dark:text-white">{{ $couriers->total() }}</span> kurir
                 </p>
                 {{ $couriers->links() }}

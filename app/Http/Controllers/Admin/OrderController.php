@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Support\RegionContext;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\Order;
-use App\Models\User;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
 {
@@ -20,15 +20,11 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $admin = Auth::user();
         $orders = Order::with(['customer.category', 'createdBy', 'returns'])
-            ->where('region_id', $admin->region_id)
+            ->where('region_id', RegionContext::regionId())
             ->where('status', '!=', 'diverifikasi_admin');
 
         $search = $request->input('search');
-
-        $newOrdersCount = Order::where('region_id', $admin->region_id)
-            ->where('status', 'pending')->count();
 
         $orders->when($search, function ($query, $searchTerm) {
             $query->where(function ($q) use ($searchTerm) {
@@ -43,10 +39,9 @@ class OrderController extends Controller
             });
         });
 
-
         $orders = $orders->latest()->paginate(10);
 
-        return view('dashboard.admin.order-list.index', compact('orders', 'newOrdersCount'));
+        return view('dashboard.admin.order-list.index', compact('orders'));
     }
 
     /**
@@ -64,9 +59,9 @@ class OrderController extends Controller
                 'items',
                 'returns',
                 'returns.returnedProducts.product',
-                'returns.returnedProducts.variant'
+                'returns.returnedProducts.variant',
             ])
-                ->where('region_id', $admin->region_id)
+                ->where('region_id', RegionContext::regionId())
                 ->findOrFail($id);
 
             $paidAtLabel = '';
@@ -77,8 +72,11 @@ class OrderController extends Controller
                 $paidAt = Carbon::parse($order->paid_at)->startOfDay();
                 $diffInDays = $createdAt->diffInDays($paidAt);
 
-                if ($diffInDays == 1) $paidAtLabel = ' (Harian)';
-                elseif ($diffInDays >= 2 && $diffInDays <= 7) $paidAtLabel = ' (Mingguan)';
+                if ($diffInDays == 1) {
+                    $paidAtLabel = ' (Harian)';
+                } elseif ($diffInDays >= 2 && $diffInDays <= 7) {
+                    $paidAtLabel = ' (Mingguan)';
+                }
 
                 $paidAtFormatted = Carbon::parse($order->paid_at)->isoFormat('D MMMM YYYY, HH:mm');
             }
@@ -95,7 +93,7 @@ class OrderController extends Controller
                 'paid_at' => $paidAtFormatted,
                 'paid_at_label' => $paidAtLabel,
                 // 'payment_proof' => $order->payment_proof,
-                'payment_proof' => $order->payment_proof ? asset('storage/' . preg_replace('#^(storage/|public/)#', '', $order->payment_proof)) : null,
+                'payment_proof' => $order->payment_proof ? asset('storage/'.preg_replace('#^(storage/|public/)#', '', $order->payment_proof)) : null,
                 'note' => $order->note,
                 'customer' => [
                     'name' => $order->customer->name ?? 'N/A',
@@ -104,7 +102,7 @@ class OrderController extends Controller
                     'address' => $order->customer->address ?? 'N/A',
                 ],
                 'kurir_name' => $order->createdBy->name ?? '-',
-                'items' => $order->items->map(fn($item) => [
+                'items' => $order->items->map(fn ($item) => [
                     'id' => $item->product_id,
                     'name' => $item->product_name,
                     'price' => $item->price,
@@ -115,7 +113,7 @@ class OrderController extends Controller
                 // Perbaikan pada bagian ini
                 'return_details' => $activeReturn ? [
                     // 'return_proof' => $activeReturn->return_proof,
-                    'return_proof' => $activeReturn->return_proof ? asset('storage/' . preg_replace('#^(storage/|public/)#', '', $activeReturn->return_proof)) : null,
+                    'return_proof' => $activeReturn->return_proof ? asset('storage/'.preg_replace('#^(storage/|public/)#', '', $activeReturn->return_proof)) : null,
                     'total_amount_returned' => $activeReturn->total_amount_returned,
                     'returned_products' => $activeReturn->returnedProducts->map(function ($p) {
                         // **PENGECEKAN AMAN**
@@ -128,9 +126,9 @@ class OrderController extends Controller
                             'name' => $productName,
                             'variant_name' => $variantName,
                             'quantity' => $p->quantity,
-                            'price' => $p->price
+                            'price' => $p->price,
                         ];
-                    })->toArray()
+                    })->toArray(),
                 ] : null,
             ];
 
@@ -139,7 +137,8 @@ class OrderController extends Controller
             return response()->json(['message' => 'Pesanan tidak ditemukan.'], 404);
         } catch (\Exception $e) {
             // Log error untuk debugging
-            \Log::error('Error fetching order details for order ID ' . $id . ' by admin: ' . $e->getMessage());
+            \Log::error('Error fetching order details for order ID '.$id.' by admin: '.$e->getMessage());
+
             return response()->json(['message' => 'Terjadi kesalahan internal.'], 500);
         }
     }
@@ -149,14 +148,13 @@ class OrderController extends Controller
      */
     public function verify($id)
     {
-        $admin = Auth::user();
-        // DIUBAH: Mencari pesanan dalam dua kemungkinan status
-        $order = Order::where('region_id', $admin->region_id)
+        $order = Order::where('region_id', RegionContext::regionId())
             ->whereIn('status', ['selesai', 'menunggu_verifikasi_admin']) // Perbaikan di sini
             ->findOrFail($id);
 
         $order->status = 'diverifikasi_admin';
         $order->save();
+
         return response()->json(['message' => 'Pesanan berhasil diverifikasi.']);
     }
 
@@ -169,8 +167,7 @@ class OrderController extends Controller
             'rejection_note' => 'required|string|min:10',
         ]);
 
-        $admin = Auth::user();
-        $order = Order::where('region_id', $admin->region_id)
+        $order = Order::where('region_id', RegionContext::regionId())
             ->whereIn('status', ['selesai', 'menunggu_verifikasi_admin'])
             ->findOrFail($id);
 
@@ -184,6 +181,7 @@ class OrderController extends Controller
             $returnRequest->admin_notes = 'Verifikasi retur ditolak oleh admin.';
             $returnRequest->save();
             $order->status = 'diterima_pembeli';
+            $order->paid_at = null;
         } else {
             if ($order->payment_proof) {
                 Storage::disk('public')->delete($order->payment_proof);
@@ -212,7 +210,7 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         try {
-            $order = Order::where('region_id', $admin->region_id)->with('returns')->findOrFail($id);
+            $order = Order::where('region_id', RegionContext::regionId())->with('returns')->findOrFail($id);
 
             // 1. Hapus bukti pembayaran utama
             if ($order->payment_proof) {
@@ -231,10 +229,16 @@ class OrderController extends Controller
             $order->delete();
 
             DB::commit();
+
             return response()->json(['message' => 'Pesanan berhasil dihapus secara permanen.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+
+            return response()->json(['message' => 'Pesanan tidak ditemukan.'], 404);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Gagal menghapus pesanan ID ' . $id . ': ' . $e->getMessage());
+            Log::error('Gagal menghapus pesanan ID '.$id.': '.$e->getMessage());
+
             return response()->json(['message' => 'Terjadi kesalahan saat menghapus pesanan.'], 500);
         }
     }

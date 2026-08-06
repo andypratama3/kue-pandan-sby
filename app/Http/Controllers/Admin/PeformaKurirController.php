@@ -2,29 +2,27 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Order;
-use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use Illuminate\Pagination\Paginator;
+use App\Models\Order;
+use App\Models\User;
+use App\Support\RegionContext;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Log;
 
 class PeformaKurirController extends Controller
 {
     /**
      * Export ranking performa kurir ke PDF.
      */
-
-
     public function exportPdf(Request $request)
     {
         try {
             $admin = auth()->user();
-            $regionId = $admin->region_id;
+            $regionId = RegionContext::regionId();
 
             /**
              * =========================
@@ -33,11 +31,11 @@ class PeformaKurirController extends Controller
              */
             $dates = explode(' - ', $request->daterange ?? '');
 
-            $startDate = !empty($dates[0])
+            $startDate = ! empty($dates[0])
                 ? Carbon::parse($dates[0])->startOfDay()
                 : Carbon::now()->startOfMonth()->startOfDay();
 
-            $endDate = !empty($dates[1])
+            $endDate = ! empty($dates[1])
                 ? Carbon::parse($dates[1])->endOfDay()
                 : Carbon::now()->endOfDay();
 
@@ -46,7 +44,7 @@ class PeformaKurirController extends Controller
              * Query Orders
              * =========================
              */
-            $orders = Order::with(['items', 'customer', 'createdBy'])
+            $orders = Order::with(['items', 'customer', 'createdBy', 'returns'])
                 ->where('region_id', $regionId)
                 ->where('status', 'diverifikasi_admin')
                 ->whereBetween('created_at', [$startDate, $endDate])
@@ -63,11 +61,15 @@ class PeformaKurirController extends Controller
                     $kurir = $orders->first()->createdBy;
 
                     return [
-                        'kurir_id'     => $kurirId,
-                        'nama_kurir'   => $kurir?->name ?? '-',
+                        'kurir_id' => $kurirId,
+                        'nama_kurir' => $kurir?->name ?? '-',
                         'jumlah_order' => $orders->count(),
-                        'total'        => $orders->sum('total_amount'),
-                        'orders'       => $orders,
+                        'total' => $orders->sum(function ($o) {
+                            $activeReturn = $o->returns->where('status', '!=', 'ditolak')->first();
+
+                            return $o->total_amount - ($activeReturn?->total_amount_returned ?? 0);
+                        }),
+                        'orders' => $orders,
                     ];
                 })
                 ->sortByDesc('jumlah_order')
@@ -87,6 +89,7 @@ class PeformaKurirController extends Controller
                 $user = $kurirs[$item['kurir_id']] ?? null;
                 $item['total_customer'] = $user?->customers_count ?? 0;
                 $item['rank'] = $i + 1;
+
                 return $item;
             });
 
@@ -96,14 +99,14 @@ class PeformaKurirController extends Controller
              * =========================
              */
             $pdf = Pdf::loadView('dashboard.admin.peforma-kurir.export-peforma-kurir', [
-                'ranking'   => $ranking,
+                'ranking' => $ranking,
                 'daterange' => $request->daterange
-                    ?? $startDate->toDateString() . ' - ' . $endDate->toDateString(),
+                    ?? $startDate->toDateString().' - '.$endDate->toDateString(),
             ])->setPaper('a4', 'portrait')->setOptions([
                 'isHtml5ParserEnabled' => true,
-                'isRemoteEnabled'     => false,
-                'dpi'                 => 72,
-                'defaultFont'         => 'DejaVu Sans',
+                'isRemoteEnabled' => false,
+                'dpi' => 72,
+                'defaultFont' => 'DejaVu Sans',
             ]);
 
             $filename = sprintf(
@@ -118,8 +121,8 @@ class PeformaKurirController extends Controller
             // Log error (WAJIB, biar gampang debug)
             Log::error('Export PDF Performa Kurir Gagal', [
                 'message' => $e->getMessage(),
-                'file'    => $e->getFile(),
-                'line'    => $e->getLine(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ]);
 
             return redirect()->back()->with(
@@ -129,24 +132,23 @@ class PeformaKurirController extends Controller
         }
     }
 
-
     public function exportPdfByCourier(Request $request, $id)
     {
         try {
             $admin = auth()->user();
-            $regionId = $admin->region_id;
+            $regionId = RegionContext::regionId();
 
             $dates = explode(' - ', $request->daterange ?? '');
 
-            $startDate = !empty($dates[0])
+            $startDate = ! empty($dates[0])
                 ? Carbon::parse($dates[0])->startOfDay()
                 : Carbon::now()->startOfMonth()->startOfDay();
 
-            $endDate = !empty($dates[1])
+            $endDate = ! empty($dates[1])
                 ? Carbon::parse($dates[1])->endOfDay()
                 : Carbon::now()->endOfDay();
 
-            $orders = Order::with(['items', 'customer', 'createdBy'])
+            $orders = Order::with(['items', 'customer', 'createdBy', 'returns'])
                 ->where('created_by_user_id', $id)
                 ->where('region_id', $regionId)
                 ->where('status', 'diverifikasi_admin')
@@ -164,11 +166,15 @@ class PeformaKurirController extends Controller
                     $kurir = $orders->first()->createdBy;
 
                     return [
-                        'kurir_id'     => $kurirId,
-                        'nama_kurir'   => $kurir?->name ?? '-',
+                        'kurir_id' => $kurirId,
+                        'nama_kurir' => $kurir?->name ?? '-',
                         'jumlah_order' => $orders->count(),
-                        'total'        => $orders->sum('total_amount'),
-                        'orders'       => $orders,
+                        'total' => $orders->sum(function ($o) {
+                            $activeReturn = $o->returns->where('status', '!=', 'ditolak')->first();
+
+                            return $o->total_amount - ($activeReturn?->total_amount_returned ?? 0);
+                        }),
+                        'orders' => $orders,
                     ];
                 })
                 ->sortByDesc('jumlah_order')
@@ -183,6 +189,7 @@ class PeformaKurirController extends Controller
                 $user = $kurirs[$item['kurir_id']] ?? null;
                 $item['total_customer'] = $user?->customers_count ?? 0;
                 $item['rank'] = $i + 1;
+
                 return $item;
             });
 
@@ -192,14 +199,14 @@ class PeformaKurirController extends Controller
              * =========================
              */
             $pdf = Pdf::loadView('dashboard.admin.peforma-kurir.export-peforma-kurir', [
-                'ranking'   => $ranking,
+                'ranking' => $ranking,
                 'daterange' => $request->daterange
-                    ?? $startDate->toDateString() . ' - ' . $endDate->toDateString(),
+                    ?? $startDate->toDateString().' - '.$endDate->toDateString(),
             ])->setPaper('a4', 'portrait')->setOptions([
                 'isHtml5ParserEnabled' => true,
-                'isRemoteEnabled'     => false,
-                'dpi'                 => 72,
-                'defaultFont'         => 'DejaVu Sans',
+                'isRemoteEnabled' => false,
+                'dpi' => 72,
+                'defaultFont' => 'DejaVu Sans',
             ]);
 
             $filename = sprintf(
@@ -214,8 +221,8 @@ class PeformaKurirController extends Controller
             // Log error (WAJIB, biar gampang debug)
             Log::error('Export PDF Performa Kurir Gagal', [
                 'message' => $e->getMessage(),
-                'file'    => $e->getFile(),
-                'line'    => $e->getLine(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ]);
 
             return redirect()->back()->with(
@@ -231,25 +238,24 @@ class PeformaKurirController extends Controller
     public function index(Request $request)
     {
         $admin = auth()->user();
-        $regionId = $admin->region_id;
+        $regionId = RegionContext::regionId();
 
         $dates = explode(' - ', $request->daterange ?? '');
 
-        $startDate = !empty($dates[0])
+        $startDate = ! empty($dates[0])
             ? $dates[0]
             : Carbon::now()->startOfMonth()->toDateString();
 
-        $endDate = !empty($dates[1])
+        $endDate = ! empty($dates[1])
             ? $dates[1]
             : Carbon::now()->toDateString();
-
 
         $orders = \App\Models\Order::where('region_id', $regionId)
             ->where('status', 'diverifikasi_admin')
             ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
                 $q->whereBetween('created_at', [
                     Carbon::parse($startDate)->startOfDay(),
-                    Carbon::parse($endDate)->endOfDay()
+                    Carbon::parse($endDate)->endOfDay(),
                 ]);
             })
             ->get();
@@ -258,6 +264,7 @@ class PeformaKurirController extends Controller
             ->map(function ($orders, $kurirId) {
 
                 $totalAmount = $orders->sum('total_amount');
+
                 return [
                     'kurir_id' => $kurirId,
                     'jumlah_order' => $orders->count(),
@@ -275,6 +282,7 @@ class PeformaKurirController extends Controller
             $item['nama_kurir'] = $user ? $user->name : '-';
             $item['total_customer'] = $user ? $user->customers()->count() : 0;
             $item['rank'] = $i + 1;
+
             return $item;
         });
 

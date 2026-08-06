@@ -2,26 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\RegionContext;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\QueryException;
 
 class ProductController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'role:admin']);
+        // index() terbuka untuk semua role yang login (kurir butuh melihat katalog).
+        // Operasi CRUD khusus admin & owner.
+        $this->middleware(['auth', 'role:admin|owner'])->except(['index']);
     }
 
     public function index()
     {
         $user = Auth::user();
-        $userRegionId = $user->region_id;
+        $userRegionId = RegionContext::regionId();
 
         $categories = Category::whereHas('products', function ($query) use ($userRegionId) {
             $query->where('region_id', $userRegionId);
@@ -30,15 +33,18 @@ class ProductController extends Controller
                 ->with(['variants' => function ($q) {
                     $q->where('is_active', true);
                 }]);
-            // ->where('is_active', true);
         }])->get();
 
         $all_categories = Category::all();
 
         // Ambil nama region dari relasi
-        $regionName = $user->region->name;
+        $regionName = RegionContext::name() ?? '';
 
-        // Kirim variabel $regionName ke view
+        // Kurir melihat katalog produk (read-only) di view khusus kurir
+        if ($user->hasRole('kurir')) {
+            return view('dashboard.kurir.products.index', compact('categories', 'all_categories', 'regionName'));
+        }
+
         return view('dashboard.admin.products.index', compact('categories', 'all_categories', 'regionName'));
     }
 
@@ -54,21 +60,23 @@ class ProductController extends Controller
             'variants.*.price' => 'required|integer|min:0',
         ]);
 
-        DB::transaction(function () use ($request) {
-            // HAPUS BARIS-BARIS INI:
-            // $image = $request->file('image');
-            // $imageName = uniqid() . '_' . time() . '.' . $image->getClientOriginalExtension();
-            // $image->move(public_path('storage/products'), $imageName);
+        // Cegah duplikasi nama produk di cabang yang sama
+        $existing = Product::where('region_id', RegionContext::regionId())
+            ->whereRaw('LOWER(name) = ?', [mb_strtolower(trim($request->name))])
+            ->exists();
+        if ($existing) {
+            return back()->withInput()->withErrors(['name' => 'Nama produk sudah digunakan di cabang ini.']);
+        }
 
-            // CUKUP GUNAKAN SATU BARIS INI
+        DB::transaction(function () use ($request) {
             $imagePath = $request->file('image')->store('products', 'public');
 
             $product = Product::create([
                 'name' => $request->name,
                 'category_id' => $request->category_id,
-                'region_id' => Auth::user()->region_id,
+                'region_id' => RegionContext::regionId(),
                 'description' => $request->description,
-                'image_path' => $imagePath, // Path yang disimpan sudah benar: "products/namafile.jpg"
+                'image_path' => $imagePath,
                 'tag' => $request->tag,
                 'is_active' => true,
             ]);
@@ -84,7 +92,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         // Pastikan admin hanya bisa melihat produk di regionnya sendiri
-        if ($product->region_id !== Auth::user()->region_id) {
+        if ($product->region_id !== RegionContext::regionId()) {
             abort(403);
         }
 
@@ -94,7 +102,7 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        if ($product->region_id !== Auth::user()->region_id) {
+        if ($product->region_id !== RegionContext::regionId()) {
             abort(403);
         }
 
@@ -126,7 +134,7 @@ class ProductController extends Controller
             $submittedVariantIds = [];
 
             foreach ($request->variants as $variantData) {
-                if (!empty($variantData['id'])) {
+                if (! empty($variantData['id'])) {
                     // Ini adalah varian LAMA -> UPDATE
                     $variant = ProductVariant::find($variantData['id']);
                     if ($variant) {
@@ -135,7 +143,7 @@ class ProductController extends Controller
                             'price' => $variantData['price'],
                             'is_active' => true,
                         ]);
-                        $submittedVariantIds[] = (int)$variant->id;
+                        $submittedVariantIds[] = (int) $variant->id;
                     }
                 } else {
                     // Ini adalah varian BARU -> CREATE
@@ -153,8 +161,11 @@ class ProductController extends Controller
                 try {
                     $variantToDelete->delete();
                 } catch (QueryException $e) {
-                    if ($e->getCode() === '23000') $variantToDelete->update(['is_active' => false]);
-                    else throw $e;
+                    if ($e->getCode() === '23000') {
+                        $variantToDelete->update(['is_active' => false]);
+                    } else {
+                        throw $e;
+                    }
                 }
             }
         });
@@ -164,7 +175,7 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        if ($product->region_id !== Auth::user()->region_id) {
+        if ($product->region_id !== RegionContext::regionId()) {
             abort(403);
         }
 

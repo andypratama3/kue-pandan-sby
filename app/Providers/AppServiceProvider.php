@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Auth;
+use App\Contracts\WhatsAppProviderInterface;
 use App\Models\Order;
+use App\Services\WhatsApp\FonnteProvider;
+use App\Services\WhatsApp\MetaCloudProvider;
+use App\Support\RegionContext;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,7 +18,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(WhatsAppProviderInterface::class, function () {
+            return match (config('services.whatsapp.provider')) {
+                'meta' => app(MetaCloudProvider::class),
+                default => app(FonnteProvider::class),
+            };
+        });
     }
 
     /**
@@ -23,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('layouts.partials.sidenav', function ($view) {
-            if (!Auth::check()) {
+            if (! Auth::check()) {
                 return; // Keluar jika pengguna tidak login
             }
 
@@ -31,9 +40,9 @@ class AppServiceProvider extends ServiceProvider
             $newOrdersCount = 0;
             $rejectedOrdersCount = 0;
 
-            // Logika untuk Admin
-            if ($user->hasRole('admin') && $user->region_id) {
-                $newOrdersCount = Order::where('region_id', $user->region_id)
+            // Logika untuk Admin (badge pesanan baru per cabang aktif)
+            if (($user->hasRole('admin') || $user->hasRole('owner')) && RegionContext::regionId()) {
+                $newOrdersCount = Order::where('region_id', RegionContext::regionId())
                     ->where('status', 'baru')->count();
             }
 

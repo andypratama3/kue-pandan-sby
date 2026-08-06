@@ -17,7 +17,7 @@
                         <span>Peringkat & Performa Reseller</span>
                     </h2>
                     <p class="text-xs text-slate-400 dark:text-slate-500">
-                        Evaluasi nilai pembelian vs retur customer reseller di Cabang {{ Auth::user()->region->name ?? 'N/A' }}.
+                        Evaluasi nilai pembelian vs retur customer reseller di Cabang {{ \App\Support\RegionContext::name() ?? 'Cabang Aktif' }}.
                     </p>
                 </div>
 

@@ -66,13 +66,16 @@
                     <li>
                         @php
                             $user = Auth::user();
-                            $region = $user->region ?? null;
                             $homeUrl = url('/dashboard');
-                            if ($user && $region) {
-                                if ($user->hasRole('admin')) {
-                                    $homeUrl = route('admin.dashboard', ['region' => $region]);
-                                } elseif ($user->hasRole('kurir')) {
-                                    $homeUrl = route('kurir.dashboard', ['region' => $region]);
+                            if ($user) {
+                                if ($user->hasRole('owner')) {
+                                    $homeUrl = route('admin.dashboard', ['region' => \App\Support\RegionContext::slug()]);
+                                } elseif ($user->region) {
+                                    if ($user->hasRole('admin')) {
+                                        $homeUrl = route('admin.dashboard', ['region' => $user->region->slug]);
+                                    } elseif ($user->hasRole('kurir')) {
+                                        $homeUrl = route('kurir.dashboard', ['region' => $user->region->slug]);
+                                    }
                                 }
                             }
                         @endphp
@@ -92,33 +95,35 @@
             </div>
         </div>
 
-        {{-- Branch/Cabang Switcher --}}
+        {{-- Branch/Cabang Switcher (khusus Owner) --}}
+        @php
+            $isOwner = Auth::user() && Auth::user()->hasRole('owner');
+            $currentRegion = \App\Support\RegionContext::region();
+        @endphp
+        @if ($isOwner)
         <div class="relative hidden sm:block mr-4">
             <button id="branch-switcher-btn" type="button"
                 class="flex items-center px-3.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl border border-slate-200/60 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand/30 transition-all">
-                <i class="fas fa-map-marker-alt mr-2 text-brand-deep dark:text-brand"></i>
-                <span id="current-branch-name">{{ Auth::user()->region->name ?? 'Pilih Cabang' }}</span>
+                <i class="fas fa-store mr-2 text-brand-deep dark:text-brand"></i>
+                <span id="current-branch-name">{{ $currentRegion->name ?? 'Pilih Cabang' }}</span>
                 <i class="fas fa-chevron-down ml-2 text-[10px] opacity-70 transition-transform duration-200"></i>
             </button>
-            
+
             <div id="branch-dropdown"
                 class="absolute right-0 z-50 hidden w-56 mt-2 bg-white rounded-2xl shadow-xl shadow-slate-900/5 dark:bg-slate-800 dark:border dark:border-slate-700 overflow-hidden border border-slate-100">
                 <div class="p-3.5 border-b border-slate-100 dark:border-slate-700 bg-mint dark:bg-slate-700/50">
-                    <p class="text-[11px] font-bold text-brand-deep dark:text-brand uppercase tracking-wider">Cabang Toko</p>
+                    <p class="text-[11px] font-bold text-brand-deep dark:text-brand uppercase tracking-wider">Ganti Cabang</p>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Owner — pantau semua cabang</p>
                 </div>
                 <div class="py-1 max-h-64 overflow-y-auto">
-                    @php
-                        $allRegions = App\Models\Region::all();
-                        $currentRegionSlug = Auth::user()->region->slug ?? null;
-                    @endphp
-                    @foreach($allRegions as $region)
-                        <a href="{{ route('admin.dashboard', ['region' => $region->slug]) }}"
-                            class="flex items-center justify-between px-4 py-2.5 text-xs font-medium {{ $region->slug === $currentRegionSlug ? 'bg-mint text-brand-deep dark:bg-brand-deep/40 dark:text-brand font-bold' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60' }} transition-colors">
+                    @foreach (App\Models\Region::active()->orderBy('id')->get() as $region)
+                        <a href="{{ route('admin.switch-region', ['region' => $region->slug]) }}"
+                            class="flex items-center justify-between px-4 py-2.5 text-xs font-medium {{ $currentRegion && $region->id === $currentRegion->id ? 'bg-mint text-brand-deep dark:bg-brand-deep/40 dark:text-brand font-bold' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60' }} transition-colors">
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-store text-brand-deep dark:text-brand"></i>
                                 {{ $region->name }}
                             </div>
-                            @if($region->slug === $currentRegionSlug)
+                            @if ($currentRegion && $region->id === $currentRegion->id)
                                 <i class="fas fa-check text-brand-deep dark:text-brand"></i>
                             @endif
                         </a>
@@ -126,6 +131,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
         {{-- Toggle Lightmode / Darkmode --}}
         <label id="theme-toggle-label-navbar" for="theme-toggle-checkbox-navbar"
@@ -168,6 +174,12 @@
                                         $timezone = 'Asia/Makassar';
                                         $tzAbbr = 'WITA';
                                     }
+                                } elseif ($user && $user->hasRole('owner')) {
+                                    $ownerRegion = \App\Support\RegionContext::region();
+                                    if ($ownerRegion && in_array(strtolower($ownerRegion->name), ['denpasar', 'bali', 'makassar'])) {
+                                        $timezone = 'Asia/Makassar';
+                                        $tzAbbr = 'WITA';
+                                    }
                                 }
                                 $lastLogin =
                                     \Carbon\Carbon::now($timezone)->isoFormat('D MMMM YYYY, HH:mm') . ' ' . $tzAbbr;
@@ -175,7 +187,7 @@
                             <div class="mb-3">
                                 <span class="block text-sm font-bold text-slate-900 dark:text-white">{{ $user->name ?? 'User' }}</span>
                                 <span class="inline-block px-2 py-0.5 mt-1 text-[10px] font-semibold text-brand-deep bg-mint rounded-full dark:bg-brand-deep dark:text-brand">
-                                    <i class="fas fa-map-marker-alt mr-1"></i>{{ $user->region->name ?? 'Semua Region' }}
+                                    <i class="fas fa-map-marker-alt mr-1"></i>{{ \App\Support\RegionContext::name() ?? 'Semua Region' }}
                                 </span>
                             </div>
                             <div class="space-y-1 text-[11px] text-slate-500 dark:text-slate-400">
@@ -185,7 +197,7 @@
                         </div>
                         @php
                             $profileUrl = route('profile.show');
-                            if (Auth::user() && Auth::user()->hasRole('admin')) {
+                            if (Auth::user() && (Auth::user()->hasRole('admin') || Auth::user()->hasRole('owner'))) {
                                 $profileUrl = url('/admin/profile');
                             } elseif (Auth::user() && Auth::user()->hasRole('kurir')) {
                                 $profileUrl = url('/kurir/profile');

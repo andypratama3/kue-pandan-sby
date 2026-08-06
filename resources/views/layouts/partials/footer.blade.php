@@ -4,7 +4,7 @@
             <div class="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-mint text-brand-deep dark:bg-brand-deep dark:text-brand border border-brand-deep/5 dark:border-brand-deep">
                     <span class="w-1.5 h-1.5 mr-1.5 bg-brand rounded-full animate-pulse"></span>
-                    {{ Auth::user()->region->name ?? 'System' }} Online
+                    {{ \App\Support\RegionContext::name() ?? 'System' }} Online
                 </span>
                 <span>&copy; {{ date('Y') }} <strong>Kue Pandan Asli</strong>. All rights reserved.</span>
             </div>

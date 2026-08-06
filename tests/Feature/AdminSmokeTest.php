@@ -19,6 +19,7 @@ class AdminSmokeTest extends TestCase
         $this->assertNotNull($admin, 'No admin user found after seeding.');
 
         $routes = [
+            '/admin/dashboard/surabaya',
             '/admin/orders',
             '/admin/historys',
             '/admin/couriers',

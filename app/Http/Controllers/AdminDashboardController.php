@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
+use App\Models\Customer;
+use App\Models\Order;
+use App\Models\Region;
+use App\Models\User;
+use App\Support\RegionContext;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use App\Models\User;
-use App\Models\Order;
-use App\Models\Customer;
-use App\Models\Region;
-use App\Models\OrderReturn;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
@@ -20,21 +20,29 @@ class AdminDashboardController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin->hasRole('admin')) {
+        if (! $admin->hasRole('admin') && ! $admin->hasRole('owner')) {
             abort(403, 'AKSES DITOLAK');
         }
+
+        // ===== ISOLASI CABANG =====
+        // Admin selalu terikat region-nya sendiri (parameter URL diabaikan agar
+        // tidak bisa membuka cabang lain). Owner mengikuti cabang yang dipilih
+        // via session (branch switcher).
+        $regionId = RegionContext::regionId();
+        if (! $regionId) {
+            abort(403, 'Cabang tidak valid.');
+        }
+        $regionModel = Region::find($regionId);
 
         // ===== TRACK VISITOR =====
         $visitFilter = $request->input('visit_filter', 'last_7_days');
         $year = now()->year;
 
-        $activeMonth = $monthFilter ?? now()->month;
+        $activeMonth = $request->input('month', now()->month);
 
         $visitChartLabels = [];
         $visitChartData = [];
         $visitDateRangeText = '';
-
-
 
         switch ($visitFilter) {
 
@@ -64,7 +72,7 @@ class AdminDashboardController extends Controller
                         $weekEnd = $endDate;
                     }
 
-                    $visitChartLabels[] = 'Minggu ' . $week;
+                    $visitChartLabels[] = 'Minggu '.$week;
                     $visitChartData[] = DB::table('visit_logs')
                         ->whereBetween('created_at', [$startDate, $weekEnd])
                         ->count();
@@ -94,7 +102,7 @@ class AdminDashboardController extends Controller
                 $lastMonth = Carbon::now()->subMonth();
 
                 $startDate = $lastMonth->copy()->startOfMonth();
-                $endDate   = $lastMonth->copy()->endOfMonth();
+                $endDate = $lastMonth->copy()->endOfMonth();
 
                 $daysInMonth = $lastMonth->daysInMonth;
 
@@ -114,7 +122,6 @@ class AdminDashboardController extends Controller
                 $visitDateRangeText = $lastMonth->isoFormat('MMMM YYYY');
                 break;
 
-
             case 'last_7_days':
             default:
                 for ($i = 6; $i >= 0; $i--) {
@@ -128,7 +135,7 @@ class AdminDashboardController extends Controller
 
                 $start = Carbon::today()->subDays(6);
                 $end = Carbon::today();
-                $visitDateRangeText = $start->isoFormat('D MMM') . ' - ' . $end->isoFormat('D MMM');
+                $visitDateRangeText = $start->isoFormat('D MMM').' - '.$end->isoFormat('D MMM');
                 break;
         }
 
@@ -136,22 +143,16 @@ class AdminDashboardController extends Controller
 
         // ===== TRACK VISITOR =====
 
-
-        $regionModel = Region::where('slug', $region)->firstOrFail();
-        $regionId = $regionModel->id;
-
         // --- DATA UTAMA UNTUK HARI INI ---
+        // Income dihitung dari pesanan tanpa retur aktif (retur selain 'ditolak').
         $incomeToday = Order::where('region_id', $regionId)
             ->whereDate('created_at', Carbon::today())
-            ->where(function ($query) {
-                $query->whereDoesntHave('returns')->orWhereHas('returns', function ($subQuery) {
-                    $subQuery->where('status', 'selesai');
-                });
+            ->whereDoesntHave('returns', function ($query) {
+                $query->where('status', '!=', 'ditolak');
             })
             ->sum('total_amount');
 
         $totalSalesToday = Order::where('region_id', $regionId)->whereDate('created_at', Carbon::today())->count();
-
 
         // DATA AVG
 
@@ -168,7 +169,6 @@ class AdminDashboardController extends Controller
             ? $totalSalesThisMonth / $daysThisMonth
             : 0;
 
-
         // ===== BULAN LALU =====
         $lastMonth = now()->subMonth();
 
@@ -183,7 +183,6 @@ class AdminDashboardController extends Controller
             ? $totalSalesLastMonth / $daysLastMonth
             : 0;
 
-
         $totalCustomersInRegion = Customer::where('region_id', $regionId)->count();
         $newCustomersToday = Customer::where('region_id', $regionId)->whereDate('created_at', Carbon::today())->count();
 
@@ -192,10 +191,8 @@ class AdminDashboardController extends Controller
         // 1. Income: Hari ini vs Kemarin
         $incomeYesterday = Order::where('region_id', $regionId)
             ->whereDate('created_at', Carbon::yesterday())
-            ->where(function ($query) {
-                $query->whereDoesntHave('returns')->orWhereHas('returns', function ($subQuery) {
-                    $subQuery->where('status', 'selesai');
-                });
+            ->whereDoesntHave('returns', function ($query) {
+                $query->where('status', '!=', 'ditolak');
             })
             ->sum('total_amount');
         if ($incomeYesterday > 0) {
@@ -252,7 +249,6 @@ class AdminDashboardController extends Controller
             $customerPercentageChange = 0;
         }
 
-
         // 5. New Customer: Hari ini vs Kemarin
         $newCustomersYesterday = Customer::where('region_id', $regionId)->whereDate('created_at', Carbon::yesterday())->count();
         if ($newCustomersYesterday > 0) {
@@ -263,10 +259,7 @@ class AdminDashboardController extends Controller
             $newCustomerPercentageChange = 0;
         }
 
-
-        $couriers = User::role('kurir')->whereHas('region', function ($query) use ($region) {
-            $query->where('slug', $region);
-        })->latest()->paginate(5, ['*'], 'couriers_page');
+        $couriers = User::role('kurir')->where('region_id', $regionId)->latest()->paginate(5, ['*'], 'couriers_page');
 
         // --- LOGIKA BARU UNTUK GRAFIK PENJUALAN ADMIN ---
         $filter = $request->input('filter', 'last_7_days');
@@ -299,9 +292,11 @@ class AdminDashboardController extends Controller
                 $weekNumber = 1;
                 while ($startDate->lte($endDate)) {
                     $weekEndDate = $startDate->copy()->endOfWeek(Carbon::SATURDAY);
-                    if ($weekEndDate->gt($endDate)) $weekEndDate = $endDate;
+                    if ($weekEndDate->gt($endDate)) {
+                        $weekEndDate = $endDate;
+                    }
 
-                    $chartLabels[] = 'Minggu ' . $weekNumber;
+                    $chartLabels[] = 'Minggu '.$weekNumber;
                     $chartDataTotal[] = Order::where('region_id', $regionId)->whereBetween('created_at', [$startDate, $weekEndDate])->count();
                     $chartDataVerified[] = Order::where('region_id', $regionId)->where('status', 'diverifikasi_admin')->whereBetween('updated_at', [$startDate, $weekEndDate])->count();
                     $chartDataVerifiedWithReturn[] = Order::where('region_id', $regionId)->where('status', 'diverifikasi_admin')->whereHas('returns')->whereBetween('updated_at', [$startDate, $weekEndDate])->count();
@@ -315,7 +310,7 @@ class AdminDashboardController extends Controller
                 $lastMonth = Carbon::now()->subMonth();
 
                 $startDate = $lastMonth->copy()->startOfMonth();
-                $endDate   = $lastMonth->copy()->endOfMonth();
+                $endDate = $lastMonth->copy()->endOfMonth();
 
                 $daysInMonth = $lastMonth->daysInMonth;
 
@@ -371,13 +366,35 @@ class AdminDashboardController extends Controller
                 }
                 $endDate = Carbon::today();
                 $startDate = Carbon::today()->subDays(6);
-                $dateRangeText = $startDate->isoFormat('D MMM') . ' - ' . $endDate->isoFormat('D MMM');
+                $dateRangeText = $startDate->isoFormat('D MMM').' - '.$endDate->isoFormat('D MMM');
                 break;
         }
 
         $totalOrdersInRange = array_sum($chartDataTotal);
         $totalVerifiedInRange = array_sum($chartDataVerified);
         $totalVerifiedWithReturnInRange = array_sum($chartDataVerifiedWithReturn);
+
+        // ===== RINGKASAN PER CABANG (KHUSUS OWNER) =====
+        $branchSummary = null;
+        if ($admin->hasRole('owner')) {
+            $branchSummary = Region::where('is_active', true)->orderBy('id')->get()->map(function ($r) {
+                $today = Carbon::today();
+
+                return [
+                    'region' => $r,
+                    'income_today' => (int) Order::where('region_id', $r->id)
+                        ->whereDate('created_at', $today)
+                        ->whereDoesntHave('returns', fn ($q) => $q->where('status', '!=', 'ditolak'))
+                        ->sum('total_amount'),
+                    'orders_today' => Order::where('region_id', $r->id)->whereDate('created_at', $today)->count(),
+                    'pending_verify' => Order::where('region_id', $r->id)
+                        ->whereIn('status', ['selesai', 'menunggu_verifikasi_admin'])
+                        ->count(),
+                    'customers' => Customer::where('region_id', $r->id)->count(),
+                    'couriers' => User::role('kurir')->where('region_id', $r->id)->count(),
+                ];
+            })->values();
+        }
 
         // Kirim semua variabel ke view, termasuk variabel persentase yang baru
         return view('dashboard.admin.dashboard', compact(
@@ -410,22 +427,43 @@ class AdminDashboardController extends Controller
             'visitChartData',
             'visitDateRangeText',
             'totalVisitsInRange',
+
+            // CABANG
+            'regionModel',
+            'branchSummary',
         ));
+    }
+
+    /**
+     * Ganti cabang aktif (khusus owner). Pilihan disimpan di session.
+     */
+    public function switchRegion(string $region)
+    {
+        $user = Auth::user();
+        if (! $user->hasRole('owner')) {
+            abort(403, 'AKSES DITOLAK');
+        }
+
+        $regionModel = Region::where('is_active', true)->where('slug', $region)->firstOrFail();
+        session(['selected_region_id' => $regionModel->id]);
+
+        return redirect()->route('admin.dashboard', ['region' => $regionModel->slug]);
     }
 
     public function profile()
     {
         $admin = Auth::user();
-        if (!$admin->hasRole('admin')) {
+        if (! $admin->hasRole('admin') && ! $admin->hasRole('owner')) {
             abort(403, 'AKSES DITOLAK');
         }
+
         return view('dashboard.admin.profile.profile', compact('admin'));
     }
 
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
-        if (!$user->hasRole('admin')) {
+        if (! $user->hasRole('admin') && ! $user->hasRole('owner')) {
             abort(403, 'AKSES DITOLAK');
         }
         $request->validate([
@@ -439,24 +477,26 @@ class AdminDashboardController extends Controller
             $user->updateProfilePhoto($request->file('photo'));
         }
         $user->save();
+
         return redirect()->route('admin.profile')->with('success', 'Profile updated successfully.');
     }
 
     public function updatePassword(Request $request)
     {
         $user = Auth::user();
-        if (!$user->hasRole('admin')) {
+        if (! $user->hasRole('admin') && ! $user->hasRole('owner')) {
             abort(403, 'AKSES DITOLAK');
         }
         $request->validate([
             'current_password' => ['required', 'string'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'The provided password does not match your current password.']);
         }
         $user->password = Hash::make($request->password);
         $user->save();
+
         return redirect()->route('admin.profile')->with('success', 'Password updated successfully.');
     }
 }

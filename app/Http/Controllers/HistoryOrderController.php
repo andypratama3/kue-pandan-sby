@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use App\Models\Order;
-use Illuminate\Http\Request;
+use App\Support\RegionContext;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
 
 class HistoryOrderController extends Controller
 {
@@ -22,7 +23,7 @@ class HistoryOrderController extends Controller
     {
         // Pastikan admin/kurir hanya bisa mengakses order yang relevan dengan mereka
         $user = Auth::user();
-        if ($user->hasRole('admin') && $user->region_id !== $order->region_id) {
+        if (($user->hasRole('admin') || $user->hasRole('owner')) && RegionContext::regionId() !== $order->region_id) {
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
         if ($user->hasRole('kurir') && $order->created_by_user_id !== $user->id) {
@@ -40,7 +41,7 @@ class HistoryOrderController extends Controller
                     $query->where('status', '!=', 'ditolak')->latest();
                 },
                 'returns.returnedProducts.product', // Relasi ke produk yg diretur
-                'returns.returnedProducts.variant'  // Relasi ke varian yg diretur
+                'returns.returnedProducts.variant',  // Relasi ke varian yg diretur
             ]);
 
             $paidAtFormatted = $order->paid_at ? Carbon::parse($order->paid_at)->isoFormat('D MMMM YYYY, HH:mm') : 'Belum Lunas';
@@ -64,9 +65,10 @@ class HistoryOrderController extends Controller
 
                 // --- PERBAIKAN PATH BUKTI PEMBAYARAN ---
                 // 'payment_proof_url' => $order->payment_proof ? Storage::url(preg_replace('#^(storage/|public/)#', '', $order->payment_proof)) : null,
-                'payment_proof_url' => $order->payment_proof ? asset('storage/' . preg_replace('#^(storage/|public/)#', '', $order->payment_proof)) : null,
+                'payment_proof_url' => $order->payment_proof ? asset('storage/'.preg_replace('#^(storage/|public/)#', '', $order->payment_proof)) : null,
+                'courier_name' => $order->createdBy->name ?? '-',
 
-                'items' => $order->items->map(fn($item) => [
+                'items' => $order->items->map(fn ($item) => [
                     'name' => $item->product_name,
                     'variant' => $item->variant_name,
                     'quantity' => $item->quantity,
@@ -81,11 +83,12 @@ class HistoryOrderController extends Controller
 
                     // --- PERBAIKAN PATH BUKTI RETUR ---
                     // 'return_proof_url' => $activeReturn->return_proof ? Storage::url(preg_replace('#^(storage/|public/)#', '', $activeReturn->return_proof)) : null,
-                    'return_proof_url' => $activeReturn->return_proof ? asset('storage/' . preg_replace('#^(storage/|public/)#', '', $activeReturn->return_proof)) : null,
+                    'return_proof_url' => $activeReturn->return_proof ? asset('storage/'.preg_replace('#^(storage/|public/)#', '', $activeReturn->return_proof)) : null,
 
                     'returned_products' => $activeReturn->returnedProducts->map(function ($p) {
                         $productName = $p->product ? $p->product->name : 'Produk Telah Dihapus';
                         $variantName = $p->variant ? $p->variant->name : null;
+
                         return [
                             'name' => $productName,
                             'variant' => $variantName,
@@ -93,20 +96,29 @@ class HistoryOrderController extends Controller
                             'price' => $p->price,
                             'subtotal' => $p->subtotal,
                         ];
-                    })->toArray()
+                    })->toArray(),
                 ] : null,
             ];
 
             return response()->json($formattedOrder);
         } catch (\Exception $e) {
-            Log::error('Error fetching history details for order ID ' . $order->id . ': ' . $e->getMessage());
+            Log::error('Error fetching history details for order ID '.$order->id.': '.$e->getMessage());
+
             return response()->json(['message' => 'Terjadi kesalahan internal.'], 500);
+        }
+    }
+
+    private function assertRegionAccess(Order $order): void
+    {
+        $user = Auth::user();
+        if (($user->hasRole('admin') || $user->hasRole('owner')) && RegionContext::regionId() !== $order->region_id) {
+            abort(403, 'AKSES DITOLAK');
         }
     }
 
     public function downloadInvoice($orderId)
     {
-        $order = \App\Models\Order::with([
+        $order = Order::with([
             'customer',
             'createdBy',
             'items',
@@ -116,30 +128,33 @@ class HistoryOrderController extends Controller
             'returns.returnedProducts.product',
             'returns.returnedProducts.variant',
         ])->findOrFail($orderId);
+
+        $this->assertRegionAccess($order);
+
         $isPdf = true;
         $pdf = \PDF::loadView('dashboard.admin.historys.invoice', compact('order', 'isPdf'))
             ->setPaper('A4', 'portrait')
             ->setOptions([
                 'isHtml5ParserEnabled' => true,
                 'isRemoteEnabled' => true,
-                'margin_top'    => 20,
-                'margin_right'  => 20,
+                'margin_top' => 20,
+                'margin_right' => 20,
                 'margin_bottom' => 20,
-                'margin_left'   => 20,
+                'margin_left' => 20,
             ]);
         $customerName = preg_replace('/[^A-Za-z0-9]/', '', $order->customer->name ?? 'Customer');
         $invoiceNumber = str_replace(['/', '\\'], '-', $order->invoice_number);
-        $filename = $customerName . '-' . $invoiceNumber . '.pdf';
+        $filename = $customerName.'-'.$invoiceNumber.'.pdf';
+
         return $pdf->download($filename);
     }
 
     public function destroy($id)
     {
-        $admin = Auth::user();
         DB::beginTransaction();
 
         try {
-            $order = Order::where('region_id', $admin->region_id)->with('returns')->findOrFail($id);
+            $order = Order::where('region_id', RegionContext::regionId())->with('returns')->findOrFail($id);
 
             // 1. Hapus bukti pembayaran utama
             if ($order->payment_proof) {
@@ -160,10 +175,16 @@ class HistoryOrderController extends Controller
 
             DB::commit();
             $routeName = 'admin.historys.index';
-            return redirect()->route($routeName)->with('success', 'Pesanan "' . $invoiceNumber . '" berhasil dihapus.');
+
+            return redirect()->route($routeName)->with('success', 'Pesanan "'.$invoiceNumber.'" berhasil dihapus.');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+
+            return response()->json(['message' => 'Pesanan tidak ditemukan.'], 404);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Gagal menghapus pesanan ID ' . $id . ': ' . $e->getMessage());
+            Log::error('Gagal menghapus pesanan ID '.$id.': '.$e->getMessage());
+
             return response()->json(['message' => 'Terjadi kesalahan saat menghapus pesanan.'], 500);
         }
     }
@@ -180,7 +201,11 @@ class HistoryOrderController extends Controller
             'returns.returnedProducts.product',
             'returns.returnedProducts.variant',
         ])->findOrFail($orderId);
+
+        $this->assertRegionAccess($order);
+
         $isPdf = false;
+
         return view('dashboard.admin.historys.invoice', compact('order', 'isPdf'));
     }
 
@@ -206,9 +231,9 @@ class HistoryOrderController extends Controller
         ];
 
         // Query dasar - tambahkan eager load 'returns'
-        $ordersQuery = Order::with(['customer', 'createdBy', 'returns' => fn($q) => $q->where('status', '!=', 'ditolak')->latest()])
+        $ordersQuery = Order::with(['customer', 'createdBy', 'returns' => fn ($q) => $q->where('status', '!=', 'ditolak')->latest()])
             ->where('status', 'diverifikasi_admin')
-            ->where('region_id', $user->region_id);
+            ->where('region_id', RegionContext::regionId());
 
         // Terapkan filter bulan dan tahun
         $ordersQuery->whereMonth('created_at', $selectedMonth)
@@ -225,16 +250,16 @@ class HistoryOrderController extends Controller
         // [!code focus:end]
 
         // Siapkan data untuk view PDF
-        $bulan = $months[$selectedMonth] . ' ' . $selectedYear;
+        $bulan = $months[$selectedMonth].' '.$selectedYear;
         $regionName = $user->region->name ?? 'Semua Region';
 
         $pdf = Pdf::loadView('dashboard.admin.historys.history-export', [
             'orders' => $orders,
             'bulan' => $bulan,
-            'regionName' => $regionName
+            'regionName' => $regionName,
         ]);
 
-        return $pdf->download('history-pesanan-' . $bulan . '.pdf');
+        return $pdf->download('history-pesanan-'.$bulan.'.pdf');
     }
 
     /**
@@ -243,7 +268,7 @@ class HistoryOrderController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $role = $user->hasRole('admin') ? 'admin' : 'kurir';
+        $role = ($user->hasRole('admin') || $user->hasRole('owner')) ? 'admin' : 'kurir';
 
         $selectedMonth = $request->input('month', now()->format('m'));
         $selectedYear = $request->input('year', now()->format('Y'));
@@ -267,11 +292,11 @@ class HistoryOrderController extends Controller
         $currentYear = now()->year;
         $years = range($currentYear, $currentYear - 5);
 
-        $ordersQuery = Order::with(['customer', 'createdBy', 'returns' => fn($q) => $q->where('status', '!=', 'ditolak')->latest()])
+        $ordersQuery = Order::with(['customer', 'createdBy', 'returns' => fn ($q) => $q->where('status', '!=', 'ditolak')->latest()])
             ->where('status', 'diverifikasi_admin');
 
         if ($role === 'admin') {
-            $ordersQuery->where('region_id', $user->region_id);
+            $ordersQuery->where('region_id', RegionContext::regionId());
         } else { // Untuk kurir
             $ordersQuery->where('created_by_user_id', $user->id);
         }
@@ -280,8 +305,8 @@ class HistoryOrderController extends Controller
         foreach ($ordersQuery->get() as $order) {
             if ($order->createdBy) {
                 $couriers[$order->createdBy->id] = [
-                    "id" => $order->createdBy->id,
-                    "name" => $order->createdBy->name
+                    'id' => $order->createdBy->id,
+                    'name' => $order->createdBy->name,
                 ];
             }
         }
@@ -290,7 +315,7 @@ class HistoryOrderController extends Controller
             ->whereYear('created_at', $selectedYear);
 
         $ordersQuery->when($selectedCourier, function ($query, $selectedCourier) {
-            $query->where('created_by_user_id', "=", $selectedCourier);
+            $query->where('created_by_user_id', '=', $selectedCourier);
         });
 
         $ordersQuery->when($search, function ($query, $searchTerm) {
@@ -303,7 +328,6 @@ class HistoryOrderController extends Controller
             });
         });
 
-
         $couriers = array_values($couriers);
 
         $orders = $ordersQuery->latest()->paginate(10);
@@ -315,7 +339,6 @@ class HistoryOrderController extends Controller
                 ? ['text' => 'Lunas', 'class' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300']
                 : ['text' => 'Belum Lunas', 'class' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'];
         }
-
 
         // [!code focus:start]
         // MODIFIKASI: Handle request AJAX untuk live search

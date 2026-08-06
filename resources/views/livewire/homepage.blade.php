@@ -1234,88 +1234,6 @@
                             </div>
                         </div>
 
-                        <!-- Testimonial 3 -->
-                        <div class="min-w-full px-4">
-                            <div class="overflow-hidden bg-white shadow-lg rounded-2xl">
-                                <div class="flex flex-col md:flex-row min-h-[450px]">
-                                    <div class="relative w-full md:w-1/3 lg:w-1/4">
-                                        <div class="relative overflow-hidden h-80 md:h-full">
-                                            <img src="{{ asset('assets/homepage/testimonial/testimoni-1.jpeg') }}"
-                                                alt="Testimoni Adhitya" loading="lazy"
-                                                class="object-cover object-center w-full h-full">
-                                            <div
-                                                class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent">
-                                            </div>
-                                            <div class="absolute bottom-4 left-4 right-4">
-                                                <div class="p-3 text-center rounded-lg bg-white/95 border border-slate-100">
-                                                    <h4 class="text-sm font-semibold text-ink">Adhitya</h4>
-                                                    <p class="text-brand-deep text-xs font-medium">Denpasar</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="w-full md:w-2/3 lg:w-3/4 p-8 md:p-12 flex flex-col justify-center bg-gradient-to-r from-transparent to-brand/5">
-                                        <div class="mb-4">
-                                            <div class="flex items-center gap-2 mb-4">
-                                                <div class="w-1 h-9 bg-brand"></div>
-                                                <div>
-                                                    <h3 class="font-display text-xl md:text-2xl font-semibold text-ink">Testimoni
-                                                        Pelanggan</h3>
-                                                    <p class="text-xs uppercase tracking-widest text-slate-400">Verified Customer</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <blockquote
-                                            class="relative mb-6 text-lg leading-relaxed text-slate-600 md:text-xl">
-                                            <div class="absolute -top-2 -left-2 text-4xl text-brand-deep/30 font-serif">
-                                                "</div>
-                                            "Kue langganan keluarga , dari dulu sering beli sampe kalau mau kasih
-                                            hampers mau ngasih oleh oleh pasti langsung beli di kue pandan asli, semua
-                                            orang dikeluarga suka dan cocok sama rasanya."
-                                            <div
-                                                class="absolute -bottom-4 -right-2 text-4xl text-brand-deep/30 font-serif">
-                                                "</div>
-                                        </blockquote>
-                                        <div
-                                            class="p-3 border border-slate-200 rounded-lg bg-white/80 backdrop-blur-sm">
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-sm font-medium text-gray-600">Rating:</span>
-                                                <div class="flex items-center gap-1">
-                                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <polygon
-                                                            points="9.9,1.1 7.6,6.6 1.6,7.6 6,11.9 4.8,17.8 9.9,14.8 15,17.8 13.8,11.9 18.2,7.6 12.2,6.6 " />
-                                                    </svg>
-                                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <polygon
-                                                            points="9.9,1.1 7.6,6.6 1.6,7.6 6,11.9 4.8,17.8 9.9,14.8 15,17.8 13.8,11.9 18.2,7.6 12.2,6.6 " />
-                                                    </svg>
-                                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <polygon
-                                                            points="9.9,1.1 7.6,6.6 1.6,7.6 6,11.9 4.8,17.8 9.9,14.8 15,17.8 13.8,11.9 18.2,7.6 12.2,6.6 " />
-                                                    </svg>
-                                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <polygon
-                                                            points="9.9,1.1 7.6,6.6 1.6,7.6 6,11.9 4.8,17.8 9.9,14.8 15,17.8 13.8,11.9 18.2,7.6 12.2,6.6 " />
-                                                    </svg>
-                                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <polygon
-                                                            points="9.9,1.1 7.6,6.6 1.6,7.6 6,11.9 4.8,17.8 9.9,14.8 15,17.8 13.8,11.9 18.2,7.6 12.2,6.6 " />
-                                                    </svg>
-                                                </div>
-                                                <span class="ml-2 text-sm font-bold text-brand-deep">5.0</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Testimonial 4 -->
                         <div class="min-w-full px-4">
                             <div class="overflow-hidden bg-white shadow-lg rounded-2xl">
@@ -1565,88 +1483,6 @@
                             </div>
                         </div>
 
-                        <!-- Testimonial 7 -->
-                        <div class="min-w-full px-4">
-                            <div class="overflow-hidden bg-white shadow-lg rounded-2xl">
-                                <div class="flex flex-col md:flex-row min-h-[450px]">
-                                    <div class="relative w-full md:w-1/3 lg:w-1/4">
-                                        <div class="relative overflow-hidden h-80 md:h-full">
-                                            <img src="{{ asset('assets/homepage/testimonial/testimoni-7.jpeg') }}"
-                                                alt="Testimoni Maya Sari" loading="lazy"
-                                                class="object-cover object-center w-full h-full">
-                                            <div
-                                                class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent">
-                                            </div>
-                                            <div class="absolute bottom-4 left-4 right-4">
-                                                <div class="p-3 text-center rounded-lg bg-white/95 border border-slate-100">
-                                                    <h4 class="text-sm font-semibold text-ink">Bu Kristika</h4>
-                                                    <p class="text-brand-deep text-xs font-medium">Denpasar, Bali</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div
-                                        class="w-full md:w-2/3 lg:w-3/4 p-8 md:p-12 flex flex-col justify-center bg-gradient-to-r from-transparent to-brand/5">
-                                        <div class="mb-4">
-                                            <div class="flex items-center gap-2 mb-4">
-                                                <div class="w-1 h-9 bg-brand"></div>
-                                                <div>
-                                                    <h3 class="font-display text-xl md:text-2xl font-semibold text-ink">Testimoni
-                                                        Pelanggan</h3>
-                                                    <p class="text-xs uppercase tracking-widest text-slate-400">Verified Customer</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <blockquote
-                                            class="relative mb-6 text-lg leading-relaxed text-slate-600 md:text-xl">
-                                            <div class="absolute -top-2 -left-2 text-4xl text-brand-deep/30 font-serif">
-                                                "</div>
-                                            "Kalau ada acara kaya arisan, kumpul keluarga atau kumpul kumpul bareng
-                                            teman langsung pesan di kue pandan asli, simple enak praktis tinggal wa dan
-                                            semua orang pada suka sama rasanya."
-                                            <div
-                                                class="absolute -bottom-4 -right-2 text-4xl text-brand-deep/30 font-serif">
-                                                "</div>
-                                        </blockquote>
-                                        <div
-                                            class="p-3 border border-slate-200 rounded-lg bg-white/80 backdrop-blur-sm">
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-sm font-medium text-gray-600">Rating:</span>
-                                                <div class="flex items-center gap-1">
-                                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <polygon
-                                                            points="9.9,1.1 7.6,6.6 1.6,7.6 6,11.9 4.8,17.8 9.9,14.8 15,17.8 13.8,11.9 18.2,7.6 12.2,6.6 " />
-                                                    </svg>
-                                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <polygon
-                                                            points="9.9,1.1 7.6,6.6 1.6,7.6 6,11.9 4.8,17.8 9.9,14.8 15,17.8 13.8,11.9 18.2,7.6 12.2,6.6 " />
-                                                    </svg>
-                                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <polygon
-                                                            points="9.9,1.1 7.6,6.6 1.6,7.6 6,11.9 4.8,17.8 9.9,14.8 15,17.8 13.8,11.9 18.2,7.6 12.2,6.6 " />
-                                                    </svg>
-                                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <polygon
-                                                            points="9.9,1.1 7.6,6.6 1.6,7.6 6,11.9 4.8,17.8 9.9,14.8 15,17.8 13.8,11.9 18.2,7.6 12.2,6.6 " />
-                                                    </svg>
-                                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor"
-                                                        viewBox="0 0 20 20">
-                                                        <polygon
-                                                            points="9.9,1.1 7.6,6.6 1.6,7.6 6,11.9 4.8,17.8 9.9,14.8 15,17.8 13.8,11.9 18.2,7.6 12.2,6.6 " />
-                                                    </svg>
-                                                </div>
-                                                <span class="ml-2 text-sm font-bold text-brand-deep">5.0</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Testimonial 8 -->
                         <div class="min-w-full px-4">
                             <div class="overflow-hidden bg-white shadow-lg rounded-2xl">
@@ -1745,9 +1581,6 @@
                         data-slide="1"></button>
                     <button
                         class="w-2.5 h-2.5 transition-all duration-300 bg-slate-300 rounded-full testimonial-dot hover:bg-brand"
-                        data-slide="2"></button>
-                    <button
-                        class="w-2.5 h-2.5 transition-all duration-300 bg-slate-300 rounded-full testimonial-dot hover:bg-brand"
                         data-slide="3"></button>
                     <button
                         class="w-2.5 h-2.5 transition-all duration-300 bg-slate-300 rounded-full testimonial-dot hover:bg-brand"
@@ -1755,9 +1588,6 @@
                     <button
                         class="w-2.5 h-2.5 transition-all duration-300 bg-slate-300 rounded-full testimonial-dot hover:bg-brand"
                         data-slide="5"></button>
-                    <button
-                        class="w-2.5 h-2.5 transition-all duration-300 bg-slate-300 rounded-full testimonial-dot hover:bg-brand"
-                        data-slide="6"></button>
                     <button
                         class="w-2.5 h-2.5 transition-all duration-300 bg-slate-300 rounded-full testimonial-dot hover:bg-brand"
                         data-slide="7"></button>
@@ -1780,8 +1610,6 @@
                     class="outlet-btn bg-brand-deep text-white px-5 py-2.5 text-sm font-semibold rounded-full border border-brand-deep transition">Surabaya</button>
                 <button id="btn-malang"
                     class="outlet-btn bg-white text-brand-deep px-5 py-2.5 text-sm font-semibold rounded-full border border-brand/30 hover:border-brand transition">Malang</button>
-                <button id="btn-denpasar"
-                    class="outlet-btn bg-white text-brand-deep px-5 py-2.5 text-sm font-semibold rounded-full border border-brand/30 hover:border-brand transition">Denpasar</button>
 
             </div>
             <div id="outlet-content" data-aos="fade-up"
