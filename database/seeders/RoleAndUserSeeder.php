@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Region;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Str;
 
@@ -19,9 +20,52 @@ class RoleAndUserSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Buat Roles
-        Role::firstOrCreate(['name' => 'owner']);
-        Role::firstOrCreate(['name' => 'admin']);
-        Role::firstOrCreate(['name' => 'kurir']);
+        $ownerRole = Role::firstOrCreate(['name' => 'owner']);
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $kurirRole = Role::firstOrCreate(['name' => 'kurir']);
+
+        // ===== KATALOG PERMISSION =====
+        // Owner -> semua permission. Admin -> operasional per cabang.
+        // Kurir -> hanya lingkup kerja sendiri (katalog, customer & order sendiri, retur).
+        $permissions = [
+            'switch region',        // pindah cabang (khusus owner)
+            'manage products',      // CRUD produk
+            'view products',        // lihat katalog produk
+            'manage couriers',      // CRUD kurir per cabang
+            'manage customers',     // CRUD customer
+            'manage orders',        // kelola pesanan (verifikasi/tolak/upload bukti)
+            'view order history',   // lihat history & invoice
+            'request return',       // ajukan retur
+            'view performance',     // laporan performa kurir/customer
+            'export reports',       // export PDF (rekap, invoice)
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+
+        // Assign permission per role (sync = idempotent & menghapus yang tak terdaftar)
+        $ownerRole->syncPermissions($permissions);
+
+        $adminRole->syncPermissions([
+            'manage products',
+            'view products',
+            'manage couriers',
+            'manage customers',
+            'manage orders',
+            'view order history',
+            'view performance',
+            'export reports',
+        ]);
+
+        $kurirRole->syncPermissions([
+            'view products',
+            'manage customers',
+            'manage orders',
+            'request return',
+        ]);
+
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Buat Regions (aktif semua)
         $regionSurabaya = Region::firstOrCreate(

@@ -105,7 +105,9 @@ Route::middleware([
 
     // ---------- RUTE ADMIN (admin & owner) ----------//
     Route::prefix('admin')->name('admin.')->middleware('role:admin|owner')->group(function () {
-        Route::get('switch-region/{region}', [AdminDashboardController::class, 'switchRegion'])->name('switch-region');
+        // Owner-only: pindah cabang (guard permission di middleware, bukan hanya controller)
+        Route::get('switch-region/{region}', [AdminDashboardController::class, 'switchRegion'])
+            ->middleware('permission:switch region')->name('switch-region');
         Route::get('peforma-kurir/export/pdf', [PeformaKurirController::class, 'exportPdf'])->name('peforma-kurir.export.pdf');
         Route::get('peforma-kurir/export/{id}/pdf', [PeformaKurirController::class, 'exportPdfByCourier']);
         Route::get('peforma-customer/export/pdf', [PeformaCustomerController::class, 'exportPdf'])->name('peforma-customer.export.pdf');
@@ -117,44 +119,55 @@ Route::middleware([
         Route::put('profile/password', [AdminDashboardController::class, 'updatePassword'])->name('profile.password');
 
         // Manajemen Produk
-        Route::resource('products', ProductController::class);
+        Route::resource('products', ProductController::class)->middleware('permission:manage products');
 
         // Manajemen Kurir
-        Route::resource('couriers', CourierController::class)->parameters(['couriers' => 'courier']);
-        Route::put('couriers/{courier}/note', [CourierController::class, 'updateNote'])->name('couriers.updateNote');
-        Route::get('couriers/{courier}/performance-data', [CourierController::class, 'performanceData'])->name('couriers.performanceData');
+        Route::resource('couriers', CourierController::class)
+            ->parameters(['couriers' => 'courier'])
+            ->middleware('permission:manage couriers');
+        Route::put('couriers/{courier}/note', [CourierController::class, 'updateNote'])->name('couriers.updateNote')
+            ->middleware('permission:manage couriers');
+        Route::get('couriers/{courier}/performance-data', [CourierController::class, 'performanceData'])->name('couriers.performanceData')
+            ->middleware('permission:manage couriers');
 
         // Manajemen Customer
-        Route::put('customers/{customer}/note', [CustomerController::class, 'updateNote'])->name('customers.updateNote');
-        Route::post('customers/{customer}/flag', [CustomerController::class, 'toggleFlag'])->name('customers.toggleFlag');
-        Route::resource('customers', CustomerController::class);
+        Route::put('customers/{customer}/note', [CustomerController::class, 'updateNote'])->name('customers.updateNote')
+            ->middleware('permission:manage customers');
+        Route::post('customers/{customer}/flag', [CustomerController::class, 'toggleFlag'])->name('customers.toggleFlag')
+            ->middleware('permission:manage customers');
+        Route::resource('customers', CustomerController::class)->middleware('permission:manage customers');
 
         // Route untuk download rekap order customer (PDF)
-        Route::get('customers/{customer}/rekap/download', [CustomerController::class, 'downloadRekap'])->name('customers.rekap.download');
+        Route::get('customers/{customer}/rekap/download', [CustomerController::class, 'downloadRekap'])->name('customers.rekap.download')
+            ->middleware('permission:manage customers');
 
         // Manajemen Pesanan untuk Admin
-        Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
-        Route::get('orders/{id}/details', [AdminOrderController::class, 'details']);
-        Route::post('orders/{id}/verify', [AdminOrderController::class, 'verify']);
-        Route::post('orders/{id}/reject', [AdminOrderController::class, 'reject']);
-        Route::delete('orders/{id}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
+        Route::middleware('permission:manage orders')->group(function () {
+            Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
+            Route::get('orders/{id}/details', [AdminOrderController::class, 'details']);
+            Route::post('orders/{id}/verify', [AdminOrderController::class, 'verify']);
+            Route::post('orders/{id}/reject', [AdminOrderController::class, 'reject']);
+            Route::delete('orders/{id}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
+        });
 
         // Manajemen History Pesanan
-        Route::get('historys', [HistoryOrderController::class, 'index'])->name('historys.index');
-        Route::get('historys/{order}/invoice', [HistoryOrderController::class, 'invoice'])->name('historys.invoice');
-        Route::get('historys/{order}/download', [HistoryOrderController::class, 'downloadInvoice'])->name('historys.download');
-        // Endpoint JSON untuk detail history pesanan (untuk modal show)
-        Route::get('historys/{order}/details', [HistoryOrderController::class, 'details'])->name('historys.details');
-        Route::get('historys/export-pdf', [HistoryOrderController::class, 'downloadHistoryPdf'])->name('historys.export.pdf');
-        Route::delete('historys/{id}', [HistoryOrderController::class, 'destroy'])->name('historys.destroy');
+        Route::middleware('permission:view order history')->group(function () {
+            Route::get('historys', [HistoryOrderController::class, 'index'])->name('historys.index');
+            Route::get('historys/{order}/invoice', [HistoryOrderController::class, 'invoice'])->name('historys.invoice');
+            Route::get('historys/{order}/download', [HistoryOrderController::class, 'downloadInvoice'])->name('historys.download');
+            // Endpoint JSON untuk detail history pesanan (untuk modal show)
+            Route::get('historys/{order}/details', [HistoryOrderController::class, 'details'])->name('historys.details');
+            Route::get('historys/export-pdf', [HistoryOrderController::class, 'downloadHistoryPdf'])->name('historys.export.pdf');
+            Route::delete('historys/{id}', [HistoryOrderController::class, 'destroy'])->name('historys.destroy');
+        });
 
-        // Routes untuk Peforma Kurir
-        Route::get('peforma-kurir', [PeformaKurirController::class, 'index'])->name('peforma-kurir.index');
-        Route::get('peforma-kurir/{kurir}', [PeformaKurirController::class, 'show'])->name('peforma-kurir.show');
-
-        // Routes untuk Peforma Customer
-        Route::get('peforma-customer', [PeformaCustomerController::class, 'index'])->name('peforma-customer.index');
-        Route::get('peforma-customer/{customer}', [PeformaCustomerController::class, 'show'])->name('peforma-customer.show');
+        // Routes untuk Peforma Kurir & Customer
+        Route::middleware('permission:view performance')->group(function () {
+            Route::get('peforma-kurir', [PeformaKurirController::class, 'index'])->name('peforma-kurir.index');
+            Route::get('peforma-kurir/{kurir}', [PeformaKurirController::class, 'show'])->name('peforma-kurir.show');
+            Route::get('peforma-customer', [PeformaCustomerController::class, 'index'])->name('peforma-customer.index');
+            Route::get('peforma-customer/{customer}', [PeformaCustomerController::class, 'show'])->name('peforma-customer.show');
+        });
     });
 
     // ---------- RUTE KURIR ----------//
@@ -185,7 +198,7 @@ Route::middleware([
             Route::post('/{order}/request-return', [ReturnController::class, 'requestReturn'])->name('requestReturn');
             Route::post('/{order}/upload-return-proof', [ReturnController::class, 'uploadReturnProof'])->name('uploadReturnProof');
 
-            Route::post('/{order}/request-return/edit', [ReturnController::class, 'editReturn'])->name('requestReturn');
+            Route::post('/{order}/request-return/edit', [ReturnController::class, 'editReturn'])->name('requestReturn.edit');
             Route::get('/{order}/request-return/edit', function () {
                 return view('dashboard.kurir.pesanan.edit');
             });

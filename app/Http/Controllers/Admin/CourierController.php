@@ -84,13 +84,21 @@ class CourierController extends Controller
     }
 
     /**
+     * Pastikan target benar-benar kurir (bukan admin/owner) di region aktif.
+     */
+    private function assertCourierTarget(User $courier): void
+    {
+        if ($courier->region_id !== RegionContext::regionId() || ! $courier->hasRole('kurir')) {
+            abort(403, 'AKSES DITOLAK');
+        }
+    }
+
+    /**
      * Memperbarui data kurir dari modal.
      */
     public function update(Request $request, User $courier)
     {
-        if ($courier->region_id !== RegionContext::regionId()) {
-            abort(403, 'AKSES DITOLAK');
-        }
+        $this->assertCourierTarget($courier);
 
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
@@ -122,9 +130,7 @@ class CourierController extends Controller
      */
     public function updateNote(Request $request, User $courier)
     {
-        if ($courier->region_id !== RegionContext::regionId()) {
-            abort(403, 'AKSES DITOLAK');
-        }
+        $this->assertCourierTarget($courier);
 
         $validated = $request->validate([
             'note' => ['nullable', 'string', 'max:1000'],
@@ -142,9 +148,7 @@ class CourierController extends Controller
      */
     public function destroy(User $courier)
     {
-        if ($courier->region_id !== RegionContext::regionId()) {
-            abort(403, 'AKSES DITOLAK');
-        }
+        $this->assertCourierTarget($courier);
 
         $courierName = $courier->name;
         $courier->delete();
@@ -158,9 +162,7 @@ class CourierController extends Controller
      */
     public function performanceData(Request $request, User $courier)
     {
-        if ($courier->region_id !== RegionContext::regionId()) {
-            abort(403, 'AKSES DITOLAK');
-        }
+        $this->assertCourierTarget($courier);
 
         $filter = $request->input('filter', 'last_7_days');
         $chartLabels = [];

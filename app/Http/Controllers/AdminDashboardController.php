@@ -34,7 +34,7 @@ class AdminDashboardController extends Controller
         }
         $regionModel = Region::find($regionId);
 
-        // ===== TRACK VISITOR =====
+        // ===== TRACK VISITOR (OPTIMIZED) =====
         $visitFilter = $request->input('visit_filter', 'last_7_days');
         $year = now()->year;
 
@@ -44,168 +44,246 @@ class AdminDashboardController extends Controller
         $visitChartData = [];
         $visitDateRangeText = '';
 
-        switch ($visitFilter) {
+        // Optimasi: Cache visit data untuk mengurangi query berulang
+        $cacheKeyVisit = "visit_stats_{$regionId}_{$visitFilter}_{$activeMonth}";
+        $visitStats = cache()->remember($cacheKeyVisit, 300, function() use ($visitFilter, $year, $activeMonth, $regionId) {
+            $labels = [];
+            $data = [];
+            $rangeText = '';
 
-            case 'daily':
-                $daysInMonth = Carbon::create($year, $activeMonth)->daysInMonth;
+            switch ($visitFilter) {
+                case 'daily':
+                    $daysInMonth = Carbon::create($year, $activeMonth)->daysInMonth;
+                    $dates = collect(range(1, $daysInMonth))->map(function($day) use ($year, $activeMonth) {
+                        return Carbon::createFromDate($year, $activeMonth, $day)->format('Y-m-d');
+                    });
 
-                for ($day = 1; $day <= $daysInMonth; $day++) {
-                    $date = Carbon::createFromDate($year, $activeMonth, $day);
+                    $visitCounts = DB::table('visit_logs')
+                        ->whereYear('created_at', $year)
+                        ->whereMonth('created_at', $activeMonth)
+                        ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+                        ->groupBy('date')
+                        ->pluck('count', 'date');
 
-                    $visitChartLabels[] = $date->format('d');
-                    $visitChartData[] = DB::table('visit_logs')
-                        ->whereDate('created_at', $date)
-                        ->count();
-                }
+                    foreach ($dates as $dateStr) {
+                        $labels[] = Carbon::parse($dateStr)->format('d');
+                        $data[] = $visitCounts->get($dateStr, 0);
+                    }
+                    $rangeText = Carbon::create($year, $activeMonth)->isoFormat('MMMM YYYY');
+                    break;
 
-                $visitDateRangeText = Carbon::create($year, $activeMonth)->isoFormat('MMMM YYYY');
-                break;
+                case 'weekly':
+                    $startDate = Carbon::now()->startOfMonth();
+                    $endDate = Carbon::now()->endOfMonth();
+                    $week = 1;
 
-            case 'weekly':
-                $startDate = Carbon::now()->startOfMonth();
-                $endDate = Carbon::now()->endOfMonth();
-                $week = 1;
+                    while ($startDate->lte($endDate)) {
+                        $weekEnd = $startDate->copy()->endOfWeek(Carbon::SATURDAY);
+                        if ($weekEnd->gt($endDate)) {
+                            $weekEnd = $endDate;
+                        }
 
-                while ($startDate->lte($endDate)) {
-                    $weekEnd = $startDate->copy()->endOfWeek(Carbon::SATURDAY);
-                    if ($weekEnd->gt($endDate)) {
-                        $weekEnd = $endDate;
+                        $labels[] = 'Minggu '.$week;
+                        $data[] = DB::table('visit_logs')
+                            ->whereBetween('created_at', [$startDate, $weekEnd])
+                            ->count();
+
+                        $startDate = $weekEnd->addDay();
+                        $week++;
+                    }
+                    $rangeText = Carbon::now()->isoFormat('MMMM YYYY');
+                    break;
+
+                case 'monthly':
+                    $visitCounts = DB::table('visit_logs')
+                        ->whereYear('created_at', now()->year)
+                        ->selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+                        ->groupBy('month')
+                        ->pluck('count', 'month');
+
+                    for ($month = 1; $month <= 12; $month++) {
+                        $date = Carbon::createFromDate(now()->year, $month, 1);
+                        $labels[] = $date->isoFormat('MMM');
+                        $data[] = $visitCounts->get($month, 0);
+                    }
+                    $rangeText = now()->year;
+                    break;
+
+                case 'last_month':
+                    $lastMonth = Carbon::now()->subMonth();
+                    $daysInMonth = $lastMonth->daysInMonth;
+
+                    $visitCounts = DB::table('visit_logs')
+                        ->whereYear('created_at', $lastMonth->year)
+                        ->whereMonth('created_at', $lastMonth->month)
+                        ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+                        ->groupBy('date')
+                        ->pluck('count', 'date');
+
+                    for ($day = 1; $day <= $daysInMonth; $day++) {
+                        $date = Carbon::createFromDate($lastMonth->year, $lastMonth->month, $day);
+                        $labels[] = $date->format('d');
+                        $data[] = $visitCounts->get($date->format('Y-m-d'), 0);
+                    }
+                    $rangeText = $lastMonth->isoFormat('MMMM YYYY');
+                    break;
+
+                case 'last_7_days':
+                default:
+                    $dates = collect(range(6, 0))->map(function($i) {
+                        return Carbon::today()->subDays($i);
+                    });
+
+                    $visitCounts = DB::table('visit_logs')
+                        ->whereDate('created_at', '>=', Carbon::today()->subDays(6))
+                        ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+                        ->groupBy('date')
+                        ->pluck('count', 'date');
+
+                    foreach ($dates as $date) {
+                        $labels[] = $date->format('d M');
+                        $data[] = $visitCounts->get($date->format('Y-m-d'), 0);
                     }
 
-                    $visitChartLabels[] = 'Minggu '.$week;
-                    $visitChartData[] = DB::table('visit_logs')
-                        ->whereBetween('created_at', [$startDate, $weekEnd])
-                        ->count();
+                    $start = Carbon::today()->subDays(6);
+                    $end = Carbon::today();
+                    $rangeText = $start->isoFormat('D MMM').' - '.$end->isoFormat('D MMM');
+                    break;
+            }
 
-                    $startDate = $weekEnd->addDay();
-                    $week++;
-                }
+            return ['labels' => $labels, 'data' => $data, 'rangeText' => $rangeText];
+        });
 
-                $visitDateRangeText = Carbon::now()->isoFormat('MMMM YYYY');
-                break;
-
-            case 'monthly':
-                for ($month = 1; $month <= 12; $month++) {
-                    $date = Carbon::createFromDate(now()->year, $month, 1);
-
-                    $visitChartLabels[] = $date->isoFormat('MMM');
-                    $visitChartData[] = DB::table('visit_logs')
-                        ->whereYear('created_at', now()->year)
-                        ->whereMonth('created_at', $month)
-                        ->count();
-                }
-
-                $visitDateRangeText = now()->year;
-                break;
-
-            case 'last_month':
-                $lastMonth = Carbon::now()->subMonth();
-
-                $startDate = $lastMonth->copy()->startOfMonth();
-                $endDate = $lastMonth->copy()->endOfMonth();
-
-                $daysInMonth = $lastMonth->daysInMonth;
-
-                for ($day = 1; $day <= $daysInMonth; $day++) {
-                    $date = Carbon::createFromDate(
-                        $lastMonth->year,
-                        $lastMonth->month,
-                        $day
-                    );
-
-                    $visitChartLabels[] = $date->format('d');
-                    $visitChartData[] = DB::table('visit_logs')
-                        ->whereDate('created_at', $date)
-                        ->count();
-                }
-
-                $visitDateRangeText = $lastMonth->isoFormat('MMMM YYYY');
-                break;
-
-            case 'last_7_days':
-            default:
-                for ($i = 6; $i >= 0; $i--) {
-                    $date = Carbon::today()->subDays($i);
-
-                    $visitChartLabels[] = $date->format('d M');
-                    $visitChartData[] = DB::table('visit_logs')
-                        ->whereDate('created_at', $date)
-                        ->count();
-                }
-
-                $start = Carbon::today()->subDays(6);
-                $end = Carbon::today();
-                $visitDateRangeText = $start->isoFormat('D MMM').' - '.$end->isoFormat('D MMM');
-                break;
-        }
-
+        $visitChartLabels = $visitStats['labels'];
+        $visitChartData = $visitStats['data'];
+        $visitDateRangeText = $visitStats['rangeText'];
         $totalVisitsInRange = array_sum($visitChartData);
 
         // ===== TRACK VISITOR =====
 
-        // --- DATA UTAMA UNTUK HARI INI ---
-        // Income dihitung dari pesanan tanpa retur aktif (retur selain 'ditolak').
-        $incomeToday = Order::where('region_id', $regionId)
-            ->whereDate('created_at', Carbon::today())
-            ->whereDoesntHave('returns', function ($query) {
-                $query->where('status', '!=', 'ditolak');
-            })
-            ->sum('total_amount');
+        // --- DATA UTAMA UNTUK HARI INI (OPTIMIZED WITH SINGLE QUERY) ---
+        // Optimasi: Gunakan single query untuk mengambil semua data hari ini
+        $todayStats = cache()->remember("dashboard_today_stats_{$regionId}", 60, function() use ($regionId) {
+            $today = Carbon::today();
+            
+            // Income hari ini (tanpa retur aktif)
+            $incomeToday = Order::where('region_id', $regionId)
+                ->whereDate('created_at', $today)
+                ->whereDoesntHave('returns', function ($query) {
+                    $query->where('status', '!=', 'ditolak');
+                })
+                ->sum('total_amount');
 
-        $totalSalesToday = Order::where('region_id', $regionId)->whereDate('created_at', Carbon::today())->count();
+            $totalSalesToday = Order::where('region_id', $regionId)
+                ->whereDate('created_at', $today)
+                ->count();
 
-        // DATA AVG
+            // Income kemarin
+            $incomeYesterday = Order::where('region_id', $regionId)
+                ->whereDate('created_at', Carbon::yesterday())
+                ->whereDoesntHave('returns', function ($query) {
+                    $query->where('status', '!=', 'ditolak');
+                })
+                ->sum('total_amount');
 
+            return [
+                'income_today' => $incomeToday,
+                'total_sales_today' => $totalSalesToday,
+                'income_yesterday' => $incomeYesterday,
+            ];
+        });
+
+        $incomeToday = $todayStats['income_today'];
+        $totalSalesToday = $todayStats['total_sales_today'];
+        $incomeYesterday = $todayStats['income_yesterday'];
+
+        // DATA AVG (OPTIMIZED)
         $thisMonth = now();
 
-        $totalSalesThisMonth = Order::where('region_id', $regionId)
-            ->whereYear('created_at', $thisMonth->year)
-            ->whereMonth('created_at', $thisMonth->month)
-            ->count();
+        // Optimasi: Gunakan cache untuk perhitungan bulanan
+        $monthlyStats = cache()->remember("dashboard_monthly_stats_{$regionId}", 300, function() use ($regionId) {
+            $thisMonth = now();
+            $lastMonth = now()->subMonth();
 
-        $daysThisMonth = $thisMonth->daysInMonth;
+            $totalSalesThisMonth = Order::where('region_id', $regionId)
+                ->whereYear('created_at', $thisMonth->year)
+                ->whereMonth('created_at', $thisMonth->month)
+                ->count();
 
-        $avgSalesThisMonth = $daysThisMonth > 0
-            ? $totalSalesThisMonth / $daysThisMonth
-            : 0;
+            $totalSalesLastMonth = Order::where('region_id', $regionId)
+                ->whereYear('created_at', $lastMonth->year)
+                ->whereMonth('created_at', $lastMonth->month)
+                ->count();
 
-        // ===== BULAN LALU =====
-        $lastMonth = now()->subMonth();
+            // Avg sales per month tahun ini
+            $avgSalesThisYear = Order::where('region_id', $regionId)
+                ->whereYear('created_at', $thisMonth->year)
+                ->selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+                ->groupBy('month')
+                ->get()
+                ->avg('total');
 
-        $totalSalesLastMonth = Order::where('region_id', $regionId)
-            ->whereYear('created_at', $lastMonth->year)
-            ->whereMonth('created_at', $lastMonth->month)
-            ->count();
+            return [
+                'total_sales_this_month' => $totalSalesThisMonth,
+                'total_sales_last_month' => $totalSalesLastMonth,
+                'avg_sales_this_year' => $avgSalesThisYear,
+                'days_this_month' => $thisMonth->daysInMonth,
+                'days_last_month' => $lastMonth->daysInMonth,
+            ];
+        });
 
-        $daysLastMonth = $lastMonth->daysInMonth;
+        $totalSalesThisMonth = $monthlyStats['total_sales_this_month'];
+        $totalSalesLastMonth = $monthlyStats['total_sales_last_month'];
+        $avgSalesPerMonth = $monthlyStats['avg_sales_this_year'];
+        $daysThisMonth = $monthlyStats['days_this_month'];
+        $daysLastMonth = $monthlyStats['days_last_month'];
 
-        $avgSalesLastMonth = $daysLastMonth > 0
-            ? $totalSalesLastMonth / $daysLastMonth
-            : 0;
+        $avgSalesThisMonth = $daysThisMonth > 0 ? $totalSalesThisMonth / $daysThisMonth : 0;
+        $avgSalesLastMonth = $daysLastMonth > 0 ? $totalSalesLastMonth / $daysLastMonth : 0;
 
-        $totalCustomersInRegion = Customer::where('region_id', $regionId)->count();
-        $newCustomersToday = Customer::where('region_id', $regionId)->whereDate('created_at', Carbon::today())->count();
+        // Customer stats (optimized)
+        $customerStats = cache()->remember("dashboard_customer_stats_{$regionId}", 300, function() use ($regionId) {
+            $totalCustomers = Customer::where('region_id', $regionId)->count();
+            $newToday = Customer::where('region_id', $regionId)
+                ->whereDate('created_at', Carbon::today())
+                ->count();
+            $newYesterday = Customer::where('region_id', $regionId)
+                ->whereDate('created_at', Carbon::yesterday())
+                ->count();
+            $newThisWeek = Customer::where('region_id', $regionId)
+                ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+                ->count();
+            $newLastWeek = Customer::where('region_id', $regionId)
+                ->whereBetween('created_at', [Carbon::now()->subWeek()->startOfWeek(), Carbon::now()->subWeek()->endOfWeek()])
+                ->count();
 
-        // --- LOGIKA BARU UNTUK PERHITUNGAN PERSENTASE ---
+            return [
+                'total' => $totalCustomers,
+                'new_today' => $newToday,
+                'new_yesterday' => $newYesterday,
+                'new_this_week' => $newThisWeek,
+                'new_last_week' => $newLastWeek,
+            ];
+        });
+
+        $totalCustomersInRegion = $customerStats['total'];
+        $newCustomersToday = $customerStats['new_today'];
+        $newCustomersYesterday = $customerStats['new_yesterday'];
+        $newCustomersThisWeek = $customerStats['new_this_week'];
+        $newCustomersLastWeek = $customerStats['new_last_week'];
+
+        // --- LOGIKA BARU UNTUK PERHITUNGAN PERSENTASE (OPTIMIZED) ---
 
         // 1. Income: Hari ini vs Kemarin
-        $incomeYesterday = Order::where('region_id', $regionId)
-            ->whereDate('created_at', Carbon::yesterday())
-            ->whereDoesntHave('returns', function ($query) {
-                $query->where('status', '!=', 'ditolak');
-            })
-            ->sum('total_amount');
         if ($incomeYesterday > 0) {
             $incomePercentageChange = (($incomeToday - $incomeYesterday) / $incomeYesterday) * 100;
         } elseif ($incomeToday > 0) {
-            $incomePercentageChange = 100; // Jika kemarin 0 dan hari ini ada, anggap naik 100%
+            $incomePercentageChange = 100;
         } else {
             $incomePercentageChange = 0;
         }
 
         // 2. Total Sales: Bulan ini vs Bulan lalu
-        $totalSalesThisMonth = Order::where('region_id', $regionId)->whereYear('created_at', Carbon::now()->year)->whereMonth('created_at', Carbon::now()->month)->count();
-        $totalSalesLastMonth = Order::where('region_id', $regionId)->whereYear('created_at', Carbon::now()->subMonth()->year)->whereMonth('created_at', Carbon::now()->subMonth()->month)->count();
         if ($totalSalesLastMonth > 0) {
             $salesPercentageChange = (($totalSalesThisMonth - $totalSalesLastMonth) / $totalSalesLastMonth) * 100;
         } elseif ($totalSalesThisMonth > 0) {
@@ -214,24 +292,9 @@ class AdminDashboardController extends Controller
             $salesPercentageChange = 0;
         }
 
-        // 3. Total avg: bulan ini vs bulan lalu
-        $avgSalesPerMonth = Order::where('region_id', $regionId)
-            ->whereYear('created_at', now()->year)
-            ->selectRaw('MONTH(created_at) as month, COUNT(*) as total')
-            ->groupBy('month')
-            ->get()
-            ->avg('total');
-
-        $avgSalesLastYear = Order::where('region_id', $regionId)
-            ->whereYear('created_at', now()->subYear()->year)
-            ->selectRaw('MONTH(created_at) as month, COUNT(*) as total')
-            ->groupBy('month')
-            ->get()
-            ->avg('total');
-
+        // 3. Avg Sales: bulan ini vs bulan lalu
         if ($avgSalesLastMonth > 0) {
-            $avgSalesPercentageChange =
-                (($avgSalesThisMonth - $avgSalesLastMonth) / $avgSalesLastMonth) * 100;
+            $avgSalesPercentageChange = (($avgSalesThisMonth - $avgSalesLastMonth) / $avgSalesLastMonth) * 100;
         } elseif ($avgSalesThisMonth > 0) {
             $avgSalesPercentageChange = 100;
         } else {
@@ -239,8 +302,6 @@ class AdminDashboardController extends Controller
         }
 
         // 4. Customer (Region): Minggu ini vs Minggu lalu
-        $newCustomersThisWeek = Customer::where('region_id', $regionId)->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
-        $newCustomersLastWeek = Customer::where('region_id', $regionId)->whereBetween('created_at', [Carbon::now()->subWeek()->startOfWeek(), Carbon::now()->subWeek()->endOfWeek()])->count();
         if ($newCustomersLastWeek > 0) {
             $customerPercentageChange = (($newCustomersThisWeek - $newCustomersLastWeek) / $newCustomersLastWeek) * 100;
         } elseif ($newCustomersThisWeek > 0) {
@@ -250,7 +311,6 @@ class AdminDashboardController extends Controller
         }
 
         // 5. New Customer: Hari ini vs Kemarin
-        $newCustomersYesterday = Customer::where('region_id', $regionId)->whereDate('created_at', Carbon::yesterday())->count();
         if ($newCustomersYesterday > 0) {
             $newCustomerPercentageChange = (($newCustomersToday - $newCustomersYesterday) / $newCustomersYesterday) * 100;
         } elseif ($newCustomersToday > 0) {
@@ -258,6 +318,11 @@ class AdminDashboardController extends Controller
         } else {
             $newCustomerPercentageChange = 0;
         }
+
+        // Pending orders notification
+        $pendingOrders = Order::where('region_id', $regionId)
+            ->whereIn('status', ['menunggu_verifikasi_admin', 'selesai'])
+            ->count();
 
         $couriers = User::role('kurir')->where('region_id', $regionId)->latest()->paginate(5, ['*'], 'couriers_page');
 
@@ -431,6 +496,9 @@ class AdminDashboardController extends Controller
             // CABANG
             'regionModel',
             'branchSummary',
+            
+            // NOTIFICATION
+            'pendingOrders',
         ));
     }
 
