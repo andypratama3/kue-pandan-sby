@@ -60,7 +60,7 @@ class CourierController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'email', 'max:255', 'not_regex:/[\r\n]/', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -102,7 +102,7 @@ class CourierController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class.',email,'.$courier->id],
+            'email' => ['required', 'string', 'email', 'max:255', 'not_regex:/[\r\n]/', 'unique:'.User::class.',email,'.$courier->id],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -151,7 +151,11 @@ class CourierController extends Controller
         $this->assertCourierTarget($courier);
 
         $courierName = $courier->name;
-        $courier->delete();
+        try {
+            $courier->delete();
+        } catch (\Illuminate\Database\QueryException $e) {
+            return back()->withErrors('Kurir "'.$courierName.'" tidak dapat dihapus karena memiliki data retur. Pertahankan atau nonaktifkan akunnya.');
+        }
 
         return redirect()->route('admin.couriers.index')->with('success', 'Kurir "'.$courierName.'" berhasil dihapus.');
     }

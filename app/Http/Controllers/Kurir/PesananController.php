@@ -269,7 +269,13 @@ class PesananController extends Controller
             $order->save();
 
             // Generate nomor invoice unik
-            $orderCountToday = Order::whereDate('created_at', $currentTime->toDateString())->count();
+            // Scope per (hari, kurir, customer) + lockForUpdate agar dua checkout
+            // konkuren (mis. double-click) tidak menghasilkan nomor invoice yang sama.
+            $orderCountToday = Order::whereDate('created_at', $currentTime->toDateString())
+                ->where('created_by_user_id', $loggedInUser->id)
+                ->where('customer_id', $validated['customer_id'])
+                ->lockForUpdate()
+                ->count();
             $dailySequenceNumber = str_pad($orderCountToday, 3, '0', STR_PAD_LEFT);
             $tanggal = $currentTime->format('dmy');
             $formattedRegionId = str_pad($loggedInUser->region_id, 2, '0', STR_PAD_LEFT);
@@ -283,6 +289,9 @@ class PesananController extends Controller
             // Harga, nama produk, dan varian DIAMBIL DARI DATABASE (cabang kurir),
             // bukan dari input klien, agar total pesanan selalu akurat.
             $products = json_decode($validated['products'], true);
+            if (! is_array($products) || count($products) === 0) {
+                throw ValidationException::withMessages(['products' => 'Minimal satu produk wajib dipilih.']);
+            }
             $totalAmount = 0;
             $orderItems = [];
 
@@ -333,6 +342,20 @@ class PesananController extends Controller
                 'order_id' => $order->id,
                 'invoice_number' => $invoiceNumber,
             ], 200);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            return response()->json(['message' => 'Validasi gagal', 'errors' => $e->errors()], 422);
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            if (($e->errorInfo[1] ?? null) === 1062) {
+                Log::warning('Checkout duplikat (unique violation): '.$e->getMessage());
+
+                return response()->json(['message' => 'Pesanan duplikat terdeteksi. Silakan coba sekali lagi.'], 422);
+            }
+            Log::error('Checkout failed: '.$e->getMessage());
+
+            return response()->json(['message' => 'Gagal menyimpan pesanan. Terjadi kesalahan internal.'], 500);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Checkout failed: '.$e->getMessage());
