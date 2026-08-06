@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-B_m1mwXC.css",
+    "file": "assets/app-DU1oIt7E.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -10,12 +10,12 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-TNlm5LBQ.js",
+    "file": "assets/app-D7yonbck.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-B_m1mwXC.css"
+      "assets/app-DU1oIt7E.css"
     ]
   },
   "resources/js/argon-dashboard-tailwind.js": {
@@ -91,7 +91,7 @@
     "isEntry": true
   },
   "resources/js/navbar-scroll-fix.js": {
-    "file": "assets/navbar-scroll-fix-CtGIODeA.js",
+    "file": "assets/navbar-scroll-fix-CvvTmJRs.js",
     "name": "navbar-scroll-fix",
     "src": "resources/js/navbar-scroll-fix.js",
     "isEntry": true
@@ -115,7 +115,7 @@
     "isEntry": true
   },
   "resources/js/sidenav-burger.js": {
-    "file": "assets/sidenav-burger-C1Ki2HOM.js",
+    "file": "assets/sidenav-burger-BX4EkxVb.js",
     "name": "sidenav-burger",
     "src": "resources/js/sidenav-burger.js",
     "isEntry": true

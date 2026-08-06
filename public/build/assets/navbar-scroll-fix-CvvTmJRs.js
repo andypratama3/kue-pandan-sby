@@ -6,16 +6,15 @@
 
         /* Light mode scrolled navbar */
         #navbar-main.scrolled:not(.dark) {
-          box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08) !important;
-          background-color: #ffffff !important; /* solid white saat scroll */
-          /* Removed backdrop-filter to prevent stacking context issues */
+          box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08) !important;
+          background-color: rgba(255, 255, 255, 0.95) !important;
         }
 
         /* Dark mode scrolled navbar */
         #navbar-main.scrolled.dark,
         .dark #navbar-main.scrolled {
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3) !important;
-          background-color: #0f172a !important; /* dark:bg-slate-900 */
+          box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4) !important;
+          background-color: rgba(15, 23, 42, 0.95) !important;
         }
 
         /* Mobile styles */

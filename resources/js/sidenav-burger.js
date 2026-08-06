@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Showing sidebar");
         if (sidebar) {
             // Mobile behavior - show sidebar with overlay
-            if (window.innerWidth < 1280) {
+            if (window.innerWidth < 1024) {
                 sidebar.classList.remove("-translate-x-full");
                 sidebar.classList.add("translate-x-0");
                 if (overlay) {
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Hiding sidebar");
         if (sidebar) {
             // Mobile behavior - hide sidebar completely
-            if (window.innerWidth < 1280) {
+            if (window.innerWidth < 1024) {
                 sidebar.classList.add("-translate-x-full");
                 sidebar.classList.remove("translate-x-0");
                 if (overlay) {
@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("resize", function() {
         console.log("Window resized, width:", window.innerWidth);
         // Reset sidebar state on resize
-        if (window.innerWidth >= 1280) {
+        if (window.innerWidth >= 1024) {
             // Desktop: show sidebar by default, hide overlay
             if (overlay) {
                 overlay.classList.add("hidden");
@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
         showSidebar();
     } else {
         // Fallback to default behavior
-        if (window.innerWidth >= 1280) {
+        if (window.innerWidth >= 1024) {
             // Desktop: show sidebar expanded by default, but ensure it's visible
             sidebar.classList.remove("-translate-x-full");
             sidebar.classList.add("translate-x-0", "w-64");

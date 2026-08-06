@@ -11,7 +11,7 @@
     {{-- Vite build assets --}}
     @vite(['resources/css/app.css', 'resources/css/argon-dashboard-tailwind.css', 'resources/js/app.js', 'resources/js/custom.js', 'resources/js/sidenav-burger.js', 'resources/js/navbar-scroll-fix.js', 'resources/js/dark-mode-toggle.js', 'resources/js/live-search.js', 'resources/js/custom-modal.js'])
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://unpkg.com/@popperjs/core@2"></script>
 
@@ -44,7 +44,7 @@
 </head>
 
 <body
-    class="m-0 overflow-x-hidden font-sans text-base antialiased font-normal bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-200 min-h-screen flex flex-col">
+    class="m-0 font-sans text-base antialiased font-normal bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200 min-h-screen flex flex-col">
     {{-- TOAST COMPONENT --}}
     <x-toast />
 
@@ -66,7 +66,7 @@
     @include('layouts.partials.sidenav')
 
     <main id="main-content"
-        class="relative flex-grow transition-all duration-300 ease-in-out main-content pt-20">
+        class="relative flex-grow transition-all duration-300 ease-in-out main-content">
         @include('layouts.partials.navbar')
         @include('layouts.partials.content')
         @include('layouts.partials.footer')
