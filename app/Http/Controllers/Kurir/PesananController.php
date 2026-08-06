@@ -208,10 +208,11 @@ class PesananController extends Controller
 
         $loggedInUser = Auth::user();
 
-        // Cek kepemilikan customer: kurir hanya bisa menginput untuk customer di cabangnya
+        // Cek kepemilikan customer: kurir hanya bisa menginput untuk customer miliknya di cabangnya
         $customer = Customer::with('category')
             ->where('id', $validated['customer_id'])
             ->where('region_id', $loggedInUser->region_id)
+            ->where('added_by_user_id', $loggedInUser->id)
             ->first();
         if (! $customer) {
             return response()->json(['message' => 'Customer tidak ditemukan. Customer bukan milik cabang Anda.'], 404);
@@ -290,7 +291,7 @@ class PesananController extends Controller
                 $variantId = isset($product['variant_id']) && $product['variant_id'] !== '' && $product['variant_id'] !== null
                     ? (int) $product['variant_id']
                     : null;
-                $quantity = max(1, (int) ($product['quantity'] ?? 0));
+                $quantity = min(999, max(1, (int) ($product['quantity'] ?? 0)));
 
                 $variantQuery = ProductVariant::with('product')
                     ->where('is_active', true)
@@ -393,7 +394,7 @@ class PesananController extends Controller
                 'created_at' => $order->created_at->isoFormat('D MMMM YYYY, HH:mm'),
                 'paid_at' => $paidAtFormatted,
                 'paid_at_label' => $paidAtLabel,
-                'payment_proof' => $order->payment_proof,
+                'payment_proof' => $order->payment_proof ? Storage::url($order->payment_proof) : null,
                 'picked_up_at' => $order->picked_up_at ? $order->picked_up_at->isoFormat('D MMMM YYYY, HH:mm') : null,
                 'delivered_at' => $order->delivered_at ? $order->delivered_at->isoFormat('D MMMM YYYY, HH:mm') : null,
                 'received_by_buyer_at' => $order->received_by_buyer_at ? $order->received_by_buyer_at->isoFormat('D MMMM YYYY, HH:mm') : null,
@@ -421,14 +422,14 @@ class PesananController extends Controller
                         'variant_name' => $item->variant_name,
                         'quantity' => $item->quantity,
                         'price' => $item->price,
-                        'image_url' => $item->product->image_path ?? null,
+                        'image_url' => $item->product->image_path ? Storage::url($item->product->image_path) : null,
                         'returned_quantity' => $returnedQuantity,
                     ];
                 })->toArray(),
                 'order_return' => $activeReturn ? [
                     'id' => $activeReturn->id,
                     'status' => $activeReturn->status,
-                    'return_proof' => $activeReturn->return_proof,
+                    'return_proof' => $activeReturn->return_proof ? Storage::url($activeReturn->return_proof) : null,
                     'total_amount_returned' => $activeReturn->total_amount_returned,
                     'created_at' => $activeReturn->created_at->setTimezone($timezone)->isoFormat('D MMMM YYYY, HH:mm'),
                 ] : null,
@@ -533,7 +534,7 @@ class PesananController extends Controller
             DB::rollBack();
             Log::error('Error processing return request for order ID '.$id.': '.$e->getMessage());
 
-            return response()->json(['message' => 'Terjadi kesalahan: '.$e->getMessage()], 500);
+            return response()->json(['message' => 'Terjadi kesalahan pada server. Silakan coba lagi.'], 500);
         }
     }
 
@@ -612,7 +613,7 @@ class PesananController extends Controller
         } catch (\Exception $e) {
             Log::error('Upload payment proof error: '.$e->getMessage());
 
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Terjadi kesalahan pada server. Silakan coba lagi.'], 500);
         }
     }
 

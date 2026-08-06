@@ -146,8 +146,6 @@
 
 @push('page-scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-    {{-- Memuat skrip live-search.js dari public/js --}}
-    <script src="{{ asset('js/live-search.js') }}"></script>
 
     <script>
         // Ganti dengan URL aplikasi Anda yang sebenarnya di production

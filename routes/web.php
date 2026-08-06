@@ -48,14 +48,16 @@ Route::get('/', function (Request $request) {
 });
 
 Route::get('privacy-policy', function () {
-    return view('privacy-policy');
+    return view('privacy-policy', ['policy' => '<h2 class="text-lg font-semibold mb-3">Kebijakan Privasi</h2>
+        <p>Kue Pandan Sby menghargai privasi Anda. Data pelanggan, pesanan, dan pembayaran hanya digunakan untuk memproses dan mengantarkan pesanan Anda, serta tidak dibagikan kepada pihak ketiga tanpa persetujuan.</p>
+        <p>Data yang kami simpan meliputi nama, nomor telepon, alamat, dan riwayat transaksi. Anda dapat menghubungi kami untuk memperbarui atau menghapus data Anda.</p>']);
 })->name('privacy-policy');
 
-// Alias untuk register (Jetstream) agar link Terms & Privacy tidak 500
-Route::view('terms-of-service', 'terms')->name('terms.show');
-Route::get('privacy-policy', function () {
-    return view('privacy-policy');
-})->name('policy.show');
+Route::get('terms-of-service', function () {
+    return view('terms', ['terms' => '<h2 class="text-lg font-semibold mb-3">Syarat & Ketentuan</h2>
+        <p>Dengan menggunakan layanan Kue Pandan Sby, Anda menyetujui bahwa pesanan yang telah dikonfirmasi tidak dapat dibatalkan sepihak, dan pembayaran dilakukan sesuai metode yang tersedia.</p>
+        <p>Pembeli bertanggung jawab atas kelengkapan alamat pengiriman. Klaim kekurangan produk dapat diajukan maksimal 1x24 jam setelah penerimaan pesanan.</p>']);
+})->name('terms.show');
 
 // Rute Logout manual
 Route::post('/logout', function (Request $request) {
@@ -108,9 +110,12 @@ Route::middleware([
         // Owner-only: pindah cabang (guard permission di middleware, bukan hanya controller)
         Route::get('switch-region/{region}', [AdminDashboardController::class, 'switchRegion'])
             ->middleware('permission:switch region')->name('switch-region');
-        Route::get('peforma-kurir/export/pdf', [PeformaKurirController::class, 'exportPdf'])->name('peforma-kurir.export.pdf');
-        Route::get('peforma-kurir/export/{id}/pdf', [PeformaKurirController::class, 'exportPdfByCourier']);
-        Route::get('peforma-customer/export/pdf', [PeformaCustomerController::class, 'exportPdf'])->name('peforma-customer.export.pdf');
+        Route::get('peforma-kurir/export/pdf', [PeformaKurirController::class, 'exportPdf'])
+            ->middleware('permission:view performance')->name('peforma-kurir.export.pdf');
+        Route::get('peforma-kurir/export/{id}/pdf', [PeformaKurirController::class, 'exportPdfByCourier'])
+            ->middleware('permission:view performance');
+        Route::get('peforma-customer/export/pdf', [PeformaCustomerController::class, 'exportPdf'])
+            ->middleware('permission:view performance')->name('peforma-customer.export.pdf');
         Route::get('dashboard/{region}', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         // Profil Admin

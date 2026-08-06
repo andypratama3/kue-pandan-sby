@@ -32,6 +32,21 @@ class WhatsAppWebhookController extends Controller
 
     public function handle(Request $request)
     {
+        $secret = config('services.whatsapp.webhook_token');
+
+        if (! is_string($secret) || $secret === '') {
+            Log::channel('whatsapp')->error('Webhook ditolak: WHATSAPP_WEBHOOK_TOKEN belum dikonfigurasi di .env.');
+
+            abort(403);
+        }
+
+        $provided = $request->query('token') ?: $request->header('X-Webhook-Token', '');
+        if (! is_string($provided) || ! hash_equals($secret, $provided)) {
+            Log::channel('whatsapp')->warning('Webhook ditolak: token tidak valid.', ['ip' => $request->ip()]);
+
+            abort(403);
+        }
+
         $incoming = $this->provider->parseIncoming($request->all());
 
         if (empty($incoming['sender'])) {

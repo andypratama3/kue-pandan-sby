@@ -144,7 +144,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Features::registration(), // Registrasi publik dimatikan: akun dibuat via admin (kurir) & seeder
         Features::resetPasswords(),
         // Features::emailVerification(),
         Features::updateProfileInformation(),

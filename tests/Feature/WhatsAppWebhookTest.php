@@ -56,6 +56,8 @@ class WhatsAppWebhookTest extends TestCase
 
         $this->provider = new FakeWhatsAppProvider;
         $this->app->instance(WhatsAppProviderInterface::class, $this->provider);
+
+        config()->set('services.whatsapp.webhook_token', 'test-webhook-token');
     }
 
     public function fonntePayload(string $message, ?string $type = null, ?string $inboxid = null): array
@@ -106,7 +108,7 @@ class WhatsAppWebhookTest extends TestCase
     {
         config()->set('services.whatsapp.provider', $provider);
 
-        $this->postJson('/api/webhook/whatsapp', $this->fonntePayload('halo'))
+        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('halo'))
             ->assertOk()
             ->assertJson(['status' => true]);
 
@@ -125,7 +127,7 @@ class WhatsAppWebhookTest extends TestCase
         config()->set('services.whatsapp.provider', $provider);
         $this->seedSurabayaWithKueIjo();
 
-        $this->postJson('/api/webhook/whatsapp', $this->fonntePayload('berapa harga kue ijo?'))
+        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('berapa harga kue ijo?'))
             ->assertOk();
 
         $reply = $this->lastReply();
@@ -144,7 +146,7 @@ class WhatsAppWebhookTest extends TestCase
         config()->set('services.whatsapp.provider', $provider);
         $this->seedSurabayaWithKueIjo();
 
-        $this->postJson('/api/webhook/whatsapp', $this->fonntePayload('menu apa saja?'))
+        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('menu apa saja?'))
             ->assertOk();
 
         $this->assertStringContainsString('Kue Ijo', $this->lastReply());
@@ -157,7 +159,7 @@ class WhatsAppWebhookTest extends TestCase
         config()->set('services.whatsapp.provider', $provider);
         $this->seedSurabayaWithKueIjo();
 
-        $this->postJson('/api/webhook/whatsapp', $this->fonntePayload('lokasi outlet dan jam bukanya?'))
+        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('lokasi outlet dan jam bukanya?'))
             ->assertOk();
 
         $this->assertStringContainsString('Surabaya', $this->lastReply());
@@ -169,7 +171,7 @@ class WhatsAppWebhookTest extends TestCase
     {
         config()->set('services.whatsapp.provider', $provider);
 
-        $this->postJson('/api/webhook/whatsapp', $this->fonntePayload('cara order kue'))
+        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('cara order kue'))
             ->assertOk();
 
         $this->assertStringContainsString('Cara memesan', $this->lastReply());
@@ -181,7 +183,7 @@ class WhatsAppWebhookTest extends TestCase
     {
         config()->set('services.whatsapp.provider', $provider);
 
-        $this->postJson('/api/webhook/whatsapp', $this->fonntePayload('kapan indonesia merdeka?'))
+        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('kapan indonesia merdeka?'))
             ->assertOk();
 
         $this->assertStringContainsString('Maaf', $this->lastReply());
@@ -193,7 +195,7 @@ class WhatsAppWebhookTest extends TestCase
     {
         config()->set('services.whatsapp.provider', $provider);
 
-        $this->postJson('/api/webhook/whatsapp', $this->fonntePayload('', 'image', null))
+        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('', 'image', null))
             ->assertOk();
 
         $this->assertStringContainsString('pesan teks', $this->lastReply());
@@ -201,9 +203,18 @@ class WhatsAppWebhookTest extends TestCase
 
     public function test_incomplete_payload_returns_200_without_exception()
     {
-        $this->postJson('/api/webhook/whatsapp', [])
+        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', [])
             ->assertOk()
             ->assertJson(['status' => true]);
+    }
+
+    public function test_webhook_rejects_missing_or_wrong_token()
+    {
+        $this->postJson('/api/webhook/whatsapp', ['sender' => '6281234567890', 'message' => 'halo'])
+            ->assertForbidden();
+        $this->postJson('/api/webhook/whatsapp?token=salah', ['sender' => '6281234567890', 'message' => 'halo'])
+            ->assertForbidden();
+        $this->assertEmpty($this->provider->sent);
     }
 
     public function test_meta_verify_returns_challenge_when_token_correct()
@@ -235,7 +246,7 @@ class WhatsAppWebhookTest extends TestCase
     {
         $region = $this->seedSurabayaWithKueIjo();
 
-        $this->postJson('/api/webhook/whatsapp', $this->fonntePayload('halo'))
+        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('halo'))
             ->assertOk();
         $this->assertDatabaseHas('chatbot_conversations', [
             'sender_number' => '6281234567890',

@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; // Impor Auth
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException; // [!code ++]
 
@@ -138,8 +139,9 @@ class ReturnController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Pengajuan retur gagal untuk order '.$order->id.': '.$e->getMessage());
 
-            return response()->json(['message' => 'Terjadi kesalahan: '.$e->getMessage()], 500);
+            return response()->json(['message' => 'Terjadi kesalahan pada server. Silakan coba lagi.'], 500);
         }
     }
 
@@ -220,7 +222,7 @@ class ReturnController extends Controller
             // 2. Buat nama file baru yang unik dengan timestamp
             $sanitizedInvoiceNumber = str_replace('/', '-', $order->invoice_number);
             $timestamp = time(); // Tambahkan timestamp saat ini
-            $extension = $file->getClientOriginalExtension();
+            $extension = $file->guessExtension() ?: 'jpg'; // ekstensi dari MIME isi file, bukan input client
             $fileName = 'RETURN-'.$sanitizedInvoiceNumber.'_'.$timestamp.'.'.$extension; // Gabungkan
             $directory = 'return_proofs';
 
@@ -244,7 +246,9 @@ class ReturnController extends Controller
                 'order' => $order,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal mengunggah file: '.$e->getMessage()], 500);
+            Log::error('Upload bukti retur gagal untuk order '.$order->id.': '.$e->getMessage());
+
+            return response()->json(['message' => 'Gagal mengunggah file. Silakan coba lagi.'], 500);
         }
 
         return response()->json(['message' => 'File tidak ditemukan.'], 400);

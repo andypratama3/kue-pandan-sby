@@ -257,7 +257,10 @@ class CustomerController extends Controller
             return redirect()->route($routeName)->withErrors($validator)->withInput()->with('error', 'Gagal memperbarui data. '.$validator->errors()->first());
         }
 
-        $customer->update($request->all());
+        $customer->update($request->only([
+            'name', 'company_name', 'address', 'landmark', 'phone',
+            'customer_category_id', 'opening_hours', 'payment_type', 'note',
+        ]));
 
         return redirect()->route($routeName)->with('success', 'Data customer "'.$customer->name.'" berhasil diperbarui.');
     }

@@ -33,6 +33,7 @@ return [
 
     'whatsapp' => [
         'provider' => env('WHATSAPP_PROVIDER', 'fonnte'), // 'fonnte' | 'meta'
+        'webhook_token' => env('WHATSAPP_WEBHOOK_TOKEN'),
     ],
 
     'fonnte' => [
