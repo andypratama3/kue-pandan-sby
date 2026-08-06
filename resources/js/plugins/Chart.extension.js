@@ -2,8 +2,22 @@
 // Chart extension for making the bars rounded
 // Code from: https://codepen.io/jedtrow/full/ygRYgo
 //
+// NOTE: chartjs.min.js yang dipakai adalah Chart.js v3 — elemen batang
+// bernama `BarElement` (di v2 bernama `Rectangle`). Guard di bawah membuat
+// extension ini tetap aman terhadap salah satu penamaan tersebut.
+//
 
-Chart.elements.Rectangle.prototype.draw = function () {
+(function () {
+  var ChartCtor = (typeof window !== 'undefined' && window.Chart) || (typeof globalThis !== 'undefined' && globalThis.Chart);
+  var RectangleCls = ChartCtor && ChartCtor.elements
+    ? (ChartCtor.elements.BarElement || ChartCtor.elements.Rectangle)
+    : null;
+
+  if (!RectangleCls) {
+    return;
+  }
+
+  RectangleCls.prototype.draw = function () {
   var ctx = this._chart.ctx;
   var vm = this._view;
   var left, right, top, bottom, signX, signY, borderSkipped, radius;
@@ -126,3 +140,4 @@ Chart.elements.Rectangle.prototype.draw = function () {
     ctx.stroke();
   }
 };
+}.call(this));

@@ -655,3 +655,91 @@ html {
     font-variant-numeric: tabular-nums;
 }
 
+/* ============================================================
+   TYPOGRAPHY & READABILITY PASS — seluruh area admin
+   ============================================================ */
+
+/* Paksa Plus Jakarta Sans di seluruh shell admin (argon css default Open Sans) */
+html body {
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+#main-content,
+#main-content * {
+    font-family: inherit;
+}
+
+/* Font Awesome harus tetap memakai font ikonnya sendiri (bukan inherit)
+   agar ikon di dalam area konten tidak rusak jadi kotak/blank */
+#main-content i.fa,
+#main-content i.fa-solid,
+#main-content i.fa-regular,
+#main-content i.fas,
+#main-content i.far,
+#main-content i.fa-brands,
+#main-content i.fab {
+    font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free' !important;
+    font-weight: 900;
+}
+
+#main-content i.fa-regular,
+#main-content i.far {
+    font-weight: 400;
+}
+
+#main-content i.fa-brands,
+#main-content i.fab {
+    font-family: 'Font Awesome 6 Brands', 'Font Awesome 5 Brands' !important;
+}
+
+/* Base line-height & warna teks lebih nyaman dibaca */
+#main-content {
+    line-height: 1.6;
+}
+
+/* Minimum ukuran teks 12px untuk label mungil (sebelumnya 9-11px) */
+#main-content .text-\[9px\],
+#main-content .text-\[10px\],
+#main-content .text-\[11px\],
+#main-content .text-\[8px\] {
+    font-size: 0.75rem !important;
+    line-height: 1.5;
+}
+
+/* Teks data tabel dinaikkan ke 13px agar nyaman dibaca */
+#main-content table .text-xs,
+#main-content table .text-\[11px\],
+#main-content .text-xs {
+    font-size: 0.8125rem !important;
+    line-height: 1.5;
+}
+
+#main-content table td,
+#main-content table th {
+    line-height: 1.5;
+}
+
+/* Konten dashboard: animasi reveal tanpa bergantung window.load */
+.content-reveal {
+    animation: contentReveal 0.45s ease-out both;
+}
+
+@keyframes contentReveal {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pastikan konten selalu terlihat walau JS animasi gagal */
+#tab-content {
+    opacity: 1 !important;
+}
+
