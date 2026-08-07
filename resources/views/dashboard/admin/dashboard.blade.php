@@ -184,11 +184,14 @@
                                         </p>
                                     </div>
                                 </div>
-                                <a href="{{ route('admin.switch-region', ['region' => $branch['region']->slug]) }}"
-                                    class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-brand-deep dark:text-brand hover:bg-mint hover:scale-105 transition-all duration-200 inline-flex items-center gap-1">
-                                    <span>Buka</span>
-                                    <i class="fas fa-arrow-right text-[9px]"></i>
-                                </a>
+                                <form method="POST" action="{{ route('admin.switch-region', ['region' => $branch['region']->slug]) }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-brand-deep dark:text-brand hover:bg-mint hover:scale-105 transition-all duration-200 inline-flex items-center gap-1">
+                                        <span>Buka</span>
+                                        <i class="fas fa-arrow-right text-[9px]"></i>
+                                    </button>
+                                </form>
                             </div>
                             <div class="grid grid-cols-2 gap-2 text-center">
                                 <div class="rounded-xl bg-white dark:bg-slate-800 p-2.5 transform group-hover:scale-105 transition-transform duration-200">

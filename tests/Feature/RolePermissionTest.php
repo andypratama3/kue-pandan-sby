@@ -86,7 +86,7 @@ class RolePermissionTest extends TestCase
         $admin = User::role('admin')->whereHas('region', fn ($q) => $q->where('slug', 'surabaya'))->first();
 
         $this->actingAs($admin)
-            ->get('/admin/switch-region/malang')
+            ->post('/admin/switch-region/malang')
             ->assertForbidden();
 
         $this->assertFalse($admin->hasPermissionTo('switch region'));

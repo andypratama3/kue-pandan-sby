@@ -19,6 +19,7 @@ class OrderReturn extends Model
         'reason',
         'total_amount_returned',
         'return_proof',
+        'admin_notes',
     ];
 
     public function returnedProducts()

@@ -26,20 +26,7 @@ class ReturnController extends Controller
     // --- Helper Functions for Timezone ---
     private function getUserTimezone()
     {
-        $user = Auth::user();
-        if (! $user || is_null($user->region_id)) {
-            return config('app.timezone', 'UTC');
-        }
-
-        switch ($user->region_id) {
-            case 3: // Denpasar
-                return 'Asia/Makassar'; // WITA
-            case 1: // Surabaya
-            case 2: // Malang
-                return 'Asia/Jakarta'; // WIB
-            default:
-                return config('app.timezone', 'UTC');
-        }
+        return Auth::user()?->timezone() ?? config('app.timezone', 'UTC');
     }
 
     private function nowInUserTimezone()
@@ -212,6 +199,12 @@ class ReturnController extends Controller
                 return response()->json(['message' => 'Tidak ada pengajuan retur aktif untuk pesanan ini.'], 400);
             }
 
+            // Cegah perubahan status pesanan yang sudah diverifikasi admin
+            // (retur termasuk yang diapprove lewat verifikasi).
+            if ($order->status === 'diverifikasi_admin' || $order->returns()->where('status', 'diverifikasi')->exists()) {
+                return response()->json(['message' => 'Pesanan ini sudah selesai diproses. Bukti retur tidak dapat diubah lagi.'], 409);
+            }
+
             $file = $request->file('payment_proof');
 
             // 1. Hapus bukti retur lama jika ada (LOGIKA REPLACE)
@@ -257,6 +250,11 @@ class ReturnController extends Controller
     public function editReturn(Request $request, Order $order)
     {
         $this->assertOwnOrder($order);
+
+        // Retur yang sudah diverifikasi/ditolak tidak bisa diedit lagi.
+        if ($order->status === 'diverifikasi_admin' || $order->returns()->whereIn('status', ['diverifikasi', 'ditolak'])->exists()) {
+            return response()->json(['message' => 'Pengajuan retur sudah diproses admin dan tidak dapat diedit lagi.'], 409);
+        }
 
         $validated = $request->validate([
             'order_return_id' => 'required|exists:order_returns,id',

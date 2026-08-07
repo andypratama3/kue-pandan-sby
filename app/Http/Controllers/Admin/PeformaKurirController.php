@@ -16,6 +16,17 @@ use Illuminate\Support\Facades\Log;
 class PeformaKurirController extends Controller
 {
     /**
+     * Parse string tanggal aman; fallback ke nilai cadangan jika format tidak valid.
+     */
+    private function parseDateOr($value, $fallback)
+    {
+        try {
+            return Carbon::parse($value);
+        } catch (\Throwable $e) {
+            return Carbon::parse($fallback);
+        }
+    }
+    /**
      * Export ranking performa kurir ke PDF.
      */
     public function exportPdf(Request $request)
@@ -32,11 +43,11 @@ class PeformaKurirController extends Controller
             $dates = explode(' - ', $request->daterange ?? '');
 
             $startDate = ! empty($dates[0])
-                ? Carbon::parse($dates[0])->startOfDay()
+                ? $this->parseDateOr($dates[0], Carbon::now()->startOfMonth()->toDateString())->startOfDay()
                 : Carbon::now()->startOfMonth()->startOfDay();
 
             $endDate = ! empty($dates[1])
-                ? Carbon::parse($dates[1])->endOfDay()
+                ? $this->parseDateOr($dates[1], Carbon::now()->toDateString())->endOfDay()
                 : Carbon::now()->endOfDay();
 
             /**
@@ -141,11 +152,11 @@ class PeformaKurirController extends Controller
             $dates = explode(' - ', $request->daterange ?? '');
 
             $startDate = ! empty($dates[0])
-                ? Carbon::parse($dates[0])->startOfDay()
+                ? $this->parseDateOr($dates[0], Carbon::now()->startOfMonth()->toDateString())->startOfDay()
                 : Carbon::now()->startOfMonth()->startOfDay();
 
             $endDate = ! empty($dates[1])
-                ? Carbon::parse($dates[1])->endOfDay()
+                ? $this->parseDateOr($dates[1], Carbon::now()->toDateString())->endOfDay()
                 : Carbon::now()->endOfDay();
 
             $orders = Order::with(['items', 'customer', 'createdBy', 'returns'])
@@ -243,11 +254,11 @@ class PeformaKurirController extends Controller
         $dates = explode(' - ', $request->daterange ?? '');
 
         $startDate = ! empty($dates[0])
-            ? $dates[0]
+            ? $this->parseDateOr($dates[0], Carbon::now()->startOfMonth()->toDateString())->toDateString()
             : Carbon::now()->startOfMonth()->toDateString();
 
         $endDate = ! empty($dates[1])
-            ? $dates[1]
+            ? $this->parseDateOr($dates[1], Carbon::now()->toDateString())->toDateString()
             : Carbon::now()->toDateString();
 
         $orders = \App\Models\Order::where('region_id', $regionId)

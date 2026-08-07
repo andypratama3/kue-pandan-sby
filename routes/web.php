@@ -108,7 +108,8 @@ Route::middleware([
     // ---------- RUTE ADMIN (admin & owner) ----------//
     Route::prefix('admin')->name('admin.')->middleware('role:admin|owner')->group(function () {
         // Owner-only: pindah cabang (guard permission di middleware, bukan hanya controller)
-        Route::get('switch-region/{region}', [AdminDashboardController::class, 'switchRegion'])
+        // POST + CSRF agar pergantian state session tidak bisa dipicu lewat GET.
+        Route::post('switch-region/{region}', [AdminDashboardController::class, 'switchRegion'])
             ->middleware('permission:switch region')->name('switch-region');
         Route::get('peforma-kurir/export/pdf', [PeformaKurirController::class, 'exportPdf'])
             ->middleware('permission:view performance')->name('peforma-kurir.export.pdf');

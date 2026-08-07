@@ -15,8 +15,6 @@ class Homepage extends Component
 
     public function render()
     {
-        return view('livewire.homepage', [
-            'testimonials' => $this->testimonials
-        ]);
+        return view('livewire.homepage');
     }
 }

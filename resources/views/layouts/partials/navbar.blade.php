@@ -125,16 +125,19 @@
                     </div>
                     <div class="py-1 max-h-64 overflow-y-auto">
                         @foreach (App\Models\Region::active()->orderBy('id')->get() as $region)
-                            <a href="{{ route('admin.switch-region', ['region' => $region->slug]) }}"
-                                class="flex items-center justify-between px-4 py-3 text-xs font-semibold {{ $currentRegion && $region->id === $currentRegion->id ? 'bg-mint text-brand-deep dark:bg-brand-deep/40 dark:text-brand font-bold' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60' }} transition-colors">
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-store text-brand-deep dark:text-brand"></i>
-                                    {{ $region->name }}
-                                </div>
-                                @if ($currentRegion && $region->id === $currentRegion->id)
-                                    <i class="fas fa-check text-brand-deep dark:text-brand"></i>
-                                @endif
-                            </a>
+                            <form method="POST" action="{{ route('admin.switch-region', ['region' => $region->slug]) }}">
+                                @csrf
+                                <button type="submit"
+                                    class="flex items-center justify-between w-full px-4 py-3 text-xs font-semibold {{ $currentRegion && $region->id === $currentRegion->id ? 'bg-mint text-brand-deep dark:bg-brand-deep/40 dark:text-brand font-bold' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/60' }} transition-colors">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-store text-brand-deep dark:text-brand"></i>
+                                        {{ $region->name }}
+                                    </div>
+                                    @if ($currentRegion && $region->id === $currentRegion->id)
+                                        <i class="fas fa-check text-brand-deep dark:text-brand"></i>
+                                    @endif
+                                </button>
+                            </form>
                         @endforeach
                     </div>
                 </div>

@@ -38,7 +38,7 @@ class OwnerMultiBranchTest extends TestCase
         $response->assertSee('Surabaya');
 
         // Pindah cabang ke Malang
-        $this->get('/admin/switch-region/malang')
+        $this->post('/admin/switch-region/malang')
             ->assertRedirect(route('admin.dashboard', ['region' => 'malang']));
 
         $malang = Region::where('slug', 'malang')->first();
@@ -57,7 +57,7 @@ class OwnerMultiBranchTest extends TestCase
 
         // Admin tidak boleh memakai route switch-region (khusus owner)
         $this->actingAs($admin)
-            ->get('/admin/switch-region/malang')
+            ->post('/admin/switch-region/malang')
             ->assertForbidden();
 
         // Admin tetap terisolasi meskipun slug URL berisi cabang lain (anti bocor data)

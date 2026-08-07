@@ -91,4 +91,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Customer::class, 'added_by_user_id');
     }
+
+    /**
+     * Zona waktu operasional user berdasarkan cabangnya. Fallback ke default app.
+     */
+    public function timezone(): string
+    {
+        return $this->region?->timezone ?: config('app.timezone', 'UTC');
+    }
 }

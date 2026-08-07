@@ -458,7 +458,7 @@
 
                     const detailsHTML = `
             <div class="flex-grow">
-                <p class="font-bold text-gray-900 dark:text-white">${product.name} ${product.variant_name ? `(${product.variant_name})` : ''}</p>
+                <p class="font-bold text-gray-900 dark:text-white">${escapeHtml(product.name)} ${product.variant_name ? `(${escapeHtml(product.variant_name)})` : ''}</p>
                 ${quantityLine}
                 ${priceLine}
             </div>
@@ -939,10 +939,10 @@
                             <td class="px-4 py-4 whitespace-nowrap"><div class="text-sm text-gray-900 dark:text-white">${index + 1}</div></td>
                             <td class="px-2 py-4">
                                 <div class="flex items-center">
-                                    <div class="flex-shrink-0 w-16 h-16"><img class="object-cover w-16 h-16 rounded-md" src="${productImage}" alt="${product.name}"></div>
+                                    <div class="flex-shrink-0 w-16 h-16"><img class="object-cover w-16 h-16 rounded-md" src="${productImage}" alt="${escapeHtml(product.name)}"></div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900 dark:text-white">${product.name}</div>
-                                        ${product.variant_name ? `<div class="text-xs text-gray-400 dark:text-gray-500">${product.variant_name}</div>` : ''}
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">${escapeHtml(product.name)}</div>
+                                        ${product.variant_name ? `<div class="text-xs text-gray-400 dark:text-gray-500">${escapeHtml(product.variant_name)}</div>` : ''}
                                         <div class="text-sm text-gray-500 dark:text-gray-400">Jumlah Awal: ${product.quantity}</div>
                                     </div>
                                 </div>
@@ -968,13 +968,13 @@
 
                     const mobileCardHTML = `
                         <div class="flex items-start gap-4 p-2 mx-0 border-b border-gray-200 dark:border-gray-700" data-return-key="${returnKey}">
-                            <div class="flex-shrink-0 w-24 h-24"><img class="object-cover w-24 h-24 rounded-md" src="${productImage}" alt="${product.name}"></div>
+                            <div class="flex-shrink-0 w-24 h-24"><img class="object-cover w-24 h-24 rounded-md" src="${productImage}" alt="${escapeHtml(product.name)}"></div>
                             <div class="flex flex-col flex-1">
                                 <div class="flex items-center justify-between mb-1">
-                                    <p class="font-bold text-black dark:text-white">${product.name}</p>
+                                    <p class="font-bold text-black dark:text-white">${escapeHtml(product.name)}</p>
                                     <button type="button" class="text-xl text-red-600 remove-product hover:text-red-900" title="Setel kuantitas ke 0">🗑</button>
                                 </div>
-                                ${product.variant_name ? `<p class="mb-1 text-xs text-gray-500 dark:text-gray-400">${product.variant_name}</p>` : ''}
+                                ${product.variant_name ? `<p class="mb-1 text-xs text-gray-500 dark:text-gray-400">${escapeHtml(product.variant_name)}</p>` : ''}
                                 <p class="text-sm text-gray-600 dark:text-gray-300">Jumlah Awal: ${product.quantity}</p>
                                     <div class="flex items-center justify-start gap-2 mt-3">
                                         <button type="button" class="px-2 text-black rounded quantity-minus dark:text-white hover:scale-110 active:scale-90">–</button>

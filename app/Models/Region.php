@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Region extends Model
 {
@@ -26,5 +28,22 @@ class Region extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+     * Zona waktu operasional cabang, dikirimkan satu sumber kebenaran agar
+     * tidak lagi di-hardcode di banyak controller.
+     */
+    protected function timezone(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                return match (Str::slug($this->name)) {
+                    'denpasar' => 'Asia/Makassar', // WITA
+                    'surabaya', 'malang' => 'Asia/Jakarta', // WIB
+                    default => config('app.timezone', 'UTC'),
+                };
+            }
+        );
     }
 }

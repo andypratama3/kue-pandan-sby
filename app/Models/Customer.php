@@ -54,6 +54,14 @@ class Customer extends Model
     }
 
     /**
+     * Mendefinisikan relasi ke model Order.
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
      * Mutator untuk format otomatis 'name'.
      */
     protected function name(): Attribute

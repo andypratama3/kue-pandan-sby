@@ -39,21 +39,7 @@ class PesananController extends Controller
      */
     private function getUserTimezone(): string
     {
-        $user = Auth::user();
-        // Fallback ke timezone default jika user tidak memiliki region_id
-        if (! $user || is_null($user->region_id)) {
-            return config('app.timezone', 'UTC');
-        }
-
-        switch ($user->region_id) {
-            case 3: // Denpasar
-                return 'Asia/Makassar'; // WITA
-            case 1: // Surabaya
-            case 2: // Malang
-                return 'Asia/Jakarta'; // WIB
-            default:
-                return config('app.timezone', 'UTC');
-        }
+        return Auth::user()?->timezone() ?? config('app.timezone', 'UTC');
     }
 
     /**
@@ -268,22 +254,40 @@ class PesananController extends Controller
             $order->updated_at = $currentTime;
             $order->save();
 
-            // Generate nomor invoice unik
+            // Generate nomor invoice unik.
             // Scope per (hari, kurir, customer) + lockForUpdate agar dua checkout
             // konkuren (mis. double-click) tidak menghasilkan nomor invoice yang sama.
-            $orderCountToday = Order::whereDate('created_at', $currentTime->toDateString())
-                ->where('created_by_user_id', $loggedInUser->id)
-                ->where('customer_id', $validated['customer_id'])
-                ->lockForUpdate()
-                ->count();
-            $dailySequenceNumber = str_pad($orderCountToday, 3, '0', STR_PAD_LEFT);
-            $tanggal = $currentTime->format('dmy');
-            $formattedRegionId = str_pad($loggedInUser->region_id, 2, '0', STR_PAD_LEFT);
-            $formattedKurirId = str_pad($loggedInUser->id, 3, '0', STR_PAD_LEFT);
-            $formattedCustomerId = str_pad($validated['customer_id'], 3, '0', STR_PAD_LEFT);
-            $invoiceNumber = "INV/{$tanggal}/{$formattedRegionId}/{$formattedKurirId}/{$formattedCustomerId}/{$dailySequenceNumber}";
+            // Retry otomatis jika nomor bentrok dengan transaksi lain (1062),
+            // sehingga pengguna tidak perlu mengulang checkout manual.
+            $invoiceNumber = null;
+            for ($attempt = 1; $attempt <= 3; $attempt++) {
+                try {
+                    $orderCountToday = Order::whereDate('created_at', $currentTime->toDateString())
+                        ->where('created_by_user_id', $loggedInUser->id)
+                        ->where('customer_id', $validated['customer_id'])
+                        ->lockForUpdate()
+                        ->count();
+                    $dailySequenceNumber = str_pad($orderCountToday, 3, '0', STR_PAD_LEFT);
+                    $tanggal = $currentTime->format('dmy');
+                    $formattedRegionId = str_pad($loggedInUser->region_id, 2, '0', STR_PAD_LEFT);
+                    $formattedKurirId = str_pad($loggedInUser->id, 3, '0', STR_PAD_LEFT);
+                    $formattedCustomerId = str_pad($validated['customer_id'], 3, '0', STR_PAD_LEFT);
+                    $invoiceNumber = "INV/{$tanggal}/{$formattedRegionId}/{$formattedKurirId}/{$formattedCustomerId}/{$dailySequenceNumber}";
 
-            $order->invoice_number = $invoiceNumber;
+                    $order->invoice_number = $invoiceNumber;
+                    $order->save();
+
+                    break;
+                } catch (\Illuminate\Database\QueryException $e) {
+                    if (($e->errorInfo[1] ?? null) === 1062 && $attempt < 3) {
+                        Log::warning('Invoice bentrok, percobaan ulang ke-'.$attempt.' untuk user '.$loggedInUser->id);
+
+                        continue;
+                    }
+
+                    throw $e;
+                }
+            }
 
             // Proses produk/item yang dipesan
             // Harga, nama produk, dan varian DIAMBIL DARI DATABASE (cabang kurir),
@@ -659,6 +663,21 @@ class PesananController extends Controller
             $newStatus = $validated['new_status'];
             $updateData = ['status' => $newStatus];
             $currentTime = $this->nowInUserTimezone();
+
+            // State machine: transisi hanya bisa selangkah ke depan.
+            // 'dikemas' disertakan untuk kompatibilitas, namun tidak pernah
+            // diset oleh endpoint ini.
+            $predecessors = [
+                'diambil' => ['baru', 'dikemas'],
+                'diantar' => ['diambil'],
+                'diterima_pembeli' => ['diantar'],
+            ];
+
+            if (! in_array($order->status, $predecessors[$newStatus] ?? [], true)) {
+                return response()->json([
+                    'message' => 'Status tidak dapat diubah dari "'.$order->status.'" ke "'.$newStatus.'".',
+                ], 400);
+            }
 
             // Logika untuk mencatat timestamp setiap perubahan status
             switch ($newStatus) {

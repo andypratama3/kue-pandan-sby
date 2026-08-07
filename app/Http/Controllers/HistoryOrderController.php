@@ -212,8 +212,15 @@ class HistoryOrderController extends Controller
     public function downloadHistoryPdf(Request $request)
     {
         $user = Auth::user();
-        $selectedMonth = $request->input('month', now()->format('m'));
-        $selectedYear = $request->input('year', now()->format('Y'));
+        $selectedMonth = (int) $request->input('month', now()->format('m'));
+        if ($selectedMonth < 1 || $selectedMonth > 12) {
+            $selectedMonth = now()->month;
+        }
+        $selectedMonth = str_pad($selectedMonth, 2, '0', STR_PAD_LEFT);
+        $selectedYear = (int) $request->input('year', now()->format('Y'));
+        if ($selectedYear < 2000 || $selectedYear > (now()->year + 20)) {
+            $selectedYear = now()->year;
+        }
 
         $months = [
             '01' => 'Januari',
@@ -270,8 +277,15 @@ class HistoryOrderController extends Controller
         $user = Auth::user();
         $role = ($user->hasRole('admin') || $user->hasRole('owner')) ? 'admin' : 'kurir';
 
-        $selectedMonth = $request->input('month', now()->format('m'));
-        $selectedYear = $request->input('year', now()->format('Y'));
+        $selectedMonth = (int) $request->input('month', now()->format('m'));
+        if ($selectedMonth < 1 || $selectedMonth > 12) {
+            $selectedMonth = now()->month;
+        }
+        $selectedMonth = str_pad($selectedMonth, 2, '0', STR_PAD_LEFT);
+        $selectedYear = (int) $request->input('year', now()->format('Y'));
+        if ($selectedYear < 2000 || $selectedYear > (now()->year + 20)) {
+            $selectedYear = now()->year;
+        }
         $selectedCourier = $request->input('courier');
         $search = $request->input('search');
 

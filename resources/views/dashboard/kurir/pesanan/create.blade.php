@@ -244,7 +244,7 @@
             toastElement.innerHTML = `
                 <div class="flex items-center">
                     <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 ${iconTextColor} ${iconBgColor} rounded-lg">${iconSvg}</div>
-                    <div class="text-sm font-normal ms-3">${message}</div>
+                    <div class="text-sm font-normal ms-3">${escapeHtml(message)}</div>
                     <button type="button" onclick="this.parentElement.parentElement.remove()" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" aria-label="Close">
                         <span class="sr-only">Close</span>
                         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" /></svg>
@@ -428,8 +428,8 @@
                 const productHtml = `
                 <div class="flex items-start justify-between text-sm">
                     <div class="flex-grow">
-                        <p class="font-semibold text-gray-800 text-md dark:text-gray-200">${item.product_name}</p>
-                        ${item.variant_name ? `<p class="text-xs text-gray-500"> ▸ ${item.variant_name}</p>` : ''}
+                        <p class="font-semibold text-gray-800 text-md dark:text-gray-200">${escapeHtml(item.product_name)}</p>
+                        ${item.variant_name ? `<p class="text-xs text-gray-500"> ▸ ${escapeHtml(item.variant_name)}</p>` : ''}
                         <p class="text-xs text-gray-600 dark:text-gray-400">${item.qty} x Rp ${item.price.toLocaleString('id-ID')}</p>
                     </div>
                     <p class="font-semibold text-gray-800 text-md dark:text-gray-200">Rp ${subtotal.toLocaleString('id-ID')}</p>
@@ -572,11 +572,11 @@
                         const sudahDipilih = cart.some(c => c.variant_id === v.id);
                         pilihDiv.innerHTML += `
                         <div class="flex flex-row items-center gap-3 p-3 border rounded bg-gray-50">
-                            ${imageUrl ? `<img src="${imageUrl}" alt="${p.name}" class="object-cover w-16 h-16 mr-2 border rounded" />` : ''}
+                            ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(p.name)}" class="object-cover w-16 h-16 mr-2 border rounded" />` : ''}
                             <div class="flex-1">
                                 <div class="font-semibold">
-                                    <span class="font-bold text-gray-800 text-md">${p.name}</span>
-                                    ${v.name ? `<div class="mb-1 text-xs text-gray-600"> ▸ ${v.name} </div>` : ''}
+                                    <span class="font-bold text-gray-800 text-md">${escapeHtml(p.name)}</span>
+                                    ${v.name ? `<div class="mb-1 text-xs text-gray-600"> ▸ ${escapeHtml(v.name)} </div>` : ''}
                                 </div>
                                 <div class="font-bold text-brand-deep">Rp ${v.price.toLocaleString()}</div>
                             </div>
@@ -590,9 +590,9 @@
                     const sudahDipilih = cart.some(c => c.product_id === p.id && !c.variant_id);
                     pilihDiv.innerHTML += `
                     <div class="flex flex-row items-center gap-3 p-3 border rounded bg-gray-50">
-                        ${imageUrl ? `<img src="${imageUrl}" alt="${p.name}" class="object-cover w-16 h-16 mr-2 border rounded" />` : ''}
+                        ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(p.name)}" class="object-cover w-16 h-16 mr-2 border rounded" />` : ''}
                         <div class="flex-1">
-                            <div class="font-semibold">${p.name}</div>
+                            <div class="font-semibold">${escapeHtml(p.name)}</div>
                             <div class="font-bold text-brand-deep">Rp ${p.price ? p.price.toLocaleString() : ''}</div>
                         </div>
                         ${sudahDipilih ?

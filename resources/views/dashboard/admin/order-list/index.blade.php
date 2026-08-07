@@ -197,8 +197,8 @@
                     productContainer.innerHTML = (data.items || []).map(item => `
                         <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                             <div>
-                                <p class="text-sm font-semibold text-gray-800 dark:text-white">${item.name || '-'}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">${item.variant_name || 'Tanpa Varian'} &times; ${item.quantity}</p>
+                                <p class="text-sm font-semibold text-gray-800 dark:text-white">${escapeHtml(item.name || '-')}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">${escapeHtml(item.variant_name || 'Tanpa Varian')} &times; ${item.quantity}</p>
                             </div>
                             <p class="text-sm font-bold text-gray-800 dark:text-white">${formatRupiah(item.price)}</p>
                         </div>
@@ -212,8 +212,8 @@
                         returnedContainer.innerHTML = data.return_details.returned_products.map(p => `
                             <div class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
                                 <div>
-                                    <p class="text-sm font-semibold text-red-800 dark:text-red-300">${p.name || '-'}</p>
-                                    <p class="text-xs text-red-600 dark:text-red-400">${p.variant_name || ''} &times; ${p.quantity}</p>
+                                    <p class="text-sm font-semibold text-red-800 dark:text-red-300">${escapeHtml(p.name || '-')}</p>
+                                    <p class="text-xs text-red-600 dark:text-red-400">${escapeHtml(p.variant_name || '')} &times; ${p.quantity}</p>
                                 </div>
                                 <p class="text-sm font-bold text-red-800 dark:text-red-300">${formatRupiah(p.price)}</p>
                             </div>

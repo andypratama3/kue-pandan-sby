@@ -11,6 +11,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class CustomerController extends Controller
 {
@@ -204,7 +205,10 @@ class CustomerController extends Controller
             'company_name' => 'nullable|string|max:255',
             'address' => 'required|string',
             'landmark' => 'nullable|string|max:255',
-            'phone' => ['required', 'string', 'max:20'],
+            'phone' => [
+                'required', 'string', 'max:20',
+                Rule::unique('customers', 'phone')->where('region_id', RegionContext::regionId()),
+            ],
             'customer_category_id' => 'nullable|exists:customer_categories,id',
             'opening_hours' => 'nullable|string|max:255',
             'payment_type' => 'nullable|string|max:255',
@@ -245,7 +249,10 @@ class CustomerController extends Controller
             'company_name' => 'required|string|max:255',
             'address' => 'required|string',
             'landmark' => 'nullable|string|max:255',
-            'phone' => ['required', 'string', 'max:20'],
+            'phone' => [
+                'required', 'string', 'max:20',
+                Rule::unique('customers', 'phone')->where('region_id', RegionContext::regionId())->ignore($customer->id),
+            ],
             'customer_category_id' => 'required|exists:customer_categories,id',
             'opening_hours' => 'required|string|max:255',
             'payment_type' => 'required|string|max:255',
@@ -293,6 +300,12 @@ class CustomerController extends Controller
         }
         if (($user->hasRole('admin') || $user->hasRole('owner')) && $customer->region_id !== RegionContext::regionId()) {
             abort(403, 'AKSES DITOLAK');
+        }
+
+        // Cegah kehilangan data: customer dengan riwayat pesanan tidak boleh
+        // dihapus permanen (order_items & order_returns ikut ter-cascade).
+        if ($customer->orders()->exists()) {
+            return back()->with('error', 'Customer "'.$customer->name.'" memiliki riwayat pesanan sehingga tidak dapat dihapus. Nonaktifkan pembuatan pesanan baru saja bila perlu.');
         }
 
         $customerName = $customer->name;

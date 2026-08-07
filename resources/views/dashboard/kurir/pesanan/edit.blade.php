@@ -129,7 +129,7 @@
                          class="w-24 mb-2">
 
                     <p class="font-semibold">
-                        ${product.name} (${product.variant_name})
+                        ${escapeHtml(product.name)} (${escapeHtml(product.variant_name || '')})
                     </p>
 
                     <p class="mt-1">

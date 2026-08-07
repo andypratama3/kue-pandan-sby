@@ -152,10 +152,33 @@ class OrderController extends Controller
             ->whereIn('status', ['selesai', 'menunggu_verifikasi_admin']) // Perbaikan di sini
             ->findOrFail($id);
 
-        $order->status = 'diverifikasi_admin';
-        $order->save();
+        DB::beginTransaction();
+        try {
+            // Jika pesanan sedang dalam proses retur, tandai retur tersebut
+            // sebagai "diverifikasi" agar status state-machine konsisten dan
+            // kurir tidak bisa mengunggah bukti ulang setelah diapprove.
+            $pendingReturn = $order->returns()
+                ->where('status', 'menunggu_konfirmasi')
+                ->latest()
+                ->first();
+            if ($pendingReturn) {
+                $pendingReturn->status = 'diverifikasi';
+                $pendingReturn->admin_notes = 'Retur diterima oleh admin.';
+                $pendingReturn->save();
+            }
 
-        return response()->json(['message' => 'Pesanan berhasil diverifikasi.']);
+            $order->status = 'diverifikasi_admin';
+            $order->save();
+
+            DB::commit();
+
+            return response()->json(['message' => 'Pesanan berhasil diverifikasi.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal verifikasi pesanan ID '.$id.': '.$e->getMessage());
+
+            return response()->json(['message' => 'Terjadi kesalahan saat verifikasi pesanan.'], 500);
+        }
     }
 
     /**

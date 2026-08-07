@@ -20,8 +20,14 @@ class PeformaCustomerController extends Controller
         $admin = auth()->user();
         $regionId = RegionContext::regionId();
 
-        $year = $request->input('year', now()->year);
-        $month = $request->input('month', now()->month);
+        $year = (int) $request->input('year', now()->year);
+        $month = (int) $request->input('month', now()->month);
+        if ($month < 1 || $month > 12) {
+            $month = now()->month;
+        }
+        if ($year < 2000 || $year > (now()->year + 20)) {
+            $year = now()->year;
+        }
 
         $months = [
             '01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April',
@@ -158,8 +164,15 @@ class PeformaCustomerController extends Controller
     public function index(Request $request) // [!code focus]
     {
         // Ambil filter bulan & tahun dari request, default ke bulan & tahun sekarang
-        $selectedMonth = $request->input('month', now()->format('m')); // [!code focus]
-        $selectedYear = $request->input('year', now()->format('Y')); // [!code focus]
+        $selectedMonth = (int) $request->input('month', now()->format('m'));
+        if ($selectedMonth < 1 || $selectedMonth > 12) {
+            $selectedMonth = now()->month;
+        }
+        $selectedMonth = str_pad($selectedMonth, 2, '0', STR_PAD_LEFT);
+        $selectedYear = (int) $request->input('year', now()->format('Y'));
+        if ($selectedYear < 2000 || $selectedYear > (now()->year + 20)) {
+            $selectedYear = now()->year;
+        }
 
         // Daftar bulan (dalam bahasa Indonesia)
         $months = [

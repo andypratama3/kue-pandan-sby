@@ -35,10 +35,24 @@ class AdminDashboardController extends Controller
         $regionModel = Region::find($regionId);
 
         // ===== TRACK VISITOR (OPTIMIZED) =====
+        $allowedVisitFilters = ['daily', 'weekly', 'monthly', 'last_month', 'last_7_days'];
         $visitFilter = $request->input('visit_filter', 'last_7_days');
+        if (! in_array($visitFilter, $allowedVisitFilters, true)) {
+            $visitFilter = 'last_7_days';
+        }
         $year = now()->year;
 
-        $activeMonth = $request->input('month', now()->month);
+        $activeMonth = (int) $request->input('month', now()->month);
+        if ($activeMonth < 1 || $activeMonth > 12) {
+            $activeMonth = now()->month;
+        }
+
+        // ===== GRAFIK PENJUALAN =====
+        $allowedFilters = ['daily', 'weekly', 'monthly', 'last_month', 'last_7_days'];
+        $filter = $request->input('filter', 'last_7_days');
+        if (! in_array($filter, $allowedFilters, true)) {
+            $filter = 'last_7_days';
+        }
 
         $visitChartLabels = [];
         $visitChartData = [];
@@ -327,7 +341,6 @@ class AdminDashboardController extends Controller
         $couriers = User::role('kurir')->where('region_id', $regionId)->latest()->paginate(5, ['*'], 'couriers_page');
 
         // --- LOGIKA BARU UNTUK GRAFIK PENJUALAN ADMIN ---
-        $filter = $request->input('filter', 'last_7_days');
         $chartLabels = [];
         $chartDataTotal = [];
         $chartDataVerified = [];

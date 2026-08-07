@@ -34,7 +34,7 @@ class RoleAndUserSeeder extends Seeder
             'manage couriers',      // CRUD kurir per cabang
             'manage customers',     // CRUD customer
             'manage orders',        // kelola pesanan (verifikasi/tolak/upload bukti)
-            'view order history',   // lihat history & invoice
+            'view order history',   // lihat history & in voice
             'request return',       // ajukan retur
             'view performance',     // laporan performa kurir/customer
             'export reports',       // export PDF (rekap, invoice)
