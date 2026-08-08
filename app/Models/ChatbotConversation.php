@@ -20,6 +20,15 @@ class ChatbotConversation extends Model
         'handled_by_ai',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'handled_by_ai' => 'boolean',
+    ];
+
     public function region()
     {
         return $this->belongsTo(Region::class);

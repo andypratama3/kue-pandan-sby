@@ -179,16 +179,44 @@ class CourierController extends Controller
         $currentYear = Carbon::now()->year;
         $currentMonth = Carbon::now()->month;
 
+        // Agregat per hari dari SQL (hanya 3 query), bukan 1 query per hari.
+        // Kolom created_by_user_id sudah terindex.
+        $createdByDate = Order::where('created_by_user_id', $courierId)
+            ->selectRaw('DATE(created_at) as d, COUNT(*) as c')
+            ->groupBy('d')
+            ->pluck('c', 'd');
+
+        $completedByDate = Order::where('created_by_user_id', $courierId)
+            ->where('status', 'selesai')
+            ->selectRaw('DATE(updated_at) as d, COUNT(*) as c')
+            ->groupBy('d')
+            ->pluck('c', 'd');
+
+        $returnedByDate = OrderReturn::whereHas('order', fn ($q) => $q->where('created_by_user_id', $courierId))
+            ->selectRaw('DATE(created_at) as d, COUNT(*) as c')
+            ->groupBy('d')
+            ->pluck('c', 'd');
+
+        $sumOf = function ($from, $to, $map) {
+            $total = 0;
+            for ($date = $from->copy(); $date->lte($to); $date->addDay()) {
+                $total += (int) ($map[$date->format('Y-m-d')] ?? 0);
+            }
+
+            return $total;
+        };
+
         // Logika perhitungan data chart (sama persis seperti di dashboard kurir)
         switch ($filter) {
             case 'daily':
                 $daysInMonth = Carbon::now()->daysInMonth;
                 for ($day = 1; $day <= $daysInMonth; $day++) {
                     $date = Carbon::createFromDate($currentYear, $currentMonth, $day);
+                    $key = $date->format('Y-m-d');
                     $chartLabels[] = $date->format('d');
-                    $chartData[] = Order::where('created_by_user_id', $courierId)->whereDate('created_at', $date)->count();
-                    $chartDataCompleted[] = Order::where('created_by_user_id', $courierId)->whereDate('updated_at', $date)->where('status', 'selesai')->count();
-                    $chartDataReturned[] = OrderReturn::whereHas('order', fn ($q) => $q->where('created_by_user_id', $courierId))->whereDate('created_at', $date)->count();
+                    $chartData[] = (int) ($createdByDate[$key] ?? 0);
+                    $chartDataCompleted[] = (int) ($completedByDate[$key] ?? 0);
+                    $chartDataReturned[] = (int) ($returnedByDate[$key] ?? 0);
                 }
                 $dateRangeText = Carbon::now()->isoFormat('MMMM YYYY');
                 break;
@@ -202,9 +230,9 @@ class CourierController extends Controller
                         $weekEndDate = $endDate;
                     }
                     $chartLabels[] = 'Minggu Ke-'.$weekNumber;
-                    $chartData[] = Order::where('created_by_user_id', $courierId)->whereBetween('created_at', [$startDate, $weekEndDate])->count();
-                    $chartDataCompleted[] = Order::where('created_by_user_id', $courierId)->whereBetween('updated_at', [$startDate, $weekEndDate])->where('status', 'selesai')->count();
-                    $chartDataReturned[] = OrderReturn::whereHas('order', fn ($q) => $q->where('created_by_user_id', $courierId))->whereBetween('created_at', [$startDate, $weekEndDate])->count();
+                    $chartData[] = $sumOf($startDate, $weekEndDate, $createdByDate);
+                    $chartDataCompleted[] = $sumOf($startDate, $weekEndDate, $completedByDate);
+                    $chartDataReturned[] = $sumOf($startDate, $weekEndDate, $returnedByDate);
                     $startDate = $weekEndDate->copy()->addDay();
                     $weekNumber++;
                 }
@@ -212,11 +240,12 @@ class CourierController extends Controller
                 break;
             case 'monthly':
                 for ($month = 1; $month <= 12; $month++) {
-                    $date = Carbon::createFromDate($currentYear, $month, 1);
-                    $chartLabels[] = $date->isoFormat('MMM');
-                    $chartData[] = Order::where('created_by_user_id', $courierId)->whereYear('created_at', $currentYear)->whereMonth('created_at', $month)->count();
-                    $chartDataCompleted[] = Order::where('created_by_user_id', $courierId)->whereYear('updated_at', $currentYear)->whereMonth('updated_at', $month)->where('status', 'selesai')->count();
-                    $chartDataReturned[] = OrderReturn::whereHas('order', fn ($q) => $q->where('created_by_user_id', $courierId))->whereYear('created_at', $currentYear)->whereMonth('created_at', $month)->count();
+                    $monthStart = Carbon::createFromDate($currentYear, $month, 1);
+                    $monthEnd = $monthStart->copy()->endOfMonth();
+                    $chartLabels[] = $monthStart->isoFormat('MMM');
+                    $chartData[] = $sumOf($monthStart, $monthEnd, $createdByDate);
+                    $chartDataCompleted[] = $sumOf($monthStart, $monthEnd, $completedByDate);
+                    $chartDataReturned[] = $sumOf($monthStart, $monthEnd, $returnedByDate);
                 }
                 $dateRangeText = $currentYear;
                 break;
@@ -227,9 +256,9 @@ class CourierController extends Controller
                 for ($i = 6; $i >= 0; $i--) {
                     $date = Carbon::today()->subDays($i);
                     $chartLabels[] = $date->format('d M');
-                    $chartData[] = Order::where('created_by_user_id', $courierId)->whereDate('created_at', $date)->count();
-                    $chartDataCompleted[] = Order::where('created_by_user_id', $courierId)->whereDate('updated_at', $date)->where('status', 'selesai')->count();
-                    $chartDataReturned[] = OrderReturn::whereHas('order', fn ($q) => $q->where('created_by_user_id', $courierId))->whereDate('created_at', $date)->count();
+                    $chartData[] = (int) ($createdByDate[$date->format('Y-m-d')] ?? 0);
+                    $chartDataCompleted[] = (int) ($completedByDate[$date->format('Y-m-d')] ?? 0);
+                    $chartDataReturned[] = (int) ($returnedByDate[$date->format('Y-m-d')] ?? 0);
                 }
                 $dateRangeText = $startDate->isoFormat('D MMM').' - '.$endDate->isoFormat('D MMM');
                 break;

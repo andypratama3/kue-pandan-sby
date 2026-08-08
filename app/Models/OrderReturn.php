@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OrderReturn extends Model
 {
@@ -22,11 +21,20 @@ class OrderReturn extends Model
         'admin_notes',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'total_amount_returned' => 'decimal:2',
+    ];
+
     public function returnedProducts()
     {
         return $this->hasMany(OrderReturnProduct::class);
     }
-    
+
     public function order()
     {
         return $this->belongsTo(Order::class);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Support\ProofFile;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -208,9 +209,7 @@ class ReturnController extends Controller
             $file = $request->file('payment_proof');
 
             // 1. Hapus bukti retur lama jika ada (LOGIKA REPLACE)
-            if ($orderReturn->return_proof) {
-                Storage::disk('public')->delete($orderReturn->return_proof);
-            }
+            ProofFile::delete($orderReturn->return_proof);
 
             // 2. Buat nama file baru yang unik dengan timestamp
             $sanitizedInvoiceNumber = str_replace('/', '-', $order->invoice_number);
@@ -219,18 +218,15 @@ class ReturnController extends Controller
             $fileName = 'RETURN-'.$sanitizedInvoiceNumber.'_'.$timestamp.'.'.$extension; // Gabungkan
             $directory = 'return_proofs';
 
-            // 3. Simpan file baru menggunakan storeAs
-            $path = $file->storeAs($directory, $fileName, 'public');
+            // 3. Simpan file baru ke disk privat
+            $path = ProofFile::storeAs($file, $directory, $fileName);
 
             // 4. Simpan path file yang benar ke tabel order_returns
             $orderReturn->return_proof = $path;
             $orderReturn->save();
 
             // Ubah status di tabel orders
-            // [!code block:start]
-            // PERBAIKAN: Menggunakan helper untuk mendapatkan waktu regional
-            $order->paid_at = $this->nowInUserTimezone();
-            // [!code block:end]
+            // paid_at TIDAK boleh di-set di sini; lunas hanya ditandai admin saat verifikasi.
             $order->status = 'menunggu_verifikasi_admin';
             $order->save();
 

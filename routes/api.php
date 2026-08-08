@@ -22,11 +22,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Webhook WhatsApp generik — dipakai Fonnte (POST) dan Meta (POST /meta).
 // Meta butuh GET terpisah untuk verifikasi awal hub.challenge.
 Route::post('/webhook/whatsapp', [WhatsAppWebhookController::class, 'handle'])->middleware('throttle:60,1');
-Route::get('/webhook/whatsapp/meta', [WhatsAppWebhookController::class, 'verify']);
+Route::get('/webhook/whatsapp/meta', [WhatsAppWebhookController::class, 'verify'])->middleware('throttle:20,1');
 Route::post('/webhook/whatsapp/meta', [WhatsAppWebhookController::class, 'handle'])->middleware('throttle:60,1');
-
-// Route lama Meta Cloud API (prototipe) — dinonaktifkan, sudah digantikan
-// oleh WhatsAppWebhookController generik. Controller lama masih disimpan
-// sampai migrasi terbukti stabil di production.
-// Route::get('/webhook/meta', [\App\Http\Controllers\Chatbot\WebhookController::class, 'verify']);
-// Route::post('/webhook/meta', [\App\Http\Controllers\Chatbot\WebhookController::class, 'receive']);

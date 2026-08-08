@@ -311,8 +311,13 @@
                         elements.totalReturned.textContent = formatRupiah(totalAmountReturned);
                     }
                     if (data.return_details.return_proof_url) {
-                        elements.returnProof.innerHTML =
-                            `<img src="${data.return_details.return_proof_url}" alt="Bukti Retur" class="w-full border rounded cursor-pointer hover:border-red-500" data-zoomable="true">`;
+                        elements.returnProof.innerHTML = '';
+                        const returnImg = document.createElement('img');
+                        returnImg.src = data.return_details.return_proof_url;
+                        returnImg.alt = 'Bukti Retur';
+                        returnImg.dataset.zoomable = 'true';
+                        returnImg.className = 'w-full border rounded cursor-pointer hover:border-red-500';
+                        elements.returnProof.appendChild(returnImg);
                     } else {
                         elements.returnProof.innerHTML = '<p class="text-sm text-center text-gray-500">Tidak ada bukti retur</p>';
                     }
@@ -325,8 +330,13 @@
                 }
 
                 if (data.payment_proof_url) {
-                    elements.paymentProof.innerHTML =
-                        `<img src="${data.payment_proof_url}" alt="Bukti Pembayaran" class="w-full border rounded cursor-pointer hover:border-blue-500" data-zoomable="true">`;
+                    elements.paymentProof.innerHTML = '';
+                    const paymentImg = document.createElement('img');
+                    paymentImg.src = data.payment_proof_url;
+                    paymentImg.alt = 'Bukti Pembayaran';
+                    paymentImg.dataset.zoomable = 'true';
+                    paymentImg.className = 'w-full border rounded cursor-pointer hover:border-blue-500';
+                    elements.paymentProof.appendChild(paymentImg);
                 } else {
                     elements.paymentProof.innerHTML =
                         '<p class="text-sm text-center text-gray-500">Tidak ada bukti pembayaran</p>';

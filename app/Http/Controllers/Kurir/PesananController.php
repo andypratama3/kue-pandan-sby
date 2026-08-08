@@ -9,6 +9,7 @@ use App\Models\OrderItem;
 use App\Models\OrderReturn;
 use App\Models\OrderReturnProduct;
 use App\Models\ProductVariant;
+use App\Support\ProofFile;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -231,7 +232,7 @@ class PesananController extends Controller
         try {
             $paymentProofPath = null;
             if ($request->hasFile('payment_proof')) {
-                $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+                $paymentProofPath = ProofFile::store($request->file('payment_proof'), 'payment_proofs');
             }
 
             $loggedInUser = Auth::user();
@@ -421,7 +422,7 @@ class PesananController extends Controller
                 'created_at' => $order->created_at->isoFormat('D MMMM YYYY, HH:mm'),
                 'paid_at' => $paidAtFormatted,
                 'paid_at_label' => $paidAtLabel,
-                'payment_proof' => $order->payment_proof ? Storage::url($order->payment_proof) : null,
+                'payment_proof' => $order->payment_proof ? route('proof.show', ['type' => 'payment', 'order' => $order->id]) : null,
                 'picked_up_at' => $order->picked_up_at ? $order->picked_up_at->isoFormat('D MMMM YYYY, HH:mm') : null,
                 'delivered_at' => $order->delivered_at ? $order->delivered_at->isoFormat('D MMMM YYYY, HH:mm') : null,
                 'received_by_buyer_at' => $order->received_by_buyer_at ? $order->received_by_buyer_at->isoFormat('D MMMM YYYY, HH:mm') : null,
@@ -456,7 +457,7 @@ class PesananController extends Controller
                 'order_return' => $activeReturn ? [
                     'id' => $activeReturn->id,
                     'status' => $activeReturn->status,
-                    'return_proof' => $activeReturn->return_proof ? Storage::url($activeReturn->return_proof) : null,
+                    'return_proof' => $activeReturn->return_proof ? route('proof.show', ['type' => 'return', 'order' => $order->id]) : null,
                     'total_amount_returned' => $activeReturn->total_amount_returned,
                     'created_at' => $activeReturn->created_at->setTimezone($timezone)->isoFormat('D MMMM YYYY, HH:mm'),
                 ] : null,
@@ -593,9 +594,7 @@ class PesananController extends Controller
             }
 
             // Hapus file lama
-            if ($order->payment_proof) {
-                Storage::disk('public')->delete($order->payment_proof);
-            }
+            ProofFile::delete($order->payment_proof);
 
             $file = $request->file('payment_proof');
 
@@ -614,14 +613,14 @@ class PesananController extends Controller
                 ->read($file)
                 ->encode(new JpegEncoder(quality: $quality));
 
-            // ✅ SIMPAN FILE
-            Storage::disk('public')->put($path, $image);
+            // ✅ SIMPAN FILE ke disk privat (bukan 'public')
+            ProofFile::put($path, $image);
 
-            // Update DB
+            // Update DB — status 'selesai' = bukti sudah diunggah, belum berarti lunas.
+            // Verifikasi akhir (paid_at) dilakukan admin lewat Admin\OrderController::verify.
             $order->update([
                 'payment_proof' => $path,
                 'status' => 'selesai',
-                'paid_at' => $this->nowInUserTimezone(),
             ]);
 
             return response()->json([

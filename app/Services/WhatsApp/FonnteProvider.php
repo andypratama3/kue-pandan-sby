@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Log;
 
 class FonnteProvider implements WhatsAppProviderInterface
 {
-    protected string $endpoint = 'https://api.fonnte.com/send';
-
     public function sendMessage(string $target, string $message, array $context = []): array
     {
         $token = config('services.fonnte.token');
@@ -26,7 +24,7 @@ class FonnteProvider implements WhatsAppProviderInterface
         }
 
         $payload = [
-            'target' => $target,
+            'target' => $this->normalizeNumber($target),
             'message' => $message,
             'typing' => true,
             'duration' => 1,
@@ -40,7 +38,7 @@ class FonnteProvider implements WhatsAppProviderInterface
             $response = Http::asForm()
                 ->withHeaders(['Authorization' => $token])
                 ->timeout(15)
-                ->post($this->endpoint, $payload);
+                ->post($this->endpoint(), $payload);
 
             $body = $response->json() ?? [];
 
@@ -55,12 +53,14 @@ class FonnteProvider implements WhatsAppProviderInterface
                 ]);
             }
 
-            return [
+            // Merge the raw provider response (e.g. 'status', 'id') alongside
+            // our normalized keys so callers can read either shape.
+            return array_merge($body, [
                 'success' => $ok,
                 'message_id' => $body['id'] ?? ($body['data']['id'] ?? null),
                 'raw' => $body,
                 'error' => $ok ? null : ($body['reason'] ?? 'send_failed'),
-            ];
+            ]);
         } catch (\Throwable $e) {
             Log::channel('whatsapp')->error('Fonnte kirim exception: '.$e->getMessage());
 
@@ -102,5 +102,28 @@ class FonnteProvider implements WhatsAppProviderInterface
     public function verifyWebhook(array $query): ?array
     {
         return null;
+    }
+
+    /**
+     * Normalize an Indonesian phone number to Fonnte's expected 62-prefixed
+     * format, stripping spaces, dashes, and a leading '+' along the way.
+     */
+    public function normalizeNumber(string $number): string
+    {
+        $number = preg_replace('/[^0-9+]/', '', $number);
+        $number = ltrim($number, '+');
+
+        if (str_starts_with($number, '0')) {
+            $number = '62'.substr($number, 1);
+        }
+
+        return $number;
+    }
+
+    protected function endpoint(): string
+    {
+        $baseUrl = config('services.fonnte.base_url', 'https://api.fonnte.com');
+
+        return rtrim($baseUrl, '/').'/send';
     }
 }

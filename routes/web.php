@@ -10,6 +10,7 @@ use App\Http\Controllers\HistoryOrderController;
 use App\Http\Controllers\Kurir\PesananController;
 use App\Http\Controllers\KurirDashboardController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProofController;
 use App\Http\Controllers\ReturnController;
 use App\Models\Product;
 use Carbon\Carbon;
@@ -105,6 +106,11 @@ Route::middleware([
         abort(403, 'User tidak memiliki role yang valid.');
     })->name('dashboard');
 
+    // ---------- BUKTI PEMBAYARAN & RETUR (file privat, butuh login) ----------//
+    Route::get('proof/{type}/{order}', [ProofController::class, 'show'])
+        ->whereIn('type', ['payment', 'return'])
+        ->name('proof.show');
+
     // ---------- RUTE ADMIN (admin & owner) ----------//
     Route::prefix('admin')->name('admin.')->middleware('role:admin|owner')->group(function () {
         // Owner-only: pindah cabang (guard permission di middleware, bukan hanya controller)
@@ -164,8 +170,11 @@ Route::middleware([
             // Endpoint JSON untuk detail history pesanan (untuk modal show)
             Route::get('historys/{order}/details', [HistoryOrderController::class, 'details'])->name('historys.details');
             Route::get('historys/export-pdf', [HistoryOrderController::class, 'downloadHistoryPdf'])->name('historys.export.pdf');
-            Route::delete('historys/{id}', [HistoryOrderController::class, 'destroy'])->name('historys.destroy');
         });
+
+        // Hapus history: permission terpisah — "view" TIDAK boleh menghapus permanen.
+        Route::delete('historys/{id}', [HistoryOrderController::class, 'destroy'])
+            ->middleware('permission:delete order history')->name('historys.destroy');
 
         // Routes untuk Peforma Kurir & Customer
         Route::middleware('permission:view performance')->group(function () {

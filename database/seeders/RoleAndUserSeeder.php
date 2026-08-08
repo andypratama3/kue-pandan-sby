@@ -2,13 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\User;
 use App\Models\Region;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Str;
 
 class RoleAndUserSeeder extends Seeder
 {
@@ -18,6 +17,21 @@ class RoleAndUserSeeder extends Seeder
     public function run(): void
     {
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // ===== PASSWORD AKUN SEEDED =====
+        // Dipakai sementara untuk akun demo. Di production WAJIB diisi lewat
+        // env SEED_ADMIN_PASSWORD; bila tidak diisi, akun dibangun dengan
+        // password acak sehingga TIDAK BISA di-login sampai password
+        // direset/diubah lewat mekanisme reset password.
+        $password = env('SEED_ADMIN_PASSWORD', '');
+
+        if (app()->isProduction() && $password === '') {
+            $password = Str::random(32);
+        } elseif ($password === '') {
+            $password = 'password';
+        }
+
+        $passwordHash = bcrypt($password);
 
         // Buat Roles
         $ownerRole = Role::firstOrCreate(['name' => 'owner']);
@@ -34,7 +48,8 @@ class RoleAndUserSeeder extends Seeder
             'manage couriers',      // CRUD kurir per cabang
             'manage customers',     // CRUD customer
             'manage orders',        // kelola pesanan (verifikasi/tolak/upload bukti)
-            'view order history',   // lihat history & in voice
+            'view order history',   // lihat history & invoice
+            'delete order history', // hapus permanen history pesanan (hanya admin/owner)
             'request return',       // ajukan retur
             'view performance',     // laporan performa kurir/customer
             'export reports',       // export PDF (rekap, invoice)
@@ -54,6 +69,7 @@ class RoleAndUserSeeder extends Seeder
             'manage customers',
             'manage orders',
             'view order history',
+            'delete order history',
             'view performance',
             'export reports',
         ]);
@@ -87,9 +103,9 @@ class RoleAndUserSeeder extends Seeder
         // Owner (tanpa region — dapat memantau & berpindah semua cabang)
         $owner = User::firstOrCreate(
             ['email' => 'owner@kuepandanasli.com'],
-            ['name' => 'Owner Kue Pandan Asli', 'password' => bcrypt('password'), 'region_id' => null]
+            ['name' => 'Owner Kue Pandan Asli', 'password' => $passwordHash, 'region_id' => null]
         );
-        if (!$owner->hasRole('owner')) {
+        if (! $owner->hasRole('owner')) {
             $owner->assignRole('owner');
         }
 
@@ -106,9 +122,9 @@ class RoleAndUserSeeder extends Seeder
         foreach ($users as $data) {
             $user = User::firstOrCreate(
                 ['email' => $data['email']],
-                ['name' => $data['name'], 'password' => bcrypt('password'), 'region_id' => $data['region_id']]
+                ['name' => $data['name'], 'password' => $passwordHash, 'region_id' => $data['region_id']]
             );
-            if (!$user->hasRole($data['role'])) {
+            if (! $user->hasRole($data['role'])) {
                 $user->assignRole($data['role']);
             }
         }

@@ -27,6 +27,17 @@ class OrderItem extends Model
     ];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'quantity' => 'integer',
+        'price' => 'decimal:2',
+        'subtotal' => 'decimal:2',
+    ];
+
+    /**
      * Get the order that the item belongs to.
      */
     public function order(): BelongsTo

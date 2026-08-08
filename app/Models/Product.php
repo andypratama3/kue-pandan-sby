@@ -16,7 +16,16 @@ class Product extends Model
         'description',
         'image_path',
         'tag',
-        'is_active'
+        'is_active',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public function category()

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\User;
+use App\Support\ProofFile;
 use App\Support\RegionContext;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -10,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 
 class HistoryOrderController extends Controller
@@ -64,8 +65,7 @@ class HistoryOrderController extends Controller
                 'paid_at' => $paidAtFormatted,
 
                 // --- PERBAIKAN PATH BUKTI PEMBAYARAN ---
-                // 'payment_proof_url' => $order->payment_proof ? Storage::url(preg_replace('#^(storage/|public/)#', '', $order->payment_proof)) : null,
-                'payment_proof_url' => $order->payment_proof ? asset('storage/'.preg_replace('#^(storage/|public/)#', '', $order->payment_proof)) : null,
+                'payment_proof_url' => $order->payment_proof ? route('proof.show', ['type' => 'payment', 'order' => $order->id]) : null,
                 'courier_name' => $order->createdBy->name ?? '-',
 
                 'items' => $order->items->map(fn ($item) => [
@@ -81,9 +81,8 @@ class HistoryOrderController extends Controller
                     'status' => $activeReturn->status,
                     'total_amount_returned' => $activeReturn->total_amount_returned,
 
-                    // --- PERBAIKAN PATH BUKTI RETUR ---
-                    // 'return_proof_url' => $activeReturn->return_proof ? Storage::url(preg_replace('#^(storage/|public/)#', '', $activeReturn->return_proof)) : null,
-                    'return_proof_url' => $activeReturn->return_proof ? asset('storage/'.preg_replace('#^(storage/|public/)#', '', $activeReturn->return_proof)) : null,
+                    // --- PERFIX PATH BUKTI RETUR ---
+                    'return_proof_url' => $activeReturn->return_proof ? route('proof.show', ['type' => 'return', 'order' => $order->id]) : null,
 
                     'returned_products' => $activeReturn->returnedProducts->map(function ($p) {
                         $productName = $p->product ? $p->product->name : 'Produk Telah Dihapus';
@@ -136,7 +135,7 @@ class HistoryOrderController extends Controller
             ->setPaper('A4', 'portrait')
             ->setOptions([
                 'isHtml5ParserEnabled' => true,
-                'isRemoteEnabled' => true,
+                'isRemoteEnabled' => false,
                 'margin_top' => 20,
                 'margin_right' => 20,
                 'margin_bottom' => 20,
@@ -157,15 +156,11 @@ class HistoryOrderController extends Controller
             $order = Order::where('region_id', RegionContext::regionId())->with('returns')->findOrFail($id);
 
             // 1. Hapus bukti pembayaran utama
-            if ($order->payment_proof) {
-                Storage::disk('public')->delete($order->payment_proof);
-            }
+            ProofFile::delete($order->payment_proof);
 
             // 2. Hapus bukti retur (jika ada)
             foreach ($order->returns as $return) {
-                if ($return->return_proof) {
-                    Storage::disk('public')->delete($return->return_proof);
-                }
+                ProofFile::delete($return->return_proof);
             }
 
             // 3. Hapus data pesanan dari database
@@ -315,12 +310,16 @@ class HistoryOrderController extends Controller
             $ordersQuery->where('created_by_user_id', $user->id);
         }
 
+        // Daftar kurir: diambil dari id unik pesanan, BUKAN seluruh koleksi
+        // order yang di-load penuh (mencegah query tak terbatas per request).
+        $courierIds = $ordersQuery->clone()->distinct()->pluck('created_by_user_id')->filter()->all();
+
         $couriers = [];
-        foreach ($ordersQuery->get() as $order) {
-            if ($order->createdBy) {
-                $couriers[$order->createdBy->id] = [
-                    'id' => $order->createdBy->id,
-                    'name' => $order->createdBy->name,
+        if (! empty($courierIds)) {
+            foreach (User::whereIn('id', $courierIds)->orderBy('name')->get() as $courierUser) {
+                $couriers[$courierUser->id] = [
+                    'id' => $courierUser->id,
+                    'name' => $courierUser->name,
                 ];
             }
         }

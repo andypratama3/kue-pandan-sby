@@ -30,6 +30,16 @@ class Customer extends Model
     ];
 
     /**
+     * The attributes that should be cast.
+     * CATATAN: is_flagged sengaja TIDAK di-fillable (hanya diubah via toggleFlag).
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'is_flagged' => 'boolean',
+    ];
+
+    /**
      * Mendefinisikan relasi ke model Region.
      */
     public function region()

@@ -26,6 +26,7 @@ class PeformaKurirController extends Controller
             return Carbon::parse($fallback);
         }
     }
+
     /**
      * Export ranking performa kurir ke PDF.
      */
@@ -149,6 +150,15 @@ class PeformaKurirController extends Controller
             $admin = auth()->user();
             $regionId = RegionContext::regionId();
 
+            // Pastikan target adalah kurir pada region aktif (bukan admin/owner/region lain).
+            $target = \App\Models\User::find($id);
+            if (! $target || $target->region_id !== $regionId || ! $target->hasRole('kurir')) {
+                return redirect()->back()->with(
+                    'error',
+                    'Target kurir tidak ditemukan pada cabang ini.'
+                );
+            }
+
             $dates = explode(' - ', $request->daterange ?? '');
 
             $startDate = ! empty($dates[0])
@@ -269,7 +279,8 @@ class PeformaKurirController extends Controller
                     Carbon::parse($endDate)->endOfDay(),
                 ]);
             })
-            ->get();
+            // Hanya kolom yang dipakai ranking — tidak memuat relasi penuh.
+            ->get(['id', 'created_by_user_id', 'total_amount']);
 
         $ranking = $orders->groupBy('created_by_user_id')
             ->map(function ($orders, $kurirId) {
@@ -286,12 +297,12 @@ class PeformaKurirController extends Controller
             ->values();
 
         $kurirIds = $ranking->pluck('kurir_id')->all();
-        $kurirs = \App\Models\User::whereIn('id', $kurirIds)->get()->keyBy('id');
+        $kurirs = \App\Models\User::whereIn('id', $kurirIds)->withCount('customers')->get()->keyBy('id');
 
         $ranking = $ranking->map(function ($item, $i) use ($kurirs) {
             $user = $kurirs[$item['kurir_id']] ?? null;
             $item['nama_kurir'] = $user ? $user->name : '-';
-            $item['total_customer'] = $user ? $user->customers()->count() : 0;
+            $item['total_customer'] = $user ? (int) $user->customers_count : 0;
             $item['rank'] = $i + 1;
 
             return $item;

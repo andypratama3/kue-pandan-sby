@@ -282,7 +282,13 @@
                 const paymentProofContainer = document.getElementById('showOrderModalPaymentProof-admin');
                 if (paymentProofContainer) {
                     if (data.payment_proof_url) {
-                        paymentProofContainer.innerHTML = `<img src="${data.payment_proof_url}" alt="Bukti Pembayaran" data-zoomable class="w-full h-40 object-cover rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer">`;
+                        paymentProofContainer.innerHTML = '';
+                        const paymentImg = document.createElement('img');
+                        paymentImg.src = data.payment_proof_url;
+                        paymentImg.alt = 'Bukti Pembayaran';
+                        paymentImg.dataset.zoomable = 'true';
+                        paymentImg.className = 'w-full h-40 object-cover rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer';
+                        paymentProofContainer.appendChild(paymentImg);
                     } else {
                         paymentProofContainer.innerHTML = '<p class="text-xs text-slate-400">Belum ada bukti pembayaran.</p>';
                     }
@@ -293,7 +299,13 @@
                 const returnProofSlot = document.getElementById('showOrderModalReturnProof-admin');
                 if (returnProofContainer && returnProofSlot) {
                     if (data.return_details?.return_proof_url) {
-                        returnProofSlot.innerHTML = `<img src="${data.return_details.return_proof_url}" alt="Bukti Retur" data-zoomable class="w-full h-40 object-cover rounded-xl cursor-pointer">`;
+                        returnProofSlot.innerHTML = '';
+                        const returnImg = document.createElement('img');
+                        returnImg.src = data.return_details.return_proof_url;
+                        returnImg.alt = 'Bukti Retur';
+                        returnImg.dataset.zoomable = 'true';
+                        returnImg.className = 'w-full h-40 object-cover rounded-xl cursor-pointer';
+                        returnProofSlot.appendChild(returnImg);
                         returnProofContainer.classList.remove('hidden');
                     } else {
                         returnProofSlot.innerHTML = '';

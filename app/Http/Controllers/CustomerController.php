@@ -11,6 +11,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class CustomerController extends Controller
@@ -131,7 +132,12 @@ class CustomerController extends Controller
             'start' => $start,
             'end' => $end,
         ]);
-        $filename = 'Rekap_Order_'.$customer->name.'_'.$start.'_to_'.$end.'.pdf';
+        // Nama file disanitasi: nama customer & tanggal boleh diisi user,
+        // jangan sampai lolos ke header Content-Disposition.
+        $safeCustomerName = Str::slug($customer->name, '_') ?: 'customer';
+        $safeStart = preg_replace('/[^0-9\-_]/', '', $start);
+        $safeEnd = preg_replace('/[^0-9\-_]/', '', $end);
+        $filename = 'Rekap_Order_'.$safeCustomerName.'_'.$safeStart.'_to_'.$safeEnd.'.pdf';
 
         return $pdf->download($filename);
     }

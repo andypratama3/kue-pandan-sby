@@ -18,7 +18,17 @@ class ProductVariant extends Model
         'product_id',
         'name',
         'price',
-        'is_active' // Tambahkan ini
+        'is_active', // Tambahkan ini
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'price' => 'decimal:2',
+        'is_active' => 'boolean',
     ];
 
     /**

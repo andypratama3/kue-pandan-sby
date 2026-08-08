@@ -31,6 +31,7 @@ class RolePermissionTest extends TestCase
             'manage customers',
             'manage orders',
             'view order history',
+            'delete order history',
             'request return',
             'view performance',
             'export reports',
@@ -60,6 +61,7 @@ class RolePermissionTest extends TestCase
             'manage customers',
             'manage orders',
             'view order history',
+            'delete order history',
             'view performance',
             'export reports',
         ], $admin->permissions->pluck('name')->all());

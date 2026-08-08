@@ -40,6 +40,7 @@ class Order extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'total_amount' => 'decimal:2',
         'paid_at' => 'datetime',
         'picked_up_at' => 'datetime',
         'delivered_at' => 'datetime',

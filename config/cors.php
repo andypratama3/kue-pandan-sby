@@ -19,7 +19,12 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    // Origin yang diizinkan, diambil dari FRONTEND_URL (atau fallback APP_URL).
+    // Kosong = CORS lintas-origin dinonaktifkan sepenuhnya.
+    'allowed_origins' => array_values(array_unique(array_filter([
+        env('FRONTEND_URL'),
+        env('APP_URL'),
+    ]))),
 
     'allowed_origins_patterns' => [],
 

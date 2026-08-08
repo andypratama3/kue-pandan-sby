@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Support\ProofFile;
 use App\Support\RegionContext;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
 {
@@ -93,7 +93,7 @@ class OrderController extends Controller
                 'paid_at' => $paidAtFormatted,
                 'paid_at_label' => $paidAtLabel,
                 // 'payment_proof' => $order->payment_proof,
-                'payment_proof' => $order->payment_proof ? asset('storage/'.preg_replace('#^(storage/|public/)#', '', $order->payment_proof)) : null,
+                'payment_proof' => $order->payment_proof ? route('proof.show', ['type' => 'payment', 'order' => $order->id]) : null,
                 'note' => $order->note,
                 'customer' => [
                     'name' => $order->customer->name ?? 'N/A',
@@ -113,7 +113,7 @@ class OrderController extends Controller
                 // Perbaikan pada bagian ini
                 'return_details' => $activeReturn ? [
                     // 'return_proof' => $activeReturn->return_proof,
-                    'return_proof' => $activeReturn->return_proof ? asset('storage/'.preg_replace('#^(storage/|public/)#', '', $activeReturn->return_proof)) : null,
+                    'return_proof' => $activeReturn->return_proof ? route('proof.show', ['type' => 'return', 'order' => $order->id]) : null,
                     'total_amount_returned' => $activeReturn->total_amount_returned,
                     'returned_products' => $activeReturn->returnedProducts->map(function ($p) {
                         // **PENGECEKAN AMAN**
@@ -168,6 +168,11 @@ class OrderController extends Controller
             }
 
             $order->status = 'diverifikasi_admin';
+            // Tandai lunas HANYA jika ada bukti pembayaran yang sudah diverifikasi.
+            // paid_at tidak boleh di-set oleh kurir sendiri (lihat uploadPaymentProof).
+            if ($order->payment_proof && ! $order->paid_at) {
+                $order->paid_at = Carbon::now();
+            }
             $order->save();
 
             DB::commit();
@@ -197,18 +202,14 @@ class OrderController extends Controller
         // (Logika penolakan lainnya tetap sama)
         $returnRequest = $order->returns()->where('status', 'menunggu_konfirmasi')->first();
         if ($returnRequest) {
-            if ($returnRequest->return_proof) {
-                Storage::disk('public')->delete($returnRequest->return_proof);
-            }
+            ProofFile::delete($returnRequest->return_proof);
             $returnRequest->status = 'ditolak';
             $returnRequest->admin_notes = 'Verifikasi retur ditolak oleh admin.';
             $returnRequest->save();
             $order->status = 'diterima_pembeli';
             $order->paid_at = null;
         } else {
-            if ($order->payment_proof) {
-                Storage::disk('public')->delete($order->payment_proof);
-            }
+            ProofFile::delete($order->payment_proof);
             $order->status = 'diterima_pembeli';
             $order->payment_proof = null;
             $order->paid_at = null;
@@ -236,15 +237,11 @@ class OrderController extends Controller
             $order = Order::where('region_id', RegionContext::regionId())->with('returns')->findOrFail($id);
 
             // 1. Hapus bukti pembayaran utama
-            if ($order->payment_proof) {
-                Storage::disk('public')->delete($order->payment_proof);
-            }
+            ProofFile::delete($order->payment_proof);
 
             // 2. Hapus bukti retur (jika ada)
             foreach ($order->returns as $return) {
-                if ($return->return_proof) {
-                    Storage::disk('public')->delete($return->return_proof);
-                }
+                ProofFile::delete($return->return_proof);
             }
 
             // 3. Hapus data pesanan dari database
