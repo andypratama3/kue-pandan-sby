@@ -1,6 +1,10 @@
+# ============================================================
 # CD — Deploy otomatis ke server via SSH + rsync
 #
-# Berjalan SETELAH workflow "CI" sukses di branch main.
+# !! SEMENTARA DINONAKTIFKAN (di-comment) !!
+# Untuk menyalakan lagi: hapus tanda "#" di semua baris di bawah.
+# Setelah itu workflow "Deploy" akan berjalan SETELAH workflow
+# "CI" sukses di branch main.
 #
 # Secrets yang harus di-set di repo (Settings → Secrets and variables → Actions):
 #   SSH_HOST     — IP/hostname server (mis. 203.0.113.10)
@@ -12,76 +16,77 @@
 # Server-side requirements (sekali setup):
 #   composer, php >= 8.1 (dengan ext pdo_mysql, gd, mbstring, dom, zip, intl),
 #   dan user SSH punya hak tulis pada REMOTE_PATH.
+# ============================================================
 
-name: Deploy
-
-on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
-    branches: [main]
-
-concurrency:
-  group: deploy
-  cancel-in-progress: false
-
-jobs:
-  deploy:
-    name: Deploy ke produksi
-    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build assets
-        run: npm run build
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          printf '%s' "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
-
-      - name: Rsync source code
-        run: |
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/id_ed25519 -p ${{ secrets.SSH_PORT || 22 }} -o StrictHostKeyChecking=no" \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude '.env' \
-            --exclude '.env.*' \
-            --exclude 'node_modules' \
-            --exclude 'vendor' \
-            --exclude 'storage/logs' \
-            --exclude 'storage/framework/cache/**' \
-            --exclude 'storage/framework/sessions/**' \
-            --exclude 'storage/framework/views/**' \
-            --exclude 'public/storage' \
-            --exclude 'tests' \
-            --exclude 'database/*.sqlite' \
-            ./ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.REMOTE_PATH }}"
-
-      - name: Run production commands
-        run: |
-          ssh -i ~/.ssh/id_ed25519 -p "${{ secrets.SSH_PORT || 22 }}" \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "cd ${{ secrets.REMOTE_PATH }} && \
-             composer install --no-dev --optimize-autoloader --no-interaction && \
-             php artisan migrate --force && \
-             php artisan config:cache && \
-             php artisan route:cache && \
-             php artisan view:cache && \
-             php artisan storage:link || true"
+# name: Deploy
+#
+# on:
+#   workflow_run:
+#     workflows: ["CI"]
+#     types: [completed]
+#     branches: [main]
+#
+# concurrency:
+#   group: deploy
+#   cancel-in-progress: false
+#
+# jobs:
+#   deploy:
+#     name: Deploy ke produksi
+#     if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+#         with:
+#           ref: ${{ github.event.workflow_run.head_sha }}
+#
+#       - name: Setup Node
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 20
+#           cache: npm
+#
+#       - name: Install npm dependencies
+#         run: npm ci
+#
+#       - name: Build assets
+#         run: npm run build
+#
+#       - name: Setup SSH key
+#         run: |
+#           mkdir -p ~/.ssh
+#           printf '%s' "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+#           chmod 600 ~/.ssh/id_ed25519
+#           ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+#
+#       - name: Rsync source code
+#         run: |
+#           rsync -avz --delete \
+#             -e "ssh -i ~/.ssh/id_ed25519 -p ${{ secrets.SSH_PORT || 22 }} -o StrictHostKeyChecking=no" \
+#             --exclude '.git' \
+#             --exclude '.github' \
+#             --exclude '.env' \
+#             --exclude '.env.*' \
+#             --exclude 'node_modules' \
+#             --exclude 'vendor' \
+#             --exclude 'storage/logs' \
+#             --exclude 'storage/framework/cache/**' \
+#             --exclude 'storage/framework/sessions/**' \
+#             --exclude 'storage/framework/views/**' \
+#             --exclude 'public/storage' \
+#             --exclude 'tests' \
+#             --exclude 'database/*.sqlite' \
+#             ./ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.REMOTE_PATH }}"
+#
+#       - name: Run production commands
+#         run: |
+#           ssh -i ~/.ssh/id_ed25519 -p "${{ secrets.SSH_PORT || 22 }}" \
+#             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+#             "cd ${{ secrets.REMOTE_PATH }} && \
+#              composer install --no-dev --optimize-autoloader --no-interaction && \
+#              php artisan migrate --force && \
+#              php artisan config:cache && \
+#              php artisan route:cache && \
+#              php artisan view:cache && \
+#              php artisan storage:link || true"
