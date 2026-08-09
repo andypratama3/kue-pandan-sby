@@ -187,7 +187,7 @@ class PesananController extends Controller
                 'payment_method' => 'required|string',
                 'note' => 'nullable|string',
                 'products' => 'required|json',
-                'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg|mimetypes:image/jpeg,image/png|max:2048',
             ]);
         } catch (ValidationException $e) {
             return response()->json(['message' => 'Validasi gagal', 'errors' => $e->errors()], 422);
@@ -580,7 +580,7 @@ class PesananController extends Controller
 
         try {
             $request->validate([
-                'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                'payment_proof' => 'required|image|mimes:jpeg,png,jpg|mimetypes:image/jpeg,image/png|max:2048',
             ]);
 
             $order = Order::where('id', $id)

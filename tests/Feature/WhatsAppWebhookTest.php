@@ -80,7 +80,15 @@ class WhatsAppWebhookTest extends TestCase
 
     protected function seedSurabayaWithKueIjo(): Region
     {
-        $region = Region::create(['name' => 'Surabaya', 'slug' => 'surabaya']);
+        $region = Region::create([
+            'name' => 'Surabaya',
+            'slug' => 'surabaya',
+            'is_active' => true,
+            'address' => 'Jl. Test Surabaya',
+            'operating_hours' => ['open' => '06:00', 'close' => '23:00'],
+            'contact_email' => 'test@surabaya.com',
+            'contact_phone' => '081234567890',
+        ]);
         $category = Category::create(['name' => 'Produk', 'slug' => 'produk']);
 
         $kueIjo = $category->products()->create([

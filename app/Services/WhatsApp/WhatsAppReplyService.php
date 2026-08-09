@@ -21,27 +21,6 @@ use Illuminate\Support\Str;
 class WhatsAppReplyService
 {
     /**
-     * Info outlet statis (bukan dari AI). Key = slug region.
-     */
-    protected array $outlets = [
-        'surabaya' => [
-            'address' => 'Jl. Lebak Jaya II, Gading, Tambaksari, Surabaya, Jawa Timur 60134',
-            'hours' => 'Setiap Hari, 06.00 - 23.00',
-            'contact' => 'pandanaslisbyadm@gmail.com',
-        ],
-        'malang' => [
-            'address' => 'Jl. Pelatuk No. 16 Sukun, Kota Malang, Jawa Timur 65147',
-            'hours' => 'Setiap Hari, 06.00 - 23.00',
-            'contact' => 'pandanaslimalangadm@gmail.com',
-        ],
-        'denpasar' => [
-            'address' => 'Gg. Ikan Arwana, Sesetan, Denpasar Selatan, Bali 80224',
-            'hours' => 'Setiap Hari, 06.00 - 23.00',
-            'contact' => 'pandanaslibaliadm@gmail.com',
-        ],
-    ];
-
-    /**
      * Bangun context jawaban: region + daftar produk aktif beserta varian & harga
      * yang benar-benar tersimpan di database untuk region tersebut.
      */
@@ -56,8 +35,17 @@ class WhatsAppReplyService
             ->orderBy('name')
             ->get();
 
-        $slug = $region ? Str::slug($region->name) : null;
-        $outlet = $slug ? ($this->outlets[$slug] ?? null) : null;
+        // Outlet info sekarang dari database, bukan hardcode
+        $outlet = null;
+        if ($region) {
+            $outlet = [
+                'address' => $region->address ?? 'Alamat tidak tersedia',
+                'hours' => $this->formatOperatingHours($region->operating_hours ?? null) ?? 'Jam operasional tidak tersedia',
+                'contact' => $region->contact_email ?? 'Kontak tidak tersedia',
+                'phone' => $region->contact_phone ?? null,
+                'maps_link' => $region->maps_link ?? null,
+            ];
+        }
 
         return [
             'region' => $region,
@@ -72,6 +60,25 @@ class WhatsAppReplyService
             ])->values()->all(),
             'products' => $products,
         ];
+    }
+
+    protected function formatOperatingHours($hours): ?string
+    {
+        if (!$hours) {
+            return 'Setiap Hari, 06.00 - 23.00'; // fallback default
+        }
+        
+        if (is_string($hours)) {
+            return $hours;
+        }
+
+        // Format array operating hours jika diperlukan
+        // Contoh: ['open' => '06:00', 'close' => '23:00'] atau format lain
+        if (is_array($hours) && isset($hours['open'], $hours['close'])) {
+            return "Setiap Hari, {$hours['open']} - {$hours['close']}";
+        }
+
+        return 'Setiap Hari, 06.00 - 23.00'; // fallback default
     }
 
     public function detectIntent(string $text): string

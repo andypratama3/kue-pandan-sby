@@ -11,10 +11,11 @@ class Region extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'is_active'];
+    protected $fillable = ['name', 'slug', 'is_active', 'escalation_contact_name', 'escalation_contact_phone', 'address', 'operating_hours', 'maps_link', 'contact_email', 'contact_phone'];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'operating_hours' => 'array',
     ];
 
     public function users()

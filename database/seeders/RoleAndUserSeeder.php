@@ -86,15 +86,39 @@ class RoleAndUserSeeder extends Seeder
         // Buat Regions (aktif semua)
         $regionSurabaya = Region::firstOrCreate(
             ['slug' => Str::slug('Surabaya')],
-            ['name' => 'Surabaya', 'is_active' => true]
+            [
+                'name' => 'Surabaya',
+                'is_active' => true,
+                'address' => 'Jl. Lebak Jaya II, Gading, Tambaksari, Surabaya, Jawa Timur 60134',
+                'operating_hours' => ['open' => '06:00', 'close' => '23:00'],
+                'maps_link' => 'https://maps.app.goo.gl/FBLH5zD3sq1wBYit8',
+                'contact_email' => 'pandanaslisbyadm@gmail.com',
+                'contact_phone' => '082144834303',
+            ]
         );
         $regionMalang = Region::firstOrCreate(
             ['slug' => Str::slug('Malang')],
-            ['name' => 'Malang', 'is_active' => true]
+            [
+                'name' => 'Malang',
+                'is_active' => true,
+                'address' => 'Jl. Pelatuk No. 16 Sukun, Kota Malang, Jawa Timur 65147',
+                'operating_hours' => ['open' => '06:00', 'close' => '23:00'],
+                'maps_link' => 'https://maps.app.goo.gl/UhTpwAjYUuMyZfYQA',
+                'contact_email' => 'pandanaslimalangadm@gmail.com',
+                'contact_phone' => '082131338971',
+            ]
         );
         $regionDenpasar = Region::firstOrCreate(
             ['slug' => Str::slug('Denpasar')],
-            ['name' => 'Denpasar', 'is_active' => true]
+            [
+                'name' => 'Denpasar',
+                'is_active' => true,
+                'address' => 'Gg. Ikan Arwana, Sesetan, Denpasar Selatan, Bali 80224',
+                'operating_hours' => ['open' => '06:00', 'close' => '23:00'],
+                'maps_link' => 'https://maps.app.goo.gl/YA8hKxqigziBTiXf7',
+                'contact_email' => 'pandanaslibaliadm@gmail.com',
+                'contact_phone' => '082338901223',
+            ]
         );
 
         // Perbaiki region yang sudah ada agar selalu aktif

@@ -16,6 +16,9 @@ class ChatbotConversation extends Model
         'region_id',
         'incoming_message',
         'detected_intent',
+        'current_step',
+        'context_data',
+        'last_interaction_at',
         'bot_reply',
         'handled_by_ai',
     ];
@@ -27,6 +30,8 @@ class ChatbotConversation extends Model
      */
     protected $casts = [
         'handled_by_ai' => 'boolean',
+        'context_data' => 'array',
+        'last_interaction_at' => 'datetime',
     ];
 
     public function region()

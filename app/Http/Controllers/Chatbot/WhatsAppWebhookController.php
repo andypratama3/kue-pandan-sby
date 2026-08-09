@@ -8,6 +8,7 @@ use App\Models\ChatbotConversation;
 use App\Models\Region;
 use App\Services\DeepSeekService;
 use App\Services\WhatsApp\WhatsAppReplyService;
+use App\Services\WhatsApp\WhatsAppConversationStateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -53,11 +54,29 @@ class WhatsAppWebhookController extends Controller
             return response()->json(['status' => true]);
         }
 
+        // Initialize state service
+        $stateService = new WhatsAppConversationStateService();
+        
+        // Get current state
+        $currentState = $stateService->getCurrentState($incoming['sender']);
+        
         $region = $this->resolveRegion($incoming['sender']);
         $context = $this->replyService->buildContext($region?->id);
+        
+        // Add state info to context
+        $context['current_step'] = $currentState['step'];
+        $context['state_context'] = $currentState['context'];
 
         $reply = $this->resolveReply($incoming, $context);
         $handledByAi = ! empty($context['handled_by_ai']);
+        
+        // Determine next step
+        $intent = $context['intent'] ?? 'lainnya';
+        $nextStep = $stateService->determineNextStep(
+            $currentState['step'],
+            $intent,
+            $incoming['text'] ?? ''
+        );
 
         try {
             $this->provider->sendTyping($incoming['sender']);
@@ -67,13 +86,16 @@ class WhatsAppWebhookController extends Controller
 
         $this->provider->sendMessage($incoming['sender'], $reply, $incoming);
 
-        ChatbotConversation::create([
+        $conversation = ChatbotConversation::create([
             'provider' => config('services.whatsapp.provider', 'fonnte'),
             'sender_number' => $incoming['sender'],
             'sender_name' => $incoming['name'],
             'region_id' => $region?->id,
             'incoming_message' => $incoming['text'] ?? '',
-            'detected_intent' => $context['intent'] ?? null,
+            'detected_intent' => $intent,
+            'current_step' => $nextStep,
+            'context_data' => $context['state_context'] ?? [],
+            'last_interaction_at' => now(),
             'bot_reply' => $reply,
             'handled_by_ai' => $handledByAi,
         ]);
@@ -83,6 +105,22 @@ class WhatsAppWebhookController extends Controller
 
     protected function resolveRegion(string $sender): ?Region
     {
+        // Pertama, cek apakah ada mapping nomor WA Business ke region
+        // Nomor WA Business adalah nomor yang dihubungi customer (recipient/to dalam payload)
+        // Jika provider kirim info recipient, gunakan itu. Jika tidak, fallback ke histori.
+        
+        // Untuk sementara, kita gunakan histori sampai payload webhook diperbaiki untuk kirim recipient number
+        // TODO: Extract recipient/to number dari webhook payload dan cek di whatsapp_business_numbers
+        
+        $businessNumber = \App\Models\WhatsAppBusinessNumber::active()
+            ->whereHas('region')
+            ->first();
+            
+        if ($businessNumber && $businessNumber->region) {
+            return $businessNumber->region;
+        }
+
+        // Fallback ke histori sender (backward compatibility)
         $last = ChatbotConversation::where('sender_number', $sender)
             ->orderByDesc('id')
             ->first();
@@ -91,7 +129,8 @@ class WhatsAppWebhookController extends Controller
             return Region::find($last->region_id);
         }
 
-        return Region::orderBy('id')->first();
+        // Ultimate fallback: region aktif pertama
+        return Region::where('is_active', true)->orderBy('id')->first();
     }
 
     protected function resolveReply(array $incoming, array &$context): string

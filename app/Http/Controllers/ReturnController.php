@@ -188,7 +188,7 @@ class ReturnController extends Controller
 
         $request->validate([
             // Nama 'payment_proof' berasal dari input form HTML, jadi tidak perlu diubah
-            'payment_proof' => 'required|file|mimes:jpg,jpeg,png|max:2048',
+            'payment_proof' => 'required|file|mimes:jpg,jpeg,png|mimetypes:image/jpeg,image/png|max:2048',
         ]);
 
         try {
