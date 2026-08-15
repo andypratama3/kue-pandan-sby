@@ -45,7 +45,9 @@ Route::get('/', function (Request $request) {
     }
 
     // $total = DB::table('visit_logs')->count();
-    return view('livewire.homepage');
+    return view('livewire.homepage', [
+        'products' => \App\Livewire\Homepage::products(),
+    ]);
 });
 
 Route::get('privacy-policy', function () {
