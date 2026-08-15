@@ -28,6 +28,7 @@ class Order extends Model
         'created_by_user_id',
         'region_id',
         'status',
+        'source',
         'paid_at',
         'picked_up_at',
         'delivered_at',
