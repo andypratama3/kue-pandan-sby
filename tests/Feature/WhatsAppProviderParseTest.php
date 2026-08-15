@@ -92,4 +92,83 @@ class WhatsAppProviderParseTest extends TestCase
         $this->assertFalse($bad['verified']);
         $this->assertNull($bad['challenge']);
     }
+
+    public function test_meta_parse_incoming_ignores_statuses_only_event()
+    {
+        $provider = new MetaCloudProvider;
+
+        $parsed = $provider->parseIncoming([
+            'entry' => [[
+                'changes' => [[
+                    'field' => 'messages',
+                    'value' => [
+                        'metadata' => [
+                            'display_phone_number' => '15551234567',
+                            'phone_number_id' => 'PHONE_NUMBER_ID',
+                        ],
+                        'statuses' => [[
+                            'id' => 'wamid.sent',
+                            'status' => 'delivered',
+                            'timestamp' => '1749416383',
+                            'recipient_id' => '16505551234',
+                        ]],
+                    ],
+                ]],
+            ]],
+        ]);
+
+        $this->assertSame('', $parsed['sender']);
+        $this->assertNull($parsed['text']);
+    }
+
+    public function test_meta_parse_incoming_ignores_message_echoes()
+    {
+        $provider = new MetaCloudProvider;
+
+        $parsed = $provider->parseIncoming([
+            'entry' => [[
+                'changes' => [[
+                    'field' => 'message_echoes',
+                    'value' => [
+                        'metadata' => [
+                            'display_phone_number' => '15551234567',
+                            'phone_number_id' => 'PHONE_NUMBER_ID',
+                        ],
+                        'contacts' => [[
+                            'profile' => ['name' => 'Sheena Nelson'],
+                            'wa_id' => '16505551234',
+                        ]],
+                        'messages' => [[
+                            'from' => '15551234567',
+                            'id' => 'wamid.HBgN',
+                            'timestamp' => '1749416383',
+                            'type' => 'text',
+                            'text' => ['body' => 'Pesan dari bisnis'],
+                        ]],
+                    ],
+                ]],
+            ]],
+        ]);
+
+        $this->assertSame('', $parsed['sender']);
+        $this->assertSame('echo', $parsed['type']);
+    }
+
+    public function test_meta_parse_incoming_ignores_unknown_field_events()
+    {
+        $provider = new MetaCloudProvider;
+
+        foreach (['account_alerts', 'message_template_status_update', 'phone_number_quality_update', 'security'] as $field) {
+            $parsed = $provider->parseIncoming([
+                'entry' => [[
+                    'changes' => [[
+                        'field' => $field,
+                        'value' => ['something' => 'else'],
+                    ]],
+                ]],
+            ]);
+
+            $this->assertSame('', $parsed['sender'], "field {$field} harus diabaikan");
+        }
+    }
 }

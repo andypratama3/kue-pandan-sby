@@ -23,9 +23,23 @@ class FakeWhatsAppProvider implements WhatsAppProviderInterface
 
     public function parseIncoming(array $payload): array
     {
-        $value = $payload['entry'][0]['changes'][0]['value'] ?? [];
+        $entry = $payload['entry'][0] ?? [];
+        $change = $entry['changes'][0] ?? [];
+        $field = $change['field'] ?? null;
+        $value = $change['value'] ?? [];
         $message = $value['messages'][0] ?? [];
         $metadata = $value['metadata'] ?? [];
+
+        if ($field === 'message_echoes') {
+            return [
+                'sender' => '',
+                'name' => null,
+                'text' => null,
+                'type' => 'echo',
+                'recipient' => null,
+                'raw_reply_context' => ['message_id' => null, 'sender' => null],
+            ];
+        }
 
         return [
             'sender' => (string) ($message['from'] ?? ''),
@@ -249,6 +263,78 @@ class WhatsAppWebhookTest extends TestCase
         $this->postMeta([])
             ->assertOk()
             ->assertJson(['status' => true]);
+    }
+
+    public function test_non_message_events_return_200_without_reply()
+    {
+        $events = [
+            'account_alerts' => ['alerts' => ['data' => 'x']],
+            'account_update' => ['account_review' => 'APPROVED'],
+            'security' => ['security_code' => 'abc'],
+            'message_template_status_update' => ['event' => 'APPROVED'],
+            'phone_number_quality_update' => ['quality' => 'GREEN'],
+            'messages' => ['statuses' => [[
+                'id' => 'wamid.sent-1',
+                'status' => 'delivered',
+                'recipient_id' => '6281234567890',
+            ]]],
+        ];
+
+        foreach ($events as $field => $value) {
+            $payload = [
+                'object' => 'whatsapp_business_account',
+                'entry' => [[
+                    'id' => 'WABA_ID',
+                    'changes' => [[
+                        'field' => $field,
+                        'value' => $value,
+                    ]],
+                ]],
+            ];
+
+            $this->postMeta($payload)
+                ->assertOk()
+                ->assertJson(['status' => true]);
+        }
+
+        $this->assertEmpty($this->provider->sent);
+    }
+
+    public function test_message_echo_event_does_not_trigger_reply_loop()
+    {
+        $payload = [
+            'object' => 'whatsapp_business_account',
+            'entry' => [[
+                'id' => 'WABA_ID',
+                'changes' => [[
+                    'field' => 'message_echoes',
+                    'value' => [
+                        'metadata' => [
+                            'display_phone_number' => '15551234567',
+                            'phone_number_id' => 'PHONE_NUMBER_ID',
+                        ],
+                        'contacts' => [[
+                            'profile' => ['name' => 'Tester'],
+                            'wa_id' => '6281234567890',
+                        ]],
+                        'messages' => [[
+                            'from' => '15551234567',
+                            'id' => 'wamid.echo-1',
+                            'timestamp' => (string) time(),
+                            'type' => 'text',
+                            'text' => ['body' => 'Halo, ini balasan bot'],
+                        ]],
+                    ],
+                ]],
+            ]],
+        ];
+
+        $this->postMeta($payload)
+            ->assertOk()
+            ->assertJson(['status' => true]);
+
+        $this->assertEmpty($this->provider->sent);
+        $this->assertDatabaseCount('chatbot_conversations', 0);
     }
 
     public function test_webhook_rejects_invalid_signature()

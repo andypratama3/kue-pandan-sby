@@ -81,13 +81,29 @@ class MetaCloudProvider implements WhatsAppProviderInterface
 
     public function parseIncoming(array $payload): array
     {
-        $value = $payload['entry'][0]['changes'][0]['value'] ?? [];
+        $entry = $payload['entry'][0] ?? [];
+        $change = $entry['changes'][0] ?? [];
+        $field = $change['field'] ?? null;
+        $value = $change['value'] ?? [];
         $message = $value['messages'][0] ?? [];
         $metadata = $value['metadata'] ?? [];
 
         $from = $message['from'] ?? null;
         $type = $message['type'] ?? 'text';
         $text = null;
+
+        // Event echo pesan yang dikirim bisnis sendiri (field message_echoes)
+        // bukan percakapan masuk — abaikan untuk mencegah loop balasan.
+        if ($field === 'message_echoes') {
+            return [
+                'sender' => '',
+                'name' => null,
+                'text' => null,
+                'type' => 'echo',
+                'recipient' => null,
+                'raw_reply_context' => ['message_id' => null, 'sender' => null],
+            ];
+        }
 
         if ($type === 'text') {
             $text = $message['text']['body'] ?? null;
