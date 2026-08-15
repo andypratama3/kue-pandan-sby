@@ -43,6 +43,11 @@ class WhatsAppWebhookController extends Controller
         $incoming = $this->provider->parseIncoming($request->all());
 
         if (empty($incoming['sender'])) {
+            // Event non-percakapan (statuses, echo, alert, update, dll.) tetap
+            // dicatat di log agar seluruh aktivitas webhook Meta terpantau,
+            // lalu dijawab 200 tanpa diproses lebih lanjut.
+            $this->logNonMessageEvent($request->all());
+
             return response()->json(['status' => true]);
         }
 
@@ -160,6 +165,50 @@ class WhatsAppWebhookController extends Controller
 
             abort(403);
         }
+    }
+
+    // ====== LOG EVENT NON-PESAN ======
+
+    /**
+     * Catat event webhook Meta yang bukan percakapan masuk (statuses, echo,
+     * account alert, template update, quality update, dll.) ke log whatsapp
+     * agar semua aktivitas webhook tetap terpantau meski tidak diproses.
+     */
+    protected function logNonMessageEvent(array $payload): void
+    {
+        $entry = $payload['entry'][0] ?? [];
+        $change = $entry['changes'][0] ?? [];
+        $field = (string) ($change['field'] ?? 'unknown');
+        $value = is_array($change['value'] ?? null) ? $change['value'] : [];
+
+        $statuses = [];
+        foreach (($value['statuses'] ?? []) as $status) {
+            $statuses[] = [
+                'message_id' => $status['id'] ?? null,
+                'status' => $status['status'] ?? null,
+                'recipient_id' => $status['recipient_id'] ?? null,
+            ];
+        }
+
+        $echoIds = [];
+        foreach (($value['messages'] ?? []) as $message) {
+            $echoIds[] = $message['id'] ?? null;
+        }
+
+        $summary = [];
+        foreach ($value as $key => $item) {
+            if (in_array($key, ['messages', 'statuses', 'metadata', 'contacts'], true)) {
+                continue;
+            }
+            $summary[$key] = $item;
+        }
+
+        Log::channel('whatsapp')->info('Webhook event non-pesan diterima.', [
+            'field' => $field,
+            'statuses' => $statuses,
+            'echoed_message_ids' => $field === 'message_echoes' ? $echoIds : null,
+            'event' => $summary,
+        ]);
     }
 
     // ====== REGION RESOLUTION ======
