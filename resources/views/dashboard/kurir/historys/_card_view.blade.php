@@ -16,7 +16,7 @@
     <div class="flex items-start justify-between mt-1">
         {{-- SISI KIRI: DATA CUSTOMER --}}
         <div class="pr-4">
-            <p class="mb-2 font-bold text-gray-800 text-md dark:text-gray-200">
+            <p class="mb-2 font-bold text-gray-800 text-base dark:text-gray-200">
                 {{ $order->customer->name ?? '-' }}
             </p>
             <p class="text-xs text-gray-600 dark:text-gray-300">
@@ -67,6 +67,6 @@
 </div>
 @empty
 <div class="py-10 text-center">
-    <p class="text-sm text-gray-500">Tidak ada data history pesanan</p>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada data history pesanan</p>
 </div>
 @endforelse

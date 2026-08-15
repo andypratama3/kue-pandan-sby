@@ -63,6 +63,6 @@
     </tr>
 @empty
     <tr class="border-b dark:border-gray-700">
-        <td colspan="7" class="px-4 py-3 text-center text-gray-500">Belum ada data kurir di region ini.</td>
+        <td colspan="7" class="px-4 py-3 text-center text-gray-500 dark:text-gray-400">Belum ada data kurir di region ini.</td>
     </tr>
 @endforelse

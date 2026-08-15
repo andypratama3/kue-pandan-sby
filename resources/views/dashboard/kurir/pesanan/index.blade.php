@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2 text-sm">
-                    <span class="px-3 py-1 font-semibold text-white bg-blue-600 rounded-full dark:bg-blue-500">
+                    <span class="px-3 py-1 font-semibold text-white bg-brand rounded-full dark:bg-brand">
                         Total: {{ $orders->total() }}
                     </span>
                 </div>
@@ -43,14 +43,14 @@
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
                     <input type="text" id="live-search-input" name="search" value="{{ request('search') }}"
-                        class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-700 dark:border-slate-600 dark:placeholder-gray-400 dark:text-white transition-all"
+                        class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-brand focus:border-brand dark:bg-slate-700 dark:border-slate-600 dark:placeholder-gray-400 dark:text-white transition-all"
                         placeholder="Cari invoice atau nama customer...">
                 </div>
 
                 <div class="flex items-center gap-3">
                     {{-- Filter Status Pesanan (Tabs) --}}
                     <div
-                        class="hidden xl:flex items-center p-1 space-x-1 text-sm text-gray-600 bg-gray-100 rounded-xl dark:bg-slate-700">
+                        class="hidden xl:flex items-center p-1 space-x-1 text-sm text-gray-600 bg-gray-100 rounded-xl dark:bg-slate-700 dark:text-gray-300">
                         @foreach ($allStatuses as $key => $label)
                             <a href="{{ route('kurir.pesanan.index', array_merge(request()->except('page'), ['status' => $key == 'semua' ? null : $key])) }}"
                                 class="flex-shrink-0 px-4 py-2 font-medium rounded-lg whitespace-nowrap transition-all
@@ -64,7 +64,7 @@
                     </div>
 
                     <a href="{{ route('kurir.pesanan.create') }}"
-                        class="flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800 focus:outline-none dark:focus:ring-blue-800 shadow-lg shadow-blue-500/30 transition-all">
+                        class="flex items-center justify-center px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-brand to-brand-deep rounded-xl hover:from-brand-deep hover:to-brand focus:ring-4 focus:ring-brand-light dark:from-brand dark:to-brand-deep dark:hover:from-brand-deep dark:hover:to-brand focus:outline-none dark:focus:ring-brand-deep shadow-lg shadow-brand/30 transition-all">
                         <i class="fas fa-plus mr-2"></i>
                         Tambah Pesanan
                     </a>
@@ -73,7 +73,7 @@
 
             {{-- Mobile Filter Status --}}
             <div
-                class="flex items-center w-full p-2 space-x-2 overflow-x-auto text-sm text-gray-600 bg-gray-100 rounded-xl mb-6 xl:hidden dark:bg-slate-700">
+                class="flex items-center w-full p-2 space-x-2 overflow-x-auto text-sm text-gray-600 bg-gray-100 rounded-xl mb-6 xl:hidden dark:bg-slate-700 dark:text-gray-300">
                 @foreach ($allStatuses as $key => $label)
                     <a href="{{ route('kurir.pesanan.index', array_merge(request()->except('page'), ['status' => $key == 'semua' ? null : $key])) }}"
                         class="flex-shrink-0 px-4 py-2 font-medium rounded-lg whitespace-nowrap transition-all
@@ -233,36 +233,20 @@
                 updateButton.addEventListener('click', handleStatusUpdate);
             }
 
-            // Inisialisasi Live Search
+// Inisialisasi Live Search
             initializeLiveSearch({
                 searchInputId: 'live-search-input',
-                desktopContainerId: 'orders-desktop-container',
-                mobileContainerId: 'orders-mobile-container'
+                desktopContainerId: 'order-results-container',
+                mobileContainerId: 'mobile-order-results-container',
             });
 
         });
     </script>
     <script>
-        function openImageViewer(src) { // [!code ++]
-            const imageViewer = document.getElementById('imageViewerModal'); // [!code ++]
-            const fullSizeImage = document.getElementById('fullSizeImage'); // [!code ++]
-            if (imageViewer && fullSizeImage) { // [!code ++]
-                fullSizeImage.src = src; // [!code ++]
-                imageViewer.classList.remove('hidden'); // [!code ++]
-                document.body.classList.add('overflow-hidden'); // Mencegah scroll di belakang modal [!code ++]
-            } // [!code ++]
-        } // [!code ++]
 
         /**
          * Menutup modal image viewer.
          */
-        function closeImageViewer() { // [!code ++]
-            const imageViewer = document.getElementById('imageViewerModal'); // [!code ++]
-            if (imageViewer) { // [!code ++]
-                imageViewer.classList.add('hidden'); // [!code ++]
-                document.body.classList.remove('overflow-hidden'); // Mengembalikan kemampuan scroll [!code ++]
-            } // [!code ++]
-        } // [!code ++]
 
         // --- Logika Modal Rincian ---
         async function fetchOrderDetails(orderId) {
@@ -280,7 +264,7 @@
                 populateOrderDetailsModal(data);
             } catch (error) {
                 modalLoader.innerHTML =
-                    `<div class="text-center"><p class="font-bold text-red-600">Gagal Memuat Data</p><p class="mt-2 text-sm text-gray-500">${error.message}</p></div>`;
+                    `<div class="text-center"><p class="font-bold text-red-600 dark:text-red-400">Gagal Memuat Data</p><p class="mt-2 text-sm text-gray-500 dark:text-gray-400">${error.message}</p></div>`;
             }
         }
 
@@ -326,44 +310,42 @@
                 statusBadge.textContent = statusText;
 
                 // 2. Tentukan kelas warna berdasarkan status
-                let badgeColorClasses = 'bg-gray-100 text-gray-800'; // Default
+                let badgeColorClasses = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'; // Default
                 switch (order.status) {
                     case 'diambil':
-                        badgeColorClasses = 'bg-blue-100 text-blue-800';
+                        badgeColorClasses = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
                         break;
                     case 'diantar':
-                        badgeColorClasses = 'bg-yellow-100 text-yellow-800';
+                        badgeColorClasses = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
                         break;
                     case 'diterima_pembeli':
-                        badgeColorClasses = 'bg-purple-100 text-purple-800';
+                        badgeColorClasses = 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
                         break;
                     case 'menunggu_retur':
-                        const createdAt = new Date(order.created_at);
-                        const now = new Date();
-                        const diffDays = (now - createdAt) / (1000 * 60 * 60 * 24);
-                        
-                        // membuat button edit
-                        const buttonReturn = document.createElement('a');
+                        // Tombol edit hanya muncul bila retur masih menunggu konfirmasi
+                        // (belum unggah bukti) dan masih dalam jendela 5 hari.
+                        if (order.order_return && order.order_return.status === 'menunggu_konfirmasi' && order.order_return
+                            .created_at_raw) {
+                            const createdAt = new Date(order.order_return.created_at_raw);
+                            const diffDays = (Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
 
-
-                        
-                        if (diffDays <= 5){
-                            buttonReturn.id = 'editReturn';
-                            buttonReturn.textContent = 'edit';
-                            buttonReturn.href = `/kurir/pesanan/${order.id}/request-return/edit`;
+                            if (diffDays <= 5) {
+                                const buttonReturn = document.createElement('a');
+                                buttonReturn.id = 'editReturn';
+                                buttonReturn.textContent = 'edit';
+                                buttonReturn.href = `/kurir/pesanan/${order.id}/request-return/edit`;
+                                document
+                                    .getElementById('editReturnProductButton')
+                                    .appendChild(buttonReturn);
+                            }
                         }
-
-                        // append element
-                        document
-                            .getElementById('editReturnProductButton')
-                            .appendChild(buttonReturn);
-                        badgeColorClasses = 'bg-red-100 text-red-800';
+                        badgeColorClasses = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
                         break;
                     case 'menunggu_verifikasi_admin':
-                        badgeColorClasses = 'bg-orange-100 text-orange-800';
+                        badgeColorClasses = 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
                         break;
                     case 'selesai':
-                        badgeColorClasses = 'bg-brand-light text-brand-deep';
+                        badgeColorClasses = 'bg-brand-light text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light';
                         break;
                 }
                 // 3. Gabungkan kelas dasar dengan kelas warna baru
@@ -444,8 +426,8 @@
                         quantityLine = `
                 <p class="text-sm text-gray-600 dark:text-gray-300">
                     Awal: <span class="font-medium text-gray-800 dark:text-gray-200">${initialQty}</span> |
-                    Retur: <span class="font-medium text-red-500">${returnedQty}</span> |
-                    Sisa: <span class="font-medium text-brand-deep">${remainingQty}</span>
+                    Retur: <span class="font-medium text-red-500 dark:text-red-400">${returnedQty}</span> |
+                    Sisa: <span class="font-medium text-brand-deep dark:text-brand-light">${remainingQty}</span>
                 </p>
             `;
                     }
@@ -496,10 +478,10 @@
             };
 
             // Logika 1: Jika ini adalah pesanan dengan retur, TAMPILKAN BUKTI RETUR
-            // (Asumsi backend konsisten mengirim 'return_details')
-            if (order.return_details && order.return_details.return_proof) {
+            // (Backend mengirim data retur di key 'order_return')
+            if (order.order_return && order.order_return.return_proof) {
                 proofUploadedTitle.textContent = 'Bukti Retur';
-                proofImage.src = getImageUrl(order.return_details.return_proof);
+                proofImage.src = getImageUrl(order.order_return.return_proof);
                 paymentProofUploaded.classList.remove('hidden');
 
                 // Logika 2: Jika BUKAN retur, tapi punya bukti bayar, TAMPILKAN BUKTI BAYAR
@@ -596,7 +578,7 @@
             modalContent.classList.add('hidden');
             modalLoader.classList.remove('hidden');
             modalLoader.innerHTML =
-                `<svg class="w-8 h-8 mx-auto text-blue-600 animate-spin" ...></svg><p class="mt-4 ...">Memuat Status...</p>`;
+                `<div class="flex flex-col items-center justify-center py-8"><svg class="w-8 h-8 text-brand animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg><p class="mt-4 text-sm text-gray-600 dark:text-gray-300">Memuat Status...</p></div>`;
             try {
                 const response = await fetch(`/kurir/pesanan/${orderId}/details`);
                 const data = await response.json();
@@ -604,7 +586,7 @@
                 populateStatusStepperModal(data);
             } catch (error) {
                 modalLoader.innerHTML =
-                    `<div class="text-center"><p class="font-bold text-red-600">Gagal Memuat</p><p class="mt-2 text-sm">${error.message}</p></div>`;
+                    `<div class="text-center"><p class="font-bold text-red-600 dark:text-red-400">Gagal Memuat</p><p class="mt-2 text-sm">${error.message}</p></div>`;
             }
         }
 
@@ -671,7 +653,6 @@
             const currentStatus = order.status || 'baru';
             const currentStatusInfo = statusMap[currentStatus];
 
-            // [!code ++]
             // Menyimpan timezone ke tombol untuk digunakan nanti
             updateButton.setAttribute('data-order-timezone', order.timezone || 'Asia/Jakarta');
 
@@ -686,13 +667,13 @@
                     updateButton.disabled = true;
                     updateButton.classList.add('opacity-50', 'cursor-not-allowed');
                     if (currentStatus === 'diverifikasi_admin') {
-                        updateButton.classList.remove('bg-blue-700', 'hover:bg-blue-800');
+                        updateButton.classList.remove('bg-brand', 'hover:bg-brand-deep');
                         updateButton.classList.add('bg-brand-deep', 'hover:bg-brand-deep');
                     }
                 } else {
                     updateButton.disabled = false;
                     updateButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-brand-deep', 'hover:bg-brand-deep');
-                    updateButton.classList.add('bg-blue-700', 'hover:bg-blue-800');
+                    updateButton.classList.add('bg-brand', 'hover:bg-brand-deep');
                     updateButton.setAttribute('data-next-status', currentStatusInfo.nextStatus);
                 }
             } else {
@@ -746,13 +727,13 @@
 
                 // Cek apakah langkah sudah selesai
                 if (timestamps[step]) {
-                    iconEl.innerHTML = '<i class="text-white dark:text-brand-deep fas fa-check-circle"></i>';
+                    iconEl.innerHTML = '<i class="text-white fas fa-check-circle"></i>';
                     iconEl.classList.add('bg-brand-deep', 'border-brand-deep');
                     timeSpanEl.textContent = `${timestamps[step]}  ${tzAbbr}`;
                     if (mobileLineEl) mobileLineEl.classList.add('bg-brand-deep');
                     if (desktopLineEl) desktopLineEl.classList.add('bg-brand-deep');
                 } else {
-                    iconEl.innerHTML = `<i class="fas ${icons[step]} text-brand-deep"></i>`;
+                    iconEl.innerHTML = `<i class="fas ${icons[step]} text-brand-deep dark:text-brand-light"></i>`;
                     timeSpanEl.textContent = tzAbbr; // Tampilkan hanya label jika belum ada waktu
                 }
             });
@@ -807,7 +788,6 @@
                     minute: '2-digit',
                 });
                 const localizedTimestamp = formatter.format(now);
-                // [!code block:end]
 
                 const timeSpanId = {
                     'diambil': 'pickedUpAt',
@@ -816,7 +796,6 @@
                 } [newStatus];
 
                 if (timeSpanId) {
-                    // [!code ++]
                     // Menampilkan waktu yang sudah dilokalisasi
                     document.getElementById(timeSpanId).textContent = localizedTimestamp;
                 }
@@ -842,46 +821,44 @@
                 .replace(/_/g, ' '));
 
             // Definisikan kelas warna dinamis
-            let newClasses = 'bg-gray-100 text-gray-800';
+            let newClasses = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
             let newColorBarClass = 'bg-gray-400';
             // ... (switch case untuk newClasses dan newColorBarClass tetap sama)
             switch (newStatus) {
                 case 'diambil':
-                    newClasses = 'bg-blue-100 text-blue-800';
+                    newClasses = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
                     newColorBarClass = 'bg-blue-500';
                     break;
                 case 'diantar':
-                    newClasses = 'bg-yellow-100 text-yellow-800';
+                    newClasses = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
                     newColorBarClass = 'bg-yellow-500';
                     break;
                 case 'diterima_pembeli':
-                    newClasses = 'bg-purple-100 text-purple-800';
+                    newClasses = 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
                     newColorBarClass = 'bg-purple-500';
                     break;
                 case 'menunggu_retur':
-                    newClasses = 'bg-red-100 text-red-800';
+                    newClasses = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
                     newColorBarClass = 'bg-red-500';
                     break;
                 case 'menunggu_verifikasi_admin':
-                    newClasses = 'bg-orange-100 text-orange-800';
+                    newClasses = 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
                     newColorBarClass = 'bg-orange-500';
                     break;
                 case 'selesai':
-                    newClasses = 'bg-brand-light text-brand-deep';
+                    newClasses = 'bg-brand-light text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light';
                     newColorBarClass = 'bg-brand';
                     break;
             }
 
 
             // Definisikan semua kelas dasar yang statis
-            const baseClasses = 'status-badge px-2.5 py-1 text-xs font-semibold rounded-full'; // [!code ++]
 
             rows.forEach(row => {
                 const statusSpan = row.querySelector('.status-badge');
                 if (statusSpan) {
                     statusSpan.textContent = statusText;
                     // Gabungkan kelas dasar dengan kelas warna yang baru
-                    statusSpan.className = `${baseClasses} ${newClasses}`; // [!code ++]
                 }
                 const colorBar = row.querySelector('.absolute.top-0.left-0');
                 if (colorBar) {
@@ -972,7 +949,7 @@
                             <div class="flex flex-col flex-1">
                                 <div class="flex items-center justify-between mb-1">
                                     <p class="font-bold text-black dark:text-white">${escapeHtml(product.name)}</p>
-                                    <button type="button" class="text-xl text-red-600 remove-product hover:text-red-900" title="Setel kuantitas ke 0">🗑</button>
+                                    <button type="button" class="text-xl text-red-600 dark:text-red-400 remove-product hover:text-red-900 dark:hover:text-red-300" title="Setel kuantitas ke 0">🗑</button>
                                 </div>
                                 ${product.variant_name ? `<p class="mb-1 text-xs text-gray-500 dark:text-gray-400">${escapeHtml(product.variant_name)}</p>` : ''}
                                 <p class="text-sm text-gray-600 dark:text-gray-300">Jumlah Awal: ${product.quantity}</p>

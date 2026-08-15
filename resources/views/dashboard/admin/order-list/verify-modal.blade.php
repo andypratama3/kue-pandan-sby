@@ -1,7 +1,7 @@
 <x-modal-custom id="verifyOrderModal" title="Verifikasi Rincian Pesanan" size="4xl">
     {{-- Loader saat data dimuat --}}
     <div id="verifyModalLoader" class="p-8 text-center">
-        <svg class="w-8 h-8 mx-auto text-brand-deep animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+        <svg class="w-8 h-8 mx-auto text-brand-deep dark:text-brand-light animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
             viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
             </circle>
@@ -48,7 +48,7 @@
                         <div>
                             <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Kurir Bertugas</label>
                             <p id="verifyModalCourierName"
-                                class="font-semibold text-gray-800 text-md dark:text-gray-200"></p>
+                                class="font-semibold text-gray-800 text-base dark:text-gray-200"></p>
                         </div>
                     </div>
                     {{-- Bagian Catatan Pesanan --}}
@@ -122,9 +122,9 @@
     {{-- Slot untuk footer dengan tombol aksi --}}
     <x-slot name="footer">
         <div
-            class="flex items-center justify-end p-4 space-x-3 border-t border-gray-200 rounded-b md:p-5 dark:border-gray-600">
+            class="flex items-center justify-end p-4 space-x-3 border-t border-gray-200 rounded-b md:p-5 dark:border-slate-700">
             <button id="btnOpenRejectModal" type="button"
-                class="px-5 py-2.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-brand-deep focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-red-600 dark:text-white dark:border-gray-600">
+                class="px-5 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
                 Tolak
             </button>
             <button id="btnVerifyOrder" type="button"

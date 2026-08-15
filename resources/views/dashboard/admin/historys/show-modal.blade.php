@@ -1,7 +1,7 @@
 <x-modal-custom id="showOrderModal" title="Rincian Pesanan" size="4xl">
     {{-- Loader saat data dimuat --}}
     <div id="showOrderModalLoader" class="p-8 text-center">
-        <svg class="w-8 h-8 mx-auto text-brand-deep animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <svg class="w-8 h-8 mx-auto text-brand-deep dark:text-brand-light animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         <p class="mt-4 text-lg font-medium text-gray-700 dark:text-gray-300">Memuat Detail Pesanan...</p>
     </div>
 
@@ -9,8 +9,8 @@
     <div id="showOrderModalContent" class="hidden">
         {{-- Kontainer Error --}}
         <div id="showOrderModalError" class="hidden py-10 text-center">
-            <p class="font-semibold text-red-600" data-role="error-title">Gagal Memuat Data</p>
-            <p class="mt-1 text-sm text-gray-500" data-role="error-message">Silakan coba lagi.</p>
+            <p class="font-semibold text-red-600 dark:text-red-400" data-role="error-title">Gagal Memuat Data</p>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400" data-role="error-message">Silakan coba lagi.</p>
         </div>
 
         {{-- Kontainer Grid untuk konten utama --}}
@@ -34,7 +34,7 @@
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Metode Pembayaran</label>
-                            <p id="showOrderModalPaymentMethod" class="font-semibold text-gray-800 uppercase text-md dark:text-gray-200"></p>
+                            <p id="showOrderModalPaymentMethod" class="font-semibold text-gray-800 uppercase text-base dark:text-gray-200"></p>
                         </div>
                         <div>
                             <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Tanggal Penting</label>
@@ -44,7 +44,7 @@
                          {{-- KURIR (KHUSUS ADMIN) --}}
                         <div class="sm:col-span-2">
                             <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Kurir Bertugas</label>
-                            <p id="showOrderModalCourier" class="font-semibold text-gray-800 text-md dark:text-gray-200"></p>
+                            <p id="showOrderModalCourier" class="font-semibold text-gray-800 text-base dark:text-gray-200"></p>
                         </div>
                     </div>
                     {{-- Bagian Catatan Pesanan --}}
@@ -111,8 +111,8 @@
 
 {{-- TEMPLATE UNTUK ITEM PRODUK --}}
 <template id="orderItemTemplate-admin">
-    <div class="flex items-start p-3 space-x-4 border rounded-lg bg-gray-50 dark:border-gray-200 dark:bg-gray-700/50 dark:border-gray-600">
-        <div class="flex items-center justify-center flex-shrink-0 w-8 h-8 mt-1 bg-gray-200 rounded-lg dark:bg-gray-600">
+    <div class="flex items-start p-3 space-x-4 border rounded-lg bg-gray-50 dark:bg-slate-700/50 dark:border-slate-600">
+        <div class="flex items-center justify-center flex-shrink-0 w-8 h-8 mt-1 bg-gray-200 rounded-lg dark:bg-slate-600">
             <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
             </svg>

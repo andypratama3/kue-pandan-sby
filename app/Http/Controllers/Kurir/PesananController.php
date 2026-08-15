@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\OrderReturn;
-use App\Models\OrderReturnProduct;
 use App\Models\ProductVariant;
 use App\Support\ProofFile;
 use Carbon\Carbon;
@@ -460,6 +458,7 @@ class PesananController extends Controller
                     'return_proof' => $activeReturn->return_proof ? route('proof.show', ['type' => 'return', 'order' => $order->id]) : null,
                     'total_amount_returned' => $activeReturn->total_amount_returned,
                     'created_at' => $activeReturn->created_at->setTimezone($timezone)->isoFormat('D MMMM YYYY, HH:mm'),
+                    'created_at_raw' => $activeReturn->created_at->setTimezone($timezone)->toISOString(),
                 ] : null,
             ];
 
@@ -470,99 +469,6 @@ class PesananController extends Controller
             Log::error('Error fetching order details for order ID '.$id.': '.$e->getMessage());
 
             return response()->json(['message' => 'Terjadi kesalahan internal.'], 500);
-        }
-    }
-
-    /**
-     * Memproses pengajuan pengembalian barang (retur) untuk sebuah pesanan.
-     *
-     * @param  int  $id  ID Pesanan
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function requestReturn(Request $request, $id)
-    {
-        if (! Auth::check()) {
-            return response()->json(['message' => 'Tidak terautentikasi'], 401);
-        }
-
-        DB::beginTransaction();
-        try {
-            $validated = $request->validate([
-                'return_quantities' => 'required|array|min:1',
-                'return_quantities.*' => 'required|integer|min:1',
-            ]);
-
-            $order = Order::with('items')->where('id', $id)
-                ->where('created_by_user_id', Auth::id())
-                ->firstOrFail();
-
-            // Retur hanya bisa diajukan jika status pesanan 'diterima_pembeli'
-            if ($order->status !== 'diterima_pembeli') {
-                return response()->json(['message' => 'Pengajuan retur hanya bisa dilakukan jika status pesanan "Diterima Pembeli".'], 400);
-            }
-
-            $currentTime = $this->nowInUserTimezone();
-
-            // Buat record OrderReturn baru
-            $orderReturn = new OrderReturn;
-            $orderReturn->order_id = $order->id;
-            $orderReturn->status = 'menunggu_verifikasi_admin';
-            $orderReturn->created_at = $currentTime;
-            $orderReturn->updated_at = $currentTime;
-            $orderReturn->save();
-
-            $totalReturnValue = 0;
-            // Loop melalui setiap produk yang ingin diretur
-            foreach ($validated['return_quantities'] as $key => $returnQty) {
-                [$productId, $variantId] = explode('-', $key);
-                $variantId = ($variantId == 0) ? null : $variantId;
-
-                $orderItem = $order->items()
-                    ->where('product_id', $productId)
-                    ->where('variant_id', $variantId)
-                    ->first();
-
-                if (! $orderItem || $returnQty > $orderItem->quantity) {
-                    throw new \Exception('Kuantitas retur tidak valid untuk produk: '.($orderItem->product_name ?? 'N/A'));
-                }
-
-                $subtotalReturn = $returnQty * $orderItem->price;
-                $totalReturnValue += $subtotalReturn;
-
-                // Buat record untuk setiap produk yang diretur
-                OrderReturnProduct::create([
-                    'order_return_id' => $orderReturn->id,
-                    'product_id' => $productId,
-                    'product_variant_id' => $variantId,
-                    'quantity' => $returnQty,
-                    'price' => $orderItem->price,
-                    'subtotal' => $subtotalReturn,
-                ]);
-            }
-
-            // Update total nilai retur dan status pesanan utama
-            $orderReturn->total_amount_returned = $totalReturnValue;
-            $orderReturn->save();
-
-            $order->status = 'menunggu_retur';
-            $order->updated_at = $currentTime;
-            $order->save();
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Permintaan retur berhasil diajukan.',
-                'order' => ['status' => 'menunggu_retur'],
-            ], 200);
-        } catch (ValidationException $e) {
-            DB::rollBack();
-
-            return response()->json(['message' => 'Data tidak valid.', 'errors' => $e->errors()], 422);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error processing return request for order ID '.$id.': '.$e->getMessage());
-
-            return response()->json(['message' => 'Terjadi kesalahan pada server. Silakan coba lagi.'], 500);
         }
     }
 
@@ -717,7 +623,22 @@ class PesananController extends Controller
             }
 
             $updateData['updated_at'] = $currentTime;
-            $order->update($updateData);
+
+            // Update ATOMIK (compare-and-swap): hanya berhasil jika status di DB
+            // masih sama dengan yang dibaca tadi — mencegah dua permintaan
+            // bersamaan saling menimpa transisi status. Dibalut transaksi agar
+            // konsisten dengan pencatatan waktu pengiriman.
+            $updated = DB::transaction(function () use ($order, $updateData) {
+                return Order::where('id', $order->id)
+                    ->where('status', $order->status)
+                    ->update($updateData);
+            });
+
+            if (! $updated) {
+                return response()->json([
+                    'message' => 'Status pesanan sudah diubah oleh permintaan lain, silakan muat ulang.',
+                ], 409);
+            }
 
             // Ambil ulang data terbaru untuk dikirim kembali ke frontend
             $updatedOrder = Order::find($id);

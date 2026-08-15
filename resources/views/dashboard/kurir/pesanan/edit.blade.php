@@ -7,7 +7,7 @@
 
     <form onsubmit="event.preventDefault(); submitReturn();">
 
-        <h3 class="mb-4 font-bold tracking-wide text-black uppercase text-md dark:text-white dark:opacity-60">Data Customer
+        <h3 class="mb-4 font-bold tracking-wide text-black uppercase text-base dark:text-white dark:opacity-60">Data Customer
         </h3>
 
         <div class="space-y-4">
@@ -36,7 +36,7 @@
             </div>
         </div>
 
-        <h3 class="mb-4 font-bold tracking-wide text-black uppercase text-md dark:text-white dark:opacity-60 mt-4">Produk
+        <h3 class="mb-4 font-bold tracking-wide text-black uppercase text-base dark:text-white dark:opacity-60 mt-4">Produk
         </h3>
 
         <div class="space-y-4">
@@ -63,7 +63,7 @@
 
         </div>
 
-        <button type="submit" class="px-6 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 mt-6">
+        <button type="submit" class="px-6 py-1 bg-brand text-white rounded hover:bg-brand-deep mt-6">
             Simpan Retur
         </button>
     </form>
@@ -95,7 +95,6 @@
             try {
                 const orderId = getID();
 
-                const STORAGE_URL = "{{ Storage::url('') }}";
                 if (!orderId) throw new Error('Order ID tidak ditemukan');
 
                 const response = await fetch(`/kurir/pesanan/${orderId}/details`, {
@@ -124,8 +123,8 @@
                     const returnedQty = product.returned_quantity ?? 0;
 
                     productHtml += `
-                <div class="mb-4 p-3 border rounded">
-                    <img src="${STORAGE_URL}${product.image_url}"
+                <div class="mb-4 p-3 border rounded dark:bg-gray-800 dark:border-gray-700">
+                    <img src="${product.image_url || ''}"
                          class="w-24 mb-2">
 
                     <p class="font-semibold">
@@ -140,7 +139,7 @@
                             min="0"
                             max="${product.quantity}"
                             value="${returnedQty}"
-                            class="return-qty border px-2 w-20"
+                            class="return-qty border px-2 w-20 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
                             data-product-key="${key}"
                         >
                         | Sisa: ${product.quantity - returnedQty}
@@ -154,7 +153,7 @@
             } catch (error) {
                 console.error(error);
                 document.getElementById('error').innerHTML = `
-            <p class="text-red-600 font-bold">${error.message}</p>
+            <p class="text-red-600 dark:text-red-400 font-bold">${error.message}</p>
         `;
             }
         }

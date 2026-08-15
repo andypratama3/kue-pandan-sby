@@ -136,7 +136,8 @@ class ProductController extends Controller
             foreach ($request->variants as $variantData) {
                 if (! empty($variantData['id'])) {
                     // Ini adalah varian LAMA -> UPDATE
-                    $variant = ProductVariant::find($variantData['id']);
+                    // Scope ke product agar tidak bisa mengubah varian milik produk/cabang lain
+                    $variant = $product->variants()->find($variantData['id']);
                     if ($variant) {
                         $variant->update([
                             'name' => $variantData['name'],

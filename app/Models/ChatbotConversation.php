@@ -21,6 +21,7 @@ class ChatbotConversation extends Model
         'last_interaction_at',
         'bot_reply',
         'handled_by_ai',
+        'provider_message_id',
     ];
 
     /**

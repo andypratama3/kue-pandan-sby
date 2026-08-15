@@ -36,7 +36,7 @@
                         <div>
                             <label class="text-sm font-medium text-gray-500 dark:text-gray-400">Metode
                                 Pembayaran</label>
-                            <p class="font-semibold text-gray-800 uppercase text-md dark:text-gray-200"
+                            <p class="font-semibold text-gray-800 uppercase text-base dark:text-gray-200"
                                 id="paymentMethod"></p>
                         </div>
                         <div>
@@ -48,7 +48,7 @@
                         </div>
                     </div>
                     <div class="pt-3 mt-3 border-t border-gray-200 dark:border-gray-700 ">
-                        <label class="mb-1 font-medium text-gray-900 text-md dark:text-gray-400">Catatan Pesanan</label>
+                        <label class="mb-1 font-medium text-gray-900 text-base dark:text-gray-400">Catatan Pesanan</label>
                         <div id="orderNotesContainer"
                             class="p-2 font-semibold text-center text-gray-800 bg-yellow-100 rounded-lg dark:bg-yellow-900/20 dark:text-gray-50">
                             <p id="orderNotes"></p>
@@ -77,14 +77,12 @@
                             <span id="modalOrderStatusBadge"
                                 class="px-4 py-1.5 text-sm font-bold rounded-full w-full text-center"></span>
                         </div>
-                        {{-- [!code block:start] --}}
                         <!-- PERBAIKAN: Ditambahkan class `hidden` agar tidak tampil secara default -->
                         <div id="returnTimestampContainer"
                             class="hidden pt-3 mt-3 border-t border-gray-200 dark:border-gray-700">
                             <p class="text-sm text-gray-600 dark:text-white">Tgl. Pengajuan Retur: <span
                                     id="returnCreatedAt" class="font-semibold"></span></p>
                         </div>
-                        {{-- [!code block:end] --}}
                     </div>
                     <div id="totalAmountSection" class="pt-4 border-t border-gray-200 dark:border-gray-700">
                         <div id="singleTotalAmountContainer">
@@ -93,7 +91,7 @@
                             </p>
                         </div>
                         <div id="returnedTotalAmountContainer" class="hidden">
-                            <label class="font-medium text-gray-500 text-md dark:text-gray-400">Total Tagihan</label>
+                            <label class="font-medium text-gray-500 text-base dark:text-gray-400">Total Tagihan</label>
                             <p id="modalInitialTotalAmount"
                                 class="text-sm font-bold text-gray-400 line-through dark:text-gray-500"></p>
                             <p id="modalLatestTotalAmount"
@@ -125,7 +123,7 @@
                             <span>Kompres gambar</span>
                         </a>
                         <button type="submit"
-                            class="inline-flex items-center justify-center w-full px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 disabled:opacity-50 transition-colors">
+                            class="inline-flex items-center justify-center w-full px-5 py-2.5 text-sm font-medium text-center text-white bg-brand rounded-lg hover:bg-brand-deep focus:ring-4 focus:ring-brand-light disabled:opacity-50 transition-colors">
                             <span id="uploadButtonText">Unggah Bukti</span>
                             <svg id="uploadButtonSpinner" aria-hidden="true"
                                 class="hidden w-4 h-4 ml-2 text-white animate-spin" viewBox="0 0 100 101"

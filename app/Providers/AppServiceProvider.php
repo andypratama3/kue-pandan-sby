@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Contracts\WhatsAppProviderInterface;
 use App\Models\Order;
-use App\Services\WhatsApp\FonnteProvider;
 use App\Services\WhatsApp\MetaCloudProvider;
 use App\Support\RegionContext;
 use Illuminate\Support\Facades\Auth;
@@ -18,12 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(WhatsAppProviderInterface::class, function () {
-            return match (config('services.whatsapp.provider')) {
-                'meta' => app(MetaCloudProvider::class),
-                default => app(FonnteProvider::class),
-            };
-        });
+        $this->app->bind(WhatsAppProviderInterface::class, fn () => app(MetaCloudProvider::class));
     }
 
     /**

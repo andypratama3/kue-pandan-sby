@@ -83,6 +83,7 @@ class MetaCloudProvider implements WhatsAppProviderInterface
     {
         $value = $payload['entry'][0]['changes'][0]['value'] ?? [];
         $message = $value['messages'][0] ?? [];
+        $metadata = $value['metadata'] ?? [];
 
         $from = $message['from'] ?? null;
         $type = $message['type'] ?? 'text';
@@ -99,6 +100,7 @@ class MetaCloudProvider implements WhatsAppProviderInterface
             'name' => $name ? (string) $name : null,
             'text' => $text,
             'type' => $type,
+            'recipient' => $metadata['display_phone_number'] ?? null,
             'raw_reply_context' => [
                 'message_id' => $message['id'] ?? null,
                 'sender' => $from,
@@ -114,8 +116,12 @@ class MetaCloudProvider implements WhatsAppProviderInterface
 
         $expected = config('services.meta_whatsapp.verify_token');
 
-        if ($mode === 'subscribe' && $token !== null && $token === $expected) {
-            return ['verified' => true, 'challenge' => $challenge ? (string) $challenge : ''];
+        // Bandingkan constant-time dengan hash_equals; tolak bila token kosong.
+        if ($mode === 'subscribe'
+            && is_string($expected) && $expected !== ''
+            && is_string($token) && $token !== ''
+            && hash_equals($expected, $token)) {
+            return ['verified' => true, 'challenge' => is_scalar($challenge) ? (string) $challenge : ''];
         }
 
         return ['verified' => false, 'challenge' => null];

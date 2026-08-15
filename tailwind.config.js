@@ -27,6 +27,9 @@ export default {
                 "brand-light": "#a9c19a",
                 ink: "#1f2a33",
                 mint: "#eef3ec",
+                /* Balanced canvas surfaces — soft sage (light), slate-900 (dark) */
+                canvas: "#f1f4ec",
+                "canvas-dark": "#0f172a",
             },
         },
     },
@@ -44,9 +47,9 @@ export default {
         'w-64',
         'rotate-180',
         {
-            // Pola untuk semua warna yang Anda gunakan (termasuk hover)
-            pattern: /^(bg|text|border|ring)-(red|green|blue|gray|slate|orange|cyan|emerald|purple|indigo)-(50|100|200|300|400|500|600|700|800|900)$/,
-            variants: ['hover', 'focus'],
+            // Pola untuk semua warna yang Anda gunakan (termasuk hover & dark mode)
+            pattern: /^(bg|text|border|ring|divide)-(red|green|blue|gray|slate|orange|yellow|amber|cyan|emerald|purple|indigo|rose|teal|pink|violet)-(50|100|200|300|400|500|600|700|800|900|950)$/,
+            variants: ['hover', 'focus', 'active', 'dark'],
         },
         {
             // Pola untuk responsive design

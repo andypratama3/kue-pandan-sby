@@ -7,7 +7,7 @@
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>
-        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Anda yakin ingin menghapus customer <br><span class="font-bold">{{ $historys->invoice_number }}</span>?</h3>
+        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Anda yakin ingin menghapus riwayat pesanan <br><span class="font-bold">{{ $historys->invoice_number }}</span>?</h3>
         <form action="
         {{ route('admin.historys.destroy', $historys->id) }}
          " method="POST" class="inline">

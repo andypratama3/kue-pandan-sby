@@ -38,7 +38,7 @@
             {{-- Ditambahkan Oleh (Kurir) --}}
             <div>
                 <label for="create-added_by_user_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ditambahkan Oleh (Kurir) <span class="text-red-500">*</span></label>
-                <select name="added_by_user_id" id="create-added_by_user_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500" required>
+                <select name="added_by_user_id" id="create-added_by_user_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400" required>
                     <option value="{{ Auth::id() }}">Saya Sendiri (Admin)</option>
                     @foreach ($couriers as $courier)
                         <option value="{{ $courier->id }}" {{ old('added_by_user_id') == $courier->id ? 'selected' : '' }}>{{ $courier->name }}</option>
@@ -70,7 +70,7 @@
                     <span
                         class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-500">+62</span>
                     <input type="tel" name="phone" id="kurir-create-phone" value="{{ old('phone') }}"
-                        class="rounded-none rounded-r-lg bg-gray-50 border text-gray-900 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5"
+                        class="rounded-none rounded-r-lg bg-gray-50 border text-gray-900 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
                         placeholder="8123456789" required inputmode="numeric" pattern="[0-9]*"
                         oninput="this.value = this.value.replace(/\D/g, '')">
                 </div>

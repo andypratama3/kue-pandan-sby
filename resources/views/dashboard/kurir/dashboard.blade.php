@@ -58,6 +58,19 @@
         ->take(3)
         ->get();
 
+    // Peta jumlah retur per item (order_id:product_id:variant_id) — 1 query saja,
+    // agar total "latest" di tabel server cocok dengan modal detail (sebelumnya selalu 0).
+    $returnedQtyMap = \App\Models\OrderReturnProduct::query()
+        ->join('order_returns', 'order_returns.id', '=', 'order_return_products.order_return_id')
+        ->whereIn('order_returns.order_id', $latestOrders->pluck('id'))
+        ->where('order_returns.status', '!=', 'ditolak')
+        ->selectRaw('order_returns.order_id, order_return_products.product_id, order_return_products.product_variant_id, SUM(order_return_products.quantity) as qty')
+        ->groupBy('order_returns.order_id', 'order_return_products.product_id', 'order_return_products.product_variant_id')
+        ->get()
+        ->mapWithKeys(function ($r) {
+            return ["{$r->order_id}:{$r->product_id}:{$r->product_variant_id}" => $r->qty];
+        });
+
     // --- Logika Grafik Diperbarui dengan filter kurir ---
     $filter = Request::input('filter', 'last_7_days');
     $chartLabels = [];
@@ -194,9 +207,9 @@
     $suggestedMax = $maxChartValue > 0 ? ceil($maxChartValue * 1.2) : 5;
 
     ?>
-    <div class="w-full max-w full">
+    <div class="w-full max-w-full">
         <div class="flex flex-wrap gap-6 -mx-3">
-            <div class="w-full max-w-full px-3 space-y-4 lg:flex-nome">
+            <div class="w-full max-w-full px-3 space-y-4 lg:flex-none">
                 <div class="mb-6">
                     <div
                         class="relative flex flex-col flex-none max-w-full gap-4 p-6 px-6 py-6 overflow-hidden border shadow-2xl rounded-3xl xl:gap-0 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800 border-amber-100 dark:border-slate-600">
@@ -368,7 +381,7 @@
 
             <div class="w-full max-w-full px-3 mt-0 mb-2 lg:mb-0 lg:flex-none">
                 <div
-                    class="relative flex flex-col min-w-0 overflow-hidden break-words border border-gray-100 shadow-2xl bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900 rounded-3xl bg-clip-border dark:border-slate-700">
+                    class="relative flex flex-col min-w-0 overflow-hidden break-words border border-gray-100 shadow-2xl bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-800 rounded-3xl bg-clip-border dark:border-slate-700">
                     <div class="p-6 pb-4 mb-0 rounded-t-4">
                         <div class="flex-1">
                             @if (Auth::user()->note)
@@ -484,7 +497,7 @@
                 <div class="flex flex-wrap mt-6 -mx-3">
                     <div class="w-full max-w-full px-3 mt-0 lg:flex-none">
                         <div
-                            class="relative flex flex-col min-w-0 mb-4 overflow-hidden break-words border border-gray-100 shadow-2xl bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-900 rounded-3xl bg-clip-border dark:border-slate-700">
+                            class="relative flex flex-col min-w-0 mb-4 overflow-hidden break-words border border-gray-100 shadow-2xl bg-gradient-to-br from-white to-gray-50 dark:from-slate-800 dark:to-slate-800 rounded-3xl bg-clip-border dark:border-slate-700">
                             <div class="p-6 pb-0 mb-0 rounded-t-3xl">
                                 <div class="flex items-center justify-between">
                                     <h5 class="mb-1 text-xl font-bold text-gray-800 dark:text-white">🎯 Latest Orders
@@ -570,7 +583,7 @@
                                                         $hasReturnedItems = false;
                                                         foreach ($order->items as $item) {
                                                             $initialQty = $item->quantity ?? 0;
-                                                            $returnedQty = $item->returned_quantity ?? 0;
+                                                            $returnedQty = $returnedQtyMap["{$order->id}:{$item->product_id}:{$item->variant_id}"] ?? 0;
                                                             $price = $item->price ?? 0;
                                                             $calculatedLatestTotal +=
                                                                 ($initialQty - $returnedQty) * $price;
@@ -668,27 +681,27 @@
                                                             $statusClass = '';
                                                             switch ($status) {
                                                                 case 'diambil':
-                                                                    $statusClass = 'bg-blue-100 text-blue-800';
+                                                                    $statusClass = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
                                                                     break;
                                                                 case 'diantar':
-                                                                    $statusClass = 'bg-yellow-100 text-yellow-800';
+                                                                    $statusClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
                                                                     break;
                                                                 case 'diterima_pembeli':
-                                                                    $statusClass = 'bg-purple-100 text-purple-800';
+                                                                    $statusClass = 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
                                                                     break;
                                                                 case 'selesai':
                                                                 case 'diverifikasi_admin':
-                                                                    $statusClass = 'bg-brand-light text-brand-deep';
+                                                                    $statusClass = 'bg-brand-light text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light';
                                                                     break;
                                                                 case 'menunggu_retur':
-                                                                    $statusClass = 'bg-red-100 text-red-800';
+                                                                    $statusClass = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
                                                                     break;
                                                                 case 'menunggu_verifikasi_admin':
                                                                     $statusClass =
                                                                         'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
                                                                     break;
                                                                 default:
-                                                                    $statusClass = 'bg-gray-100 text-gray-800';
+                                                                    $statusClass = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
                                                                     break;
                                                             }
                                                         @endphp
@@ -758,7 +771,7 @@
                                                 $hasReturnedItems = false;
                                                 foreach ($order->items as $item) {
                                                     $initialQty = $item->quantity ?? 0;
-                                                    $returnedQty = $item->returned_quantity ?? 0;
+                                                    $returnedQty = $returnedQtyMap["{$order->id}:{$item->product_id}:{$item->variant_id}"] ?? 0;
                                                     $price = $item->price ?? 0;
                                                     $calculatedLatestTotal += ($initialQty - $returnedQty) * $price;
                                                     if ($returnedQty > 0) {
@@ -808,7 +821,7 @@
                                                         <span class="mx-1">|</span>
                                                         @if ($showReturnedView)
                                                             <span class="inline-flex items-center gap-1">
-                                                                <del class="mr-1 text-xs text-gray-500">Rp
+                                                                <del class="mr-1 text-xs text-gray-500 dark:text-gray-400">Rp
                                                                     {{ number_format($initialTotal, 0, ',', '.') }}</del>
                                                                 <span
                                                                     class="font-bold text-brand-deep dark:text-brand">Rp
@@ -830,27 +843,27 @@
                                                         $statusClass = '';
                                                         switch ($status) {
                                                             case 'diambil':
-                                                                $statusClass = 'bg-blue-100 text-blue-800';
+                                                                $statusClass = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
                                                                 break;
                                                             case 'diantar':
-                                                                $statusClass = 'bg-yellow-100 text-yellow-800';
+                                                                $statusClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
                                                                 break;
                                                             case 'diterima_pembeli':
-                                                                $statusClass = 'bg-purple-100 text-purple-800';
+                                                                $statusClass = 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
                                                                 break;
                                                             case 'selesai':
                                                             case 'diverifikasi_admin':
-                                                                $statusClass = 'bg-brand-light text-brand-deep';
+                                                                $statusClass = 'bg-brand-light text-brand-deep dark:bg-brand-deep dark:text-brand-light';
                                                                 break;
                                                             case 'menunggu_retur':
-                                                                $statusClass = 'bg-red-100 text-red-800';
+                                                                $statusClass = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
                                                                 break;
                                                             case 'menunggu_verifikasi_admin':
                                                                 $statusClass =
                                                                     'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
                                                                 break;
                                                             default:
-                                                                $statusClass = 'bg-gray-100 text-gray-800';
+                                                                $statusClass = 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
                                                                 break;
                                                         }
                                                     @endphp
@@ -861,7 +874,7 @@
                                                     <div class="flex items-center space-x-3">
                                                         @if ($formattedPhone)
                                                             <a href="https://wa.me/{{ $formattedPhone }}" target="_blank"
-                                                                class="text-brand transition-colors hover:text-brand-deep">
+                                                                class="text-brand transition-colors hover:text-brand-deep dark:hover:text-brand-light">
                                                                 <i class="text-2xl fab fa-whatsapp"></i>
                                                             </a>
                                                         @endif
@@ -1044,7 +1057,6 @@
             }));
         }
 
-        // [!code block:start]
         /**
          * Membuka modal image viewer untuk menampilkan gambar dalam ukuran penuh.
          * @param {string} src - URL sumber gambar yang akan ditampilkan.
@@ -1069,7 +1081,6 @@
                 document.body.classList.remove('overflow-hidden'); // Mengembalikan kemampuan scroll
             }
         }
-        // [!code block:end]
 
         // DITAMBAHKAN: Fungsi baru untuk memperbarui statistik di dashboard secara client-side
         function updateDashboardCounters(oldStatus, newStatus) {
@@ -1189,7 +1200,7 @@
                 populateOrderDetailsModal(data);
             } catch (error) {
                 modalLoader.innerHTML =
-                    `<div class="text-center"><p class="font-bold text-red-600">Gagal Memuat Data</p><p class="mt-2 text-sm text-gray-500">${error.message}</p></div>`;
+                    `<div class="text-center"><p class="font-bold text-red-600 dark:text-red-400">Gagal Memuat Data</p><p class="mt-2 text-sm text-gray-500 dark:text-gray-400">${error.message}</p></div>`;
             }
         }
 
@@ -1235,25 +1246,25 @@
                 statusBadge.textContent = statusText;
 
                 // 2. Tentukan kelas warna berdasarkan status
-                let badgeColorClasses = 'bg-gray-100 text-gray-800'; // Default
+                let badgeColorClasses = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'; // Default
                 switch (order.status) {
                     case 'diambil':
-                        badgeColorClasses = 'bg-blue-100 text-blue-800';
+                        badgeColorClasses = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
                         break;
                     case 'diantar':
-                        badgeColorClasses = 'bg-yellow-100 text-yellow-800';
+                        badgeColorClasses = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
                         break;
                     case 'diterima_pembeli':
-                        badgeColorClasses = 'bg-purple-100 text-purple-800';
+                        badgeColorClasses = 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
                         break;
                     case 'menunggu_retur':
-                        badgeColorClasses = 'bg-red-100 text-red-800';
+                        badgeColorClasses = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
                         break;
                     case 'menunggu_verifikasi_admin':
-                        badgeColorClasses = 'bg-orange-100 text-orange-800';
+                        badgeColorClasses = 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
                         break;
                     case 'selesai':
-                        badgeColorClasses = 'bg-brand-light text-brand-deep';
+                        badgeColorClasses = 'bg-brand-light text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light';
                         break;
                 }
                 // 3. Gabungkan kelas dasar dengan kelas warna baru
@@ -1262,7 +1273,7 @@
                 // icon success
                 if (order.status === 'selesai' && statusIcon) {
                     statusIcon.innerHTML =
-                        `<svg class="w-8 h-8" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#6f8f5f" stroke-width="1.5" fill="#eef3ec"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" stroke="#6f8f5f" stroke-width="2"/></svg>`;
+                        `<svg class="w-8 h-8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" class="fill-brand-light dark:fill-brand-deep" stroke="currentColor" stroke-width="1.5"/><path class="text-brand-deep dark:text-brand-light" stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" fill="none"/></svg>`;
                     statusIcon.classList.remove('hidden');
                 } else if (statusIcon) {
                     statusIcon.innerHTML = ''; // Kosongkan ikon jika status bukan 'selesai'
@@ -1334,8 +1345,8 @@
                         quantityLine = `
                     <p class="text-sm text-gray-600 dark:text-gray-300">
                         Awal: <span class="font-medium text-gray-800 dark:text-gray-200">${initialQty}</span> |
-                        Retur: <span class="font-medium text-red-500">${returnedQty}</span> |
-                        Sisa: <span class="font-medium text-brand-deep">${remainingQty}</span>
+                        Retur: <span class="font-medium text-red-500 dark:text-red-400">${returnedQty}</span> |
+                        Sisa: <span class="font-medium text-brand-deep dark:text-brand-light">${remainingQty}</span>
                     </p>
                 `;
                     }
@@ -1386,10 +1397,10 @@
             };
 
             // Logika 1: Jika ini adalah pesanan dengan retur, TAMPILKAN BUKTI RETUR
-            // (Asumsi backend konsisten mengirim 'return_details')
-            if (order.return_details && order.return_details.return_proof) {
+            // (Backend mengirim data retur di key 'order_return')
+            if (order.order_return && order.order_return.return_proof) {
                 proofUploadedTitle.textContent = 'Bukti Retur';
-                proofImage.src = getImageUrl(order.return_details.return_proof);
+                proofImage.src = getImageUrl(order.order_return.return_proof);
                 paymentProofUploaded.classList.remove('hidden');
 
                 // Logika 2: Jika BUKAN retur, tapi punya bukti bayar, TAMPILKAN BUKTI BAYAR
@@ -1489,7 +1500,7 @@
             modalContent.classList.add('hidden');
             modalLoader.classList.remove('hidden');
             modalLoader.innerHTML =
-                `<svg class="w-8 h-8 mx-auto text-blue-600 animate-spin" ...></svg><p class="mt-4 ...">Memuat Status...</p>`;
+                `<svg class="w-8 h-8 mx-auto text-blue-600 dark:text-blue-400 animate-spin" ...></svg><p class="mt-4 ...">Memuat Status...</p>`;
             try {
                 const response = await fetch(`/kurir/pesanan/${orderId}/details`);
                 const data = await response.json();
@@ -1497,7 +1508,7 @@
                 populateStatusStepperModal(data);
             } catch (error) {
                 modalLoader.innerHTML =
-                    `<div class="text-center"><p class="font-bold text-red-600">Gagal Memuat</p><p class="mt-2 text-sm">${error.message}</p></div>`;
+                    `<div class="text-center"><p class="font-bold text-red-600 dark:text-red-400">Gagal Memuat</p><p class="mt-2 text-sm">${error.message}</p></div>`;
             }
         }
 
@@ -1576,13 +1587,13 @@
                     updateButton.disabled = true;
                     updateButton.classList.add('opacity-50', 'cursor-not-allowed');
                     if (currentStatus === 'diverifikasi_admin') {
-                        updateButton.classList.remove('bg-blue-700', 'hover:bg-blue-800');
+                        updateButton.classList.remove('bg-brand', 'hover:bg-brand-deep');
                         updateButton.classList.add('bg-brand-deep', 'hover:bg-brand-deep');
                     }
                 } else {
                     updateButton.disabled = false;
                     updateButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-brand-deep', 'hover:bg-brand-deep');
-                    updateButton.classList.add('bg-blue-700', 'hover:bg-blue-800');
+                    updateButton.classList.add('bg-brand', 'hover:bg-brand-deep');
                     updateButton.setAttribute('data-next-status', currentStatusInfo.nextStatus);
                 }
             } else {
@@ -1633,14 +1644,13 @@
 
                 // Cek apakah langkah sudah selesai
                 if (timestamps[step]) {
-                    iconEl.innerHTML =
-                    '<i class="text-white dark:text-brand-deep fas fa-check-circle"></i>'; // [!code ++]
+                    iconEl.innerHTML = `<i class="fas fa-check-circle text-white"></i>`;
                     iconEl.classList.add('bg-brand-deep', 'border-brand-deep');
                     timeSpanEl.textContent = `${timestamps[step]}  ${tzAbbr}`;
                     if (mobileLineEl) mobileLineEl.classList.add('bg-brand-deep');
                     if (desktopLineEl) desktopLineEl.classList.add('bg-brand-deep');
                 } else {
-                    iconEl.innerHTML = `<i class="fas ${icons[step]} text-brand-deep"></i>`;
+                    iconEl.innerHTML = `<i class="fas ${icons[step]} text-brand-deep dark:text-brand-light"></i>`;
                     timeSpanEl.textContent = tzAbbr; // Tampilkan hanya label jika belum ada waktu
                 }
             });
@@ -1650,7 +1660,6 @@
             const updateButton = document.getElementById('updateStatusButton');
             const orderId = updateButton.getAttribute('data-order-id');
             const newStatus = updateButton.getAttribute('data-next-status');
-            // [!code --]
             // Mengambil timezone dari atribut data yang disimpan sebelumnya
             const timezone = updateButton.getAttribute('data-order-timezone')
 
@@ -1685,7 +1694,6 @@
 
                 dispatchToast(result.message, 'success');
 
-                // [!code block:start]
                 // --- LOGIKA WAKTU DENGAN ZONA WAKTU DINAMIS ---
                 const now = new Date();
                 const formatter = new Intl.DateTimeFormat('id-ID', {
@@ -1697,7 +1705,6 @@
                     minute: '2-digit',
                 });
                 const localizedTimestamp = formatter.format(now);
-                // [!code block:end]
 
                 const timeSpanId = {
                     'diambil': 'pickedUpAt',
@@ -1706,7 +1713,6 @@
                 } [newStatus];
 
                 if (timeSpanId) {
-                    // [!code ++]
                     // Menampilkan waktu yang sudah dilokalisasi
                     document.getElementById(timeSpanId).textContent = localizedTimestamp;
                 }
@@ -1733,26 +1739,26 @@
             const statusText = STATUS_LABEL_MAP[newStatus] || (newStatus.charAt(0).toUpperCase() + newStatus.slice(1)
                 .replace(/_/g, ' '));
 
-            let newClasses = 'bg-gray-100 text-gray-800';
+            let newClasses = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
             switch (newStatus) {
                 case 'diambil':
-                    newClasses = 'bg-blue-100 text-blue-800';
+                    newClasses = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
                     break;
                 case 'diantar':
-                    newClasses = 'bg-yellow-100 text-yellow-800';
+                    newClasses = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
                     break;
                 case 'diterima_pembeli':
-                    newClasses = 'bg-purple-100 text-purple-800';
+                    newClasses = 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
                     break;
                 case 'menunggu_retur':
-                    newClasses = 'bg-red-100 text-red-800';
+                    newClasses = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
                     break;
                 case 'menunggu_verifikasi_admin':
                     newClasses = 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
                     break;
                 case 'selesai':
                 case 'diverifikasi_admin':
-                    newClasses = 'bg-brand-light text-brand-deep';
+                    newClasses = 'bg-brand-light text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light';
                     break;
             }
 
@@ -1760,7 +1766,10 @@
                 'bg-blue-100', 'text-blue-800', 'bg-yellow-100', 'text-yellow-800',
                 'bg-purple-100', 'text-purple-800', 'bg-brand-light', 'text-brand-deep',
                 'bg-red-100', 'text-red-800', 'bg-orange-100', 'text-orange-800',
-                'dark:bg-orange-900', 'dark:text-orange-300', 'bg-gray-100', 'text-gray-800'
+                'dark:bg-orange-900', 'dark:text-orange-300', 'bg-gray-100', 'text-gray-800',
+                'dark:bg-blue-900', 'dark:text-blue-300', 'dark:bg-yellow-900', 'dark:text-yellow-300',
+                'dark:bg-purple-900', 'dark:text-purple-300', 'dark:bg-red-900', 'dark:text-red-300',
+                'dark:bg-brand-deep/60', 'dark:text-brand-light', 'dark:bg-gray-700', 'dark:text-gray-300'
             ];
 
             rows.forEach(row => {
@@ -1808,7 +1817,7 @@
                 const desktopRowHTML =
                     `<tr data-return-key="${returnKey}"><td class="px-4 py-4 whitespace-nowrap"><div class="text-sm text-gray-900 dark:text-white">${index + 1}</div></td><td class="px-2 py-4"><div class="flex items-center"><div class="flex-shrink-0 w-16 h-16"><img class="object-cover w-16 h-16 rounded-md" src="${productImage}" alt="${escapeHtml(product.name)}"></div><div class="ml-4"><div class="text-sm font-medium text-gray-900 dark:text-white">${escapeHtml(product.name)}</div>${product.variant_name ? `<div class="text-xs text-gray-400 dark:text-gray-500">${escapeHtml(product.variant_name)}</div>` : ''}<div class="text-sm text-gray-500 dark:text-gray-400">Jumlah Awal: ${product.quantity}</div></div></div></td><td class="py-4 whitespace-nowrap"><div class="flex items-center justify-center gap-2"><button type="button" class="px-2 text-black transition rounded quantity-minus hover:bg-gray-300 dark:text-white dark:hover:bg-gray-700 hover:scale-110 active:scale-90">–</button><span data-name="return_qty[${returnKey}]" data-max="${product.quantity}" class="px-2 text-black bg-gray-200 rounded quantity-input dark:text-white dark:bg-gray-700">0</span><button type="button" class="px-2 text-black transition rounded quantity-plus hover:bg-gray-300 dark:text-white dark:hover:bg-gray-700 hover:scale-110 active:scale-90">+</button></div></td><td class="px-4 py-4 text-sm font-medium text-center whitespace-nowrap"><button type="button" class="text-red-600 remove-product hover:text-red-900 dark:hover:text-red-500 hover:scale-110 active:scale-90" title="Setel kuantitas ke 0">🗑</button></td></tr>`;
                 const mobileCardHTML =
-                    `<div class="flex items-start gap-4 px-4 py-2 mx-0 border-b border-gray-200 dark:border-gray-700" data-return-key="${returnKey}"><div class="flex-shrink-0 w-24 h-24"><img class="object-cover w-24 h-24 rounded-md" src="${productImage}" alt="${escapeHtml(product.name)}"></div><div class="flex flex-col flex-1"><div class="flex items-center justify-between mb-1"><p class="font-bold text-black dark:text-white">${escapeHtml(product.name)}</p><button type="button" class="text-red-600 remove-product text-md hover:text-red-900 dark:hover:text-red-500 hover:scale-110 active:scale-90" title="Setel kuantitas ke 0">🗑</button></div>${product.variant_name ? `<p class="mb-1 text-xs text-gray-500 dark:text-gray-400">${escapeHtml(product.variant_name)}</p>` : ''}<p class="text-sm text-gray-600 dark:text-gray-300">Jumlah Awal: ${product.quantity}</p><div class="flex items-center justify-between mt-3"><div class="flex items-center gap-2"><button type="button" class="px-2 text-black rounded quantity-minus dark:text-white hover:scale-110 active:scale-90">–</button><span data-name="return_qty[${returnKey}]" data-max="${product.quantity}" class="px-2 text-black bg-gray-200 rounded quantity-input dark:text-white dark:bg-gray-700">0</span><button type="button" class="px-2 text-black rounded quantity-plus dark:text-white hover:scale-110 active:scale-90">+</button></div></div></div></div>`;
+                    `<div class="flex items-start gap-4 px-4 py-2 mx-0 border-b border-gray-200 dark:border-gray-700" data-return-key="${returnKey}"><div class="flex-shrink-0 w-24 h-24"><img class="object-cover w-24 h-24 rounded-md" src="${productImage}" alt="${escapeHtml(product.name)}"></div><div class="flex flex-col flex-1"><div class="flex items-center justify-between mb-1"><p class="font-bold text-black dark:text-white">${escapeHtml(product.name)}</p><button type="button" class="text-red-600 remove-product text-base hover:text-red-900 dark:hover:text-red-500 hover:scale-110 active:scale-90" title="Setel kuantitas ke 0">🗑</button></div>${product.variant_name ? `<p class="mb-1 text-xs text-gray-500 dark:text-gray-400">${escapeHtml(product.variant_name)}</p>` : ''}<p class="text-sm text-gray-600 dark:text-gray-300">Jumlah Awal: ${product.quantity}</p><div class="flex items-center justify-between mt-3"><div class="flex items-center gap-2"><button type="button" class="px-2 text-black rounded quantity-minus dark:text-white hover:scale-110 active:scale-90">–</button><span data-name="return_qty[${returnKey}]" data-max="${product.quantity}" class="px-2 text-black bg-gray-200 rounded quantity-input dark:text-white dark:bg-gray-700">0</span><button type="button" class="px-2 text-black rounded quantity-plus dark:text-white hover:scale-110 active:scale-90">+</button></div></div></div></div>`;
 
                 desktopContainer.insertAdjacentHTML('beforeend', desktopRowHTML);
                 mobileContainer.insertAdjacentHTML('beforeend', mobileCardHTML);

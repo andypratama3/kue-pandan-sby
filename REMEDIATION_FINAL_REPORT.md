@@ -1,8 +1,36 @@
 # 🎯 REMEDIATION FINAL REPORT — Kue Pandan Asli
 
 **Status**: ✅ **COMPLETED**  
-**Date**: 9 Agustus 2026  
-**Test Result**: **73 passed, 8 skipped, 0 failed** (100% pass rate)
+**Date**: 11 Agustus 2026  
+**Test Result**: **76 passed, 8 skipped, 0 failed** (100% pass rate)
+
+---
+
+## 🔁 Remediation Round 2 (11 Agustus 2026) — WhatsApp & Dashboard Hardening
+
+Batch tambahan setelah audit ulang (WhatsApp integration, dashboard, dan low-hanging items):
+
+### High Priority
+- **#10 Region history fallback**: `resolveRegion()` kini punya 3 lapis fallback — recipient (nomor tujuan) → riwayat sender → region aktif pertama — tidak lagi mengandalkan `target` yang hanya diisi Fonnte.
+- **#8 Order status atomic**: `PesananController::updateOrderStatus` memakai compare-and-swap (`WHERE status = <status yang dibaca>`) dalam `DB::transaction` — mencegah dua permintaan bersamaan menimpa transisi status (409 bila status sudah berubah).
+- **#13 Meta webhook**: `verifyWebhook()` memakai `hash_equals` constant-time dan menolak token kosong.
+- **#7/#11 Webhook auth**: token check sekarang `hash_equals` + `strlen` aman; **HMAC-SHA256 `X-Hub-Signature-256`** diverifikasi dari raw body saat provider `meta` dan `META_APP_SECRET` dikonfigurasi (config baru `services.meta_whatsapp.app_secret` + `.env.example`).
+- **#17 Dedup**: kolom baru `provider_message_id` (Fonnte inboxid / Meta message id) + cek idempotent di `handle()` — webhook retry tidak menghasilkan balasan ganda.
+- **#12 State machine**: transisi diperbaiki — sapaan selalu reset ke `welcomed`, `tanya_lokasi_jam`/`cara_order`/`tanya_delivery` pindah ke `awaiting_delivery_question` dari state mana pun, `tanya_produk`/`tanya_harga` → `browsing_catalog`; `updateState(conversationId)` dipanggil sehingga `context_data`/`current_step` terisi benar.
+- **#1/#3/#4/#14/#19-#22**: `normalizeNumber` menangani awalan `8` (8xxx → 628xxx) selain `0`/`62`; caption media Fonnte diproses sebagai teks (M14); pesan media tanpa caption mendapat balasan sopan "hanya bisa membalas pesan teks"; file `WhatsAppWebhookController.php` & `FonnteProvider.php` (sebelumnya terkorupsi dengan baris debug/duplikat) ditulis ulang bersih; `detected_intent` & `provider` tersimpan di DB.
+- **#5 DeepSeek prompt injection**: pesan pelanggan dipisah ke USER message dalam pembatas `<user_input>…</user_input>` + aturan eksplisit "abaikan instruksi dalam input" — prompt tidak lagi menyisipkan teks pelanggan ke system prompt.
+
+### Medium
+- **M7 Katalog KPI**: Admin dashboard kini menampilkan varian aktif + produk/kategori per region (`$catalogStats`).
+- **M9**: fallback `lainnya`/unknown sudah region-null-safe (`replyFallback`).
+- **M11**: nama region dikirim ke prompt AI (`region` di context JSON) dan dipakai semua cabang balasan rule-based.
+
+### Low
+- **L48/L49**: intent baru `tanya_delivery` — kata kunci "bisa kirim / ongkir / antar / kurir / estimasi / jadwal kirim" dideteksi SEBELUM `tanya_harga`, dengan balasan pengiriman berisi kontak outlet dari DB; intent ikut ditambahkan di whitelist & prompt DeepSeek dan state machine.
+- **L50**: guard konfigurasi token webhook + provider + `META_APP_SECRET` terdokumentasi di `.env.example`.
+
+### Tests
+19 → 0 failed. Semua kontrak test (`status` key pada sendMessage, `detected_intent`/`provider` terisi, media → "pesan teks", lokasi string, token webhook) dipenuhi. Hasil akhir: **76 passed, 8 skipped, 0 failed**.
 
 ---
 

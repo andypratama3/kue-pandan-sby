@@ -67,7 +67,7 @@
             <p class="pt-4 text-center text-gray-600 dark:text-gray-400" id="currentOrderStatusText"></p>
 
             <button id="updateStatusButton" type="button"
-                class="w-full px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-colors duration-200"
+                class="w-full px-5 py-2.5 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-deep focus:ring-4 focus:outline-none focus:ring-brand-light dark:bg-brand dark:hover:bg-brand-deep dark:focus:ring-brand-deep transition-colors duration-200"
                 data-order-id="" data-next-status="">
                 <span id="updateStatusButtonText">Memuat...</span>
                 <svg id="updateStatusButtonSpinner" class="hidden w-4 h-4 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">

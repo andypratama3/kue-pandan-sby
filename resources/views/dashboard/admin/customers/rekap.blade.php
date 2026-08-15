@@ -5,10 +5,10 @@
     <form method="GET" action="{{ route('admin.customers.rekap.download', $customer) }}" target="_blank" id="rekap-form-{{ $customer->id }}">
         <div class="mb-4">
             <label for="daterange-{{ $customer->id }}" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">Pilih Rentang Tanggal</label>
-            <input type="text" name="daterange" id="daterange-{{ $customer->id }}" class="w-full px-3 py-2 border rounded-lg focus:ring focus:ring-brand dark:bg-gray-800 dark:text-white" autocomplete="off" required>
+            <input type="text" name="daterange" id="daterange-{{ $customer->id }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-brand dark:bg-slate-800 dark:border-slate-700 dark:text-white dark:placeholder-slate-500" autocomplete="off" required>
         </div>
         <div class="flex justify-end gap-2">
-            <button type="submit" class="px-4 py-2 text-white bg-brand-deep rounded hover:bg-brand-deep">Download</button>
+            <button type="submit" class="px-4 py-2 text-white bg-brand-deep rounded-xl hover:bg-brand shadow-sm">Download</button>
         </div>
     </form>
     @push('page-scripts')

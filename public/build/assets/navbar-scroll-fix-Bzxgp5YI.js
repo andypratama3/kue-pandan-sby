@@ -14,7 +14,7 @@
         #navbar-main.scrolled.dark,
         .dark #navbar-main.scrolled {
           box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4) !important;
-          background-color: rgba(15, 23, 42, 0.95) !important;
+          background-color: rgba(30, 41, 59, 0.95) !important;
         }
 
         /* Mobile styles */
@@ -29,7 +29,7 @@
           #navbar-main.scrolled.dark,
           .dark #navbar-main.scrolled {
             box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4) !important;
-            background-color: #0f172a !important; /* dark:bg-slate-900 */
+            background-color: #1e293b !important; /* dark:bg-slate-800 */
           }
         }
 

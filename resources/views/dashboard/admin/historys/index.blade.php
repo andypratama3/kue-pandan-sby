@@ -12,7 +12,7 @@
 
     <div class="space-y-6">
         <!-- Main Card Container -->
-        <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-lg space-y-6 min-h-[700px]">
+        <div class="p-6 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl shadow-lg space-y-6 min-h-[700px]">
             
             <!-- Header & Filter Form -->
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-6 border-b border-slate-100 dark:border-slate-800">
@@ -103,7 +103,7 @@
             </div>
 
             <!-- Table Container -->
-            <div class="overflow-hidden border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 shadow-sm">
+            <div class="overflow-hidden border border-slate-200/80 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-800 shadow-sm">
                 <div class="overflow-x-auto min-h-[500px]">
                     <table class="w-full text-sm text-left">
                         <thead class="text-xs font-extrabold text-slate-400 uppercase bg-slate-50/90 dark:bg-slate-800/90">
@@ -290,7 +290,7 @@
                         paymentImg.className = 'w-full h-40 object-cover rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer';
                         paymentProofContainer.appendChild(paymentImg);
                     } else {
-                        paymentProofContainer.innerHTML = '<p class="text-xs text-slate-400">Belum ada bukti pembayaran.</p>';
+                        paymentProofContainer.innerHTML = '<p class="text-xs text-slate-400 dark:text-slate-500">Belum ada bukti pembayaran.</p>';
                     }
                 }
 

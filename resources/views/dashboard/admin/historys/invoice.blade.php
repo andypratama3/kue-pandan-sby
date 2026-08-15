@@ -301,7 +301,7 @@ $isPdf = request()->routeIs('admin.historys.download');
                     <tfoot>
                         <tr class="bg-gray-100 font-bold">
                             <td colspan="4" class="border px-3 py-2 text-right">Subtotal Final</td>
-                            <td class="border px-3 py-2 text-right text-brand-deep">
+                            <td class="border px-3 py-2 text-right text-brand-deep" style="color:#3f5d3a">
                                 Rp {{ number_format($order->total_amount - $activeReturn->total_amount_returned, 0, ',', '.') }}
                             </td>
                         </tr>
@@ -393,8 +393,8 @@ $isPdf = request()->routeIs('admin.historys.download');
         @if(!$isPdf)
         <div class="mt-8 flex justify-between items-center">
             <div class="no-print flex gap-2">
-                <button onclick="window.print()" class="px-4 py-2 bg-brand-deep text-white rounded hover:bg-brand-deep">Print Invoice</button>
-                <button onclick="window.close()" class="px-4 py-2 bg-red-400 text-white rounded hover:bg-gray-600">Tutup</button>
+                <button onclick="window.print()" class="px-4 py-2 bg-brand-deep text-white rounded hover:bg-brand-deep" style="background-color:#3f5d3a;color:#fff">Print Invoice</button>
+                <button onclick="window.close()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Tutup</button>
             </div>
         </div>
         @endif

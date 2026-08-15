@@ -1,5 +1,5 @@
 @forelse ($orders as $order)
-    <tr class="border-b dark:border-gray-700">
+    <tr class="border-b dark:border-slate-800 hover:bg-slate-50/60 dark:hover:bg-slate-800/60 transition-colors">
         {{-- NO --}}
         <td class="px-4 py-3 font-medium text-center text-gray-900 dark:text-white">
             {{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}
@@ -52,7 +52,7 @@
             <div class="relative inline-block text-left">
                 {{-- Tombol untuk membuka dropdown --}}
                 <button type="button"
-                    class="flex items-center justify-center w-8 h-8 text-gray-500 rounded-full js-dropdown-toggle hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand dark:text-gray-400 dark:hover:bg-gray-700"
+                    class="flex items-center justify-center w-8 h-8 text-gray-500 rounded-full js-dropdown-toggle hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand dark:text-gray-400 dark:hover:bg-slate-700 dark:focus:ring-offset-slate-800"
                     data-target-dropdown="actions-dropdown-{{ $order->id }}">
                     <span class="sr-only">Buka menu aksi</span>
                     <i class="fas fa-ellipsis-v"></i>
@@ -60,11 +60,11 @@
 
                 {{-- Menu dropdown, awalnya disembunyikan --}}
                 <div id="actions-dropdown-{{ $order->id }}"
-                    class="absolute right-0 z-10 hidden w-48 mt-2 origin-top-right bg-white rounded-md shadow-lg js-dropdown-menu ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 dark:ring-gray-600">
+                    class="absolute right-0 z-10 hidden w-48 mt-2 origin-top-right bg-white rounded-md shadow-lg js-dropdown-menu ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-slate-700 dark:ring-slate-600">
                     <div class="py-1" role="menu" aria-orientation="vertical">
                         {{-- Tombol Detail --}}
                         <button type="button"
-                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 js-open-modal-btn hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+                            class="flex items-center w-full px-4 py-2 text-sm text-gray-700 js-open-modal-btn js-open-detail-modal hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-600"
                             data-target-modal="showOrderModal" data-order-id="{{ $order->id }}" role="menuitem">
                             <i class="w-5 mr-2 text-center fas fa-eye"></i>
                             <span>Detail</span>
@@ -87,7 +87,7 @@
                         @endphp
                         @if ($wa_number)
                             <a href="https://wa.me/{{ $wa_number }}?text={{ $wa_message }}" target="_blank"
-                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+                                class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-600"
                                 role="menuitem">
                                 <i class="w-5 mr-2 text-center text-brand fab fa-whatsapp"></i>
                                 <span>WhatsApp</span>
@@ -96,7 +96,7 @@
 
                         {{-- Tombol Invoice --}}
                         <a href="{{ route('admin.historys.invoice', $order->id) }}" target="_blank"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-600"
                             role="menuitem">
                             <i class="w-5 mr-2 text-center fas fa-file-invoice"></i>
                             <span>Invoice</span>
@@ -104,7 +104,7 @@
 
                         {{-- Tombol Download --}}
                         <a href="{{ route('admin.historys.download', $order->id) }}"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-600"
                             role="menuitem">
                             <i class="w-5 mr-2 text-center fas fa-download"></i>
                             <span>Download</span>
@@ -112,13 +112,13 @@
 
                         {{-- Delete Historys --}}
                         {{-- <a href="{{ route('admin.orders.destroy', $order->id) }}"
-                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+                            class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-600"
                             role="menuitem">
                             <i class="w-5 mr-2 text-center fas fa-trash "></i>
                             <span>Delete</span>
                         </a> --}}
                         <button type="button" data-target-modal="delete-historys-modal-{{ $order->id }}"
-                            class="flex items-center w-full px-4 py-2 text-sm text-left text-red-600 js-open-modal-btn hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500 dark:hover:text-white">
+                            class="flex items-center w-full px-4 py-2 text-sm text-left text-red-600 js-open-modal-btn hover:bg-gray-100 dark:hover:bg-slate-600 dark:text-red-500 dark:hover:text-white">
                             <span class="inline-block w-6 mr-2 text-center"><i class="fas fa-trash"></i></span>
                             <span>Delete</span>
                         </button>
@@ -129,7 +129,7 @@
     </tr>
 @empty
     <tr>
-        <td colspan="7" class="px-4 py-4 text-center text-gray-500">
+        <td colspan="7" class="px-4 py-4 text-center text-gray-500 dark:text-gray-400">
             <p class="mb-0 text-sm">Tidak ada data history pesanan yang cocok.</p>
         </td>
     </tr>

@@ -105,32 +105,29 @@ class WhatsAppConversationStateService
 
     /**
      * Determine next step berdasarkan intent dan current step.
+     *
+     * Info-only mode: intent apa pun yang bisa dijawab mandiri memindahkan
+     * state ke tahap yang sesuai, dan sapaan selalu mereset ke welcome —
+     * supaya percakapan tidak terjebak di state lama saat topik berganti.
      */
     public function determineNextStep(string $currentStep, string $intent, string $messageText): string
     {
-        // Jika di idle dan sapaan → welcomed
-        if ($currentStep === self::STATE_IDLE && $intent === 'sapaan') {
+        // Sapaan selalu membuka/mengembalikan percakapan ke welcome.
+        if ($intent === 'sapaan') {
             return self::STATE_WELCOMED;
         }
 
-        // Jika welcomed atau browsing, lalu tanya produk/harga/menu → browsing_catalog
-        if (in_array($currentStep, [self::STATE_WELCOMED, self::STATE_IDLE]) && 
-            in_array($intent, ['tanya_produk', 'tanya_harga'])) {
+        // Tanya produk / harga -> sedang melihat katalog (dari state mana pun).
+        if (in_array($intent, ['tanya_produk', 'tanya_harga'])) {
             return self::STATE_BROWSING_CATALOG;
         }
 
-        // Jika browsing catalog, lalu tanya lokasi/cara_order → awaiting_delivery
-        if ($currentStep === self::STATE_BROWSING_CATALOG && 
-            in_array($intent, ['tanya_lokasi_jam', 'cara_order'])) {
+        // Tanya lokasi/jam operasional/cara order/pengiriman -> info pengiriman (dari state mana pun).
+        if (in_array($intent, ['tanya_lokasi_jam', 'cara_order', 'tanya_delivery'])) {
             return self::STATE_AWAITING_DELIVERY;
         }
 
-        // FAQ komplain atau lainnya → tetap di step sekarang (tidak ubah flow)
-        if (in_array($intent, ['komplain', 'lainnya'])) {
-            return $currentStep;
-        }
-
-        // Default: tetap di step sekarang
+        // FAQ (komplain/lainnya) tidak mengubah flow.
         return $currentStep;
     }
 
@@ -139,6 +136,6 @@ class WhatsAppConversationStateService
      */
     public function isFaqIntent(string $intent): bool
     {
-        return in_array($intent, ['komplain', 'lainnya', 'tanya_lokasi_jam']);
+        return in_array($intent, ['komplain', 'lainnya', 'tanya_lokasi_jam', 'tanya_delivery']);
     }
 }

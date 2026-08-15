@@ -90,6 +90,13 @@ class WhatsAppReplyService
             return 'tanya_lokasi_jam';
         }
 
+        // Pertanyaan pengiriman/ongkir dideteksi SEBELUM 'tanya_harga' karena
+        // frasa "ongkir" / "biaya kirim" / "bisa kirim" juga mengandung kata
+        // "kirim"/"antar" yang harus menang atas "biaya".
+        if (Str::contains($lower, ['bisa kirim', 'bisa antar', 'bisa diantar', 'pengiriman', 'ongkir', 'ongkos kirim', 'biaya kirim', 'kirim', 'antar', 'delivery', 'kurir', 'sampai kapan', 'estimasi', 'jadwal kirim', 'butuh berapa lama'])) {
+            return 'tanya_delivery';
+        }
+
         if (Str::contains($lower, ['harga', 'berapa', 'biaya', 'tarif', 'price'])) {
             return 'tanya_harga';
         }
@@ -129,6 +136,7 @@ class WhatsAppReplyService
             'tanya_produk' => $this->replyProducts($context, $regionName),
             'tanya_lokasi_jam' => $this->replyLocationHours($outlet, $regionName),
             'cara_order' => $this->replyHowToOrder($regionName),
+        'tanya_delivery' => $this->replyDelivery($outlet, $regionName),
             'komplain' => $this->replyComplaint($regionName),
             default => $this->replyFallback($regionName),
         };
@@ -218,6 +226,18 @@ class WhatsAppReplyService
                     .'Kami akan meneruskan keluhan ini ke admin/kurir wilayah agar segera ditindaklanjuti. '
                     ."Silakan hubungi admin langsung untuk detail (alamat tersedia di halaman Lokasi Outlet).\n"
                     .'Terima kasih atas kesabaran Anda.';
+    }
+
+    protected function replyDelivery(array $outlet, string $regionName): string
+    {
+        $phone = $outlet['phone'] ?? null;
+        $contactLine = $phone
+            ? "Silakan hubungi {$phone} untuk konfirmasi pengiriman. 📞"
+            : 'Silakan hubungi admin/kurir wilayah untuk konfirmasi pengiriman.';
+
+        return "Pengiriman Kue Pandan Asli {$regionName} diantar oleh kurir wilayah kami. 🛵\n"
+            .'Estimasi dan ongkos kirim menyesuaikan jarak pengiriman dari outlet ke alamat Anda.'
+            ."\n\n{$contactLine}";
     }
 
     protected function replyFallback(string $regionName): string

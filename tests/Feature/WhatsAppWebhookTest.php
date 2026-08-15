@@ -6,7 +6,6 @@ use App\Contracts\WhatsAppProviderInterface;
 use App\Models\Category;
 use App\Models\Region;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class FakeWhatsAppProvider implements WhatsAppProviderInterface
@@ -24,12 +23,17 @@ class FakeWhatsAppProvider implements WhatsAppProviderInterface
 
     public function parseIncoming(array $payload): array
     {
+        $value = $payload['entry'][0]['changes'][0]['value'] ?? [];
+        $message = $value['messages'][0] ?? [];
+        $metadata = $value['metadata'] ?? [];
+
         return [
-            'sender' => (string) ($payload['sender'] ?? ''),
-            'name' => $payload['name'] ?? null,
-            'text' => $payload['message'] ?? null,
-            'type' => $payload['type'] ?? 'text',
-            'raw_reply_context' => ['inboxid' => $payload['inboxid'] ?? null, 'sender' => $payload['sender'] ?? null],
+            'sender' => (string) ($message['from'] ?? ''),
+            'name' => $value['contacts'][0]['profile']['name'] ?? null,
+            'text' => $message['text']['body'] ?? null,
+            'type' => $message['type'] ?? 'text',
+            'recipient' => $metadata['display_phone_number'] ?? null,
+            'raw_reply_context' => ['message_id' => $message['id'] ?? null, 'sender' => $message['from'] ?? null],
         ];
     }
 
@@ -57,20 +61,61 @@ class WhatsAppWebhookTest extends TestCase
         $this->provider = new FakeWhatsAppProvider;
         $this->app->instance(WhatsAppProviderInterface::class, $this->provider);
 
-        config()->set('services.whatsapp.webhook_token', 'test-webhook-token');
+        config()->set('services.whatsapp.provider', 'meta');
+        config()->set('services.meta_whatsapp.verify_token', 'secret-verify-123');
+        config()->set('services.meta_whatsapp.app_secret', 'test-app-secret');
     }
 
-    public function fonntePayload(string $message, ?string $type = null, ?string $inboxid = null): array
+    public function metaPayload(string $message, ?string $type = null, ?string $messageId = null): array
     {
-        return array_filter([
-            'device' => '1234',
-            'sender' => '6281234567890',
-            'message' => $message,
-            'name' => 'Tester',
-            'inboxid' => $inboxid ?? uniqid(),
-            'timestamp' => time(),
-            'type' => $type,
-        ]);
+        $payload = [
+            'object' => 'whatsapp_business_account',
+            'entry' => [[
+                'id' => 'WABA_ID',
+                'changes' => [[
+                    'value' => [
+                        'messaging_product' => 'whatsapp',
+                        'metadata' => [
+                            'display_phone_number' => '15551234567',
+                            'phone_number_id' => 'PHONE_NUMBER_ID',
+                        ],
+                        'contacts' => [[
+                            'profile' => ['name' => 'Tester'],
+                            'wa_id' => '6281234567890',
+                        ]],
+                        'messages' => [[
+                            'from' => '6281234567890',
+                            'id' => $messageId ?? uniqid('wamid.'),
+                            'timestamp' => (string) time(),
+                            'type' => $type ?? 'text',
+                            'text' => ['body' => $message],
+                        ]],
+                    ],
+                    'field' => 'messages',
+                ]],
+            ]],
+        ];
+
+        return $payload;
+    }
+
+    protected function postMeta(array $payload, array $headers = []): \Illuminate\Testing\TestResponse
+    {
+        $content = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $signature = 'sha256='.hash_hmac('sha256', $content, config('services.meta_whatsapp.app_secret'));
+
+        return $this->call(
+            'POST',
+            '/api/webhook/whatsapp/meta',
+            [],
+            [],
+            [],
+            $this->transformHeadersToServerVars([
+                'Content-Type' => 'application/json',
+                'X-Hub-Signature-256' => $signature,
+            ] + $headers),
+            $content,
+        );
     }
 
     protected function lastReply(): string
@@ -106,36 +151,26 @@ class WhatsAppWebhookTest extends TestCase
         return $region;
     }
 
-    public static function providers(): array
+    public function test_greeting_gets_ramah_reply()
     {
-        return [['fonnte'], ['meta']];
-    }
-
-    #[DataProvider('providers')]
-    public function test_greeting_gets_ramah_reply(string $provider)
-    {
-        config()->set('services.whatsapp.provider', $provider);
-
-        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('halo'))
+        $this->postMeta($this->metaPayload('halo'))
             ->assertOk()
             ->assertJson(['status' => true]);
 
         $this->assertStringContainsString('Halo', $this->lastReply());
         $this->assertDatabaseHas('chatbot_conversations', [
-            'provider' => $provider,
+            'provider' => 'meta',
             'sender_number' => '6281234567890',
             'detected_intent' => 'sapaan',
             'handled_by_ai' => false,
         ]);
     }
 
-    #[DataProvider('providers')]
-    public function test_price_question_uses_db_price_only(string $provider)
+    public function test_price_question_uses_db_price_only()
     {
-        config()->set('services.whatsapp.provider', $provider);
         $this->seedSurabayaWithKueIjo();
 
-        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('berapa harga kue ijo?'))
+        $this->postMeta($this->metaPayload('berapa harga kue ijo?'))
             ->assertOk();
 
         $reply = $this->lastReply();
@@ -143,92 +178,108 @@ class WhatsAppWebhookTest extends TestCase
         $this->assertStringContainsString('9.000', $reply);
         $this->assertStringContainsString('15.000', $reply);
         $this->assertDatabaseHas('chatbot_conversations', [
-            'provider' => $provider,
+            'provider' => 'meta',
             'detected_intent' => 'tanya_harga',
         ]);
     }
 
-    #[DataProvider('providers')]
-    public function test_menu_question_lists_products(string $provider)
+    public function test_menu_question_lists_products()
     {
-        config()->set('services.whatsapp.provider', $provider);
         $this->seedSurabayaWithKueIjo();
 
-        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('menu apa saja?'))
+        $this->postMeta($this->metaPayload('menu apa saja?'))
             ->assertOk();
 
         $this->assertStringContainsString('Kue Ijo', $this->lastReply());
         $this->assertDatabaseHas('chatbot_conversations', ['detected_intent' => 'tanya_produk']);
     }
 
-    #[DataProvider('providers')]
-    public function test_location_question_returns_outlet_info(string $provider)
+    public function test_location_question_returns_outlet_info()
     {
-        config()->set('services.whatsapp.provider', $provider);
         $this->seedSurabayaWithKueIjo();
 
-        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('lokasi outlet dan jam bukanya?'))
+        $this->postMeta($this->metaPayload('lokasi outlet dan jam bukanya?'))
             ->assertOk();
 
         $this->assertStringContainsString('Surabaya', $this->lastReply());
         $this->assertDatabaseHas('chatbot_conversations', ['detected_intent' => 'tanya_lokasi_jam']);
     }
 
-    #[DataProvider('providers')]
-    public function test_how_to_order_question(string $provider)
+    public function test_how_to_order_question()
     {
-        config()->set('services.whatsapp.provider', $provider);
-
-        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('cara order kue'))
+        $this->postMeta($this->metaPayload('cara order kue'))
             ->assertOk();
 
         $this->assertStringContainsString('Cara memesan', $this->lastReply());
         $this->assertDatabaseHas('chatbot_conversations', ['detected_intent' => 'cara_order']);
     }
 
-    #[DataProvider('providers')]
-    public function test_out_of_topic_question_falls_back_politely(string $provider)
+    public function test_out_of_topic_question_falls_back_politely()
     {
-        config()->set('services.whatsapp.provider', $provider);
-
-        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('kapan indonesia merdeka?'))
+        $this->postMeta($this->metaPayload('kapan indonesia merdeka?'))
             ->assertOk();
 
         $this->assertStringContainsString('Maaf', $this->lastReply());
         $this->assertDatabaseHas('chatbot_conversations', ['detected_intent' => 'lainnya']);
     }
 
-    #[DataProvider('providers')]
-    public function test_media_message_gets_polite_reply(string $provider)
+    public function test_media_message_gets_polite_reply()
     {
-        config()->set('services.whatsapp.provider', $provider);
-
-        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('', 'image', null))
+        $this->postMeta($this->metaPayload('', 'image'))
             ->assertOk();
 
         $this->assertStringContainsString('pesan teks', $this->lastReply());
     }
 
+    public function test_duplicate_message_id_is_ignored()
+    {
+        $messageId = 'wamid.duplicate-1';
+
+        $this->postMeta($this->metaPayload('halo', null, $messageId))
+            ->assertOk();
+        $this->postMeta($this->metaPayload('halo', null, $messageId))
+            ->assertOk()
+            ->assertJson(['status' => true, 'duplicate' => true]);
+
+        $this->assertCount(1, $this->provider->sent);
+    }
+
     public function test_incomplete_payload_returns_200_without_exception()
     {
-        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', [])
+        $this->postMeta([])
             ->assertOk()
             ->assertJson(['status' => true]);
     }
 
-    public function test_webhook_rejects_missing_or_wrong_token()
+    public function test_webhook_rejects_invalid_signature()
     {
-        $this->postJson('/api/webhook/whatsapp', ['sender' => '6281234567890', 'message' => 'halo'])
-            ->assertForbidden();
-        $this->postJson('/api/webhook/whatsapp?token=salah', ['sender' => '6281234567890', 'message' => 'halo'])
-            ->assertForbidden();
+        $content = json_encode($this->metaPayload('halo'));
+
+        $this->call(
+            'POST',
+            '/api/webhook/whatsapp/meta',
+            [],
+            [],
+            [],
+            $this->transformHeadersToServerVars(['X-Hub-Signature-256' => 'sha256=invalid']),
+            $content,
+        )->assertForbidden();
+
+        $this->call(
+            'POST',
+            '/api/webhook/whatsapp/meta',
+            [],
+            [],
+            [],
+            $this->transformHeadersToServerVars([]),
+            $content,
+        )->assertForbidden();
+
         $this->assertEmpty($this->provider->sent);
     }
 
     public function test_meta_verify_returns_challenge_when_token_correct()
     {
-        config()->set('services.meta_whatsapp.verify_token', 'secret-verify-123');
-
         $this->get('/api/webhook/whatsapp/meta?'.http_build_query([
             'hub_mode' => 'subscribe',
             'hub_verify_token' => 'secret-verify-123',
@@ -240,8 +291,6 @@ class WhatsAppWebhookTest extends TestCase
 
     public function test_meta_verify_returns_403_when_token_wrong()
     {
-        config()->set('services.meta_whatsapp.verify_token', 'secret-verify-123');
-
         $this->get('/api/webhook/whatsapp/meta?'.http_build_query([
             'hub_mode' => 'subscribe',
             'hub_verify_token' => 'salah',
@@ -254,7 +303,7 @@ class WhatsAppWebhookTest extends TestCase
     {
         $region = $this->seedSurabayaWithKueIjo();
 
-        $this->postJson('/api/webhook/whatsapp?token=test-webhook-token', $this->fonntePayload('halo'))
+        $this->postMeta($this->metaPayload('halo'))
             ->assertOk();
         $this->assertDatabaseHas('chatbot_conversations', [
             'sender_number' => '6281234567890',

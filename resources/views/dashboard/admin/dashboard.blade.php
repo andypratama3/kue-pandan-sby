@@ -150,7 +150,7 @@
 
         <!-- 2. Ringkasan Per Cabang (khusus Owner) -->
         @if ($user->hasRole('owner') && isset($branchSummary) && $branchSummary->isNotEmpty())
-            <div class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
+            <div class="rounded-3xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 sm:p-6 shadow-sm hover:shadow-lg transition-shadow duration-300">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                         <div class="w-8 h-8 rounded-xl bg-brand/10 text-brand-deep dark:text-brand-light flex items-center justify-center">
@@ -162,7 +162,7 @@
                         <i class="fas fa-sync-alt mr-1"></i> Live Monitoring
                     </span>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-{{ min($branchSummary->count(), 4) }} gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 {{ match (true) { $branchSummary->count() >= 4 => 'xl:grid-cols-4', $branchSummary->count() === 3 => 'xl:grid-cols-3', $branchSummary->count() === 2 => 'xl:grid-cols-2', default => 'xl:grid-cols-1' } }} gap-4">
                     @foreach ($branchSummary as $branch)
                         <div class="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 transition-all hover:shadow-lg group {{ $branch['region']->id === \App\Support\RegionContext::regionId() ? 'bg-mint/50 dark:bg-brand-deep/30 border-brand/30' : 'bg-slate-50/70 dark:bg-slate-800/40' }}"
                              x-data="{ isHovered: false }"
@@ -243,7 +243,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
                 <!-- Card 1: Income -->
-                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                <div class="relative overflow-hidden bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
                      x-data="{ showTooltip: false }"
                      @mouseenter="showTooltip = true"
                      @mouseleave="showTooltip = false">
@@ -293,7 +293,7 @@
                 </div>
 
                 <!-- Card 2: Total Sales Today -->
-                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                <div class="relative overflow-hidden bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
                      x-data="{ showTooltip: false }"
                      @mouseenter="showTooltip = true"
                      @mouseleave="showTooltip = false">
@@ -341,7 +341,7 @@
                 </div>
 
                 <!-- Card 3: Avg Sales -->
-                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                <div class="relative overflow-hidden bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
                      x-data="{ showTooltip: false }"
                      @mouseenter="showTooltip = true"
                      @mouseleave="showTooltip = false">
@@ -389,7 +389,7 @@
                 </div>
 
                 <!-- Card 4: Customers in Region -->
-                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                <div class="relative overflow-hidden bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
                      x-data="{ showTooltip: false }"
                      @mouseenter="showTooltip = true"
                      @mouseleave="showTooltip = false">
@@ -437,7 +437,7 @@
                 </div>
 
                 <!-- Card 5: New Customers Today -->
-                <div class="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
+                <div class="relative overflow-hidden bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer"
                      x-data="{ showTooltip: false }"
                      @mouseenter="showTooltip = true"
                      @mouseleave="showTooltip = false">
@@ -486,11 +486,46 @@
             </div>
         </div>
 
+        <!-- Katalog Stats Strip: Varian & Kategori per region -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 -mt-1">
+            <div class="relative overflow-hidden bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group">
+                <div class="absolute inset-0 bg-gradient-to-br from-brand/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative z-10 flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Varian Produk Aktif</span>
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white mt-1">{{ number_format($catalogStats['variants'], 0, ',', '.') }}</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand/20 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+                        <i class="fas fa-layer-group text-sm"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative overflow-hidden bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group">
+                <div class="absolute inset-0 bg-gradient-to-br from-brand/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative z-10 flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Produk & Kategori</span>
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white mt-1">
+                            {{ number_format($catalogStats['products'], 0, ',', '.') }}
+                            <span class="text-sm font-bold text-slate-400 dark:text-slate-500">produk</span>
+                            <span class="mx-2 text-slate-300 dark:text-slate-600">•</span>
+                            {{ number_format($catalogStats['categories'], 0, ',', '.') }}
+                            <span class="text-sm font-bold text-slate-400 dark:text-slate-500">kategori</span>
+                        </h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-light to-brand-deep text-white flex items-center justify-center shadow-lg shadow-brand-deep/20 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300">
+                        <i class="fas fa-cake-candles text-sm"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 4. Dual Charts Section with Enhanced Interactivity -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <!-- Chart 1: Sales Chart -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300"
+            <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300"
                  x-data="{ showExportMenu: false, chartLoading: false }">
                 
                 <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -528,7 +563,7 @@
                             <div x-show="showExportMenu" @click.away="showExportMenu = false" x-transition
                                 class="absolute right-0 z-30 w-44 mt-2 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 py-1 text-xs">
                                 <button @click="exportChart('sales', 'png')" class="w-full text-left px-4 py-2 font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60 flex items-center gap-2">
-                                    <i class="fas fa-image text-brand-deep"></i>
+                                    <i class="fas fa-image text-brand-deep dark:text-brand-light"></i>
                                     <span>Export PNG</span>
                                 </button>
                                 <button @click="exportChart('sales', 'pdf')" class="w-full text-left px-4 py-2 font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60 flex items-center gap-2">
@@ -577,7 +612,7 @@
             </div>
 
             <!-- Chart 2: Visitors Chart -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300"
+            <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300"
                  x-data="{ showExportMenu: false }">
                 
                 <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -607,7 +642,7 @@
                             <div x-show="showExportMenu" @click.away="showExportMenu = false" x-transition
                                 class="absolute right-0 z-30 w-44 mt-2 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 py-1 text-xs">
                                 <button @click="exportChart('visitors', 'png')" class="w-full text-left px-4 py-2 font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60 flex items-center gap-2">
-                                    <i class="fas fa-image text-brand-deep"></i>
+                                    <i class="fas fa-image text-brand-deep dark:text-brand-light"></i>
                                     <span>Export PNG</span>
                                 </button>
                                 <button @click="exportData('visitors', 'csv')" class="w-full text-left px-4 py-2 font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/60 flex items-center gap-2">
@@ -644,7 +679,7 @@
         </div>
 
         <!-- 5. Courier Activity Monitoring Card with Enhanced Features -->
-        <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 space-y-4">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div>
                     <h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center gap-2">

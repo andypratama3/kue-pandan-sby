@@ -161,7 +161,7 @@ class PeformaCustomerController extends Controller
     /**
      * Display a listing of customer performance.
      */
-    public function index(Request $request) // [!code focus]
+    public function index(Request $request)
     {
         // Ambil filter bulan & tahun dari request, default ke bulan & tahun sekarang
         $selectedMonth = (int) $request->input('month', now()->format('m'));
@@ -192,7 +192,6 @@ class PeformaCustomerController extends Controller
         // Ambil data ranking customer untuk rentang bulan/tahun terpilih
         $ranking = $this->calculateCustomerPerformance($startDate, $endDate);
 
-        // [!code focus:start]
         // BUAT PAGINASI MANUAL
         $perPage = 10; // Tentukan jumlah item per halaman
         $currentPage = Paginator::resolveCurrentPage('page');
@@ -204,14 +203,13 @@ class PeformaCustomerController extends Controller
             $currentPage,
             ['path' => Paginator::resolveCurrentPath()]
         );
-        // [!code focus:end]
 
         // Nama bulan untuk judul
         $bulan = $months[$selectedMonth].' '.$selectedYear;
 
         return view('dashboard.admin.peforma-customer.peforma-customer', compact(
-            'paginatedRanking', 'bulan', 'months', 'years', 'selectedMonth', 'selectedYear' // [!code focus]
-        ))->with('ranking', $paginatedRanking); // [!code focus]
+            'paginatedRanking', 'bulan', 'months', 'years', 'selectedMonth', 'selectedYear'
+        ))->with('ranking', $paginatedRanking);
     }
 
     /**

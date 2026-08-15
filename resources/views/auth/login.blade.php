@@ -14,7 +14,7 @@
             }, 1500); // <-- Atur delay di sini (dalam milidetik). 1000 = 1 detik.
         });
     </script>
-    <div id="preloader" class="fixed top-0 left-0 w-full h-full bg-white flex justify-center items-center z-50">
+    <div id="preloader" class="fixed top-0 left-0 w-full h-full bg-white dark:bg-slate-900 flex justify-center items-center z-50">
         <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-brand"></div>
     </div>
     <div class="min-h-screen flex items-center justify-center relative overflow-hidden">
@@ -32,25 +32,23 @@
              max-w-md md:max-w-4xl
              mx-auto
              bg-white rounded-3xl border border-slate-200/60 shadow-xl shadow-slate-900/10
-             flex overflow-hidden">
+             flex overflow-hidden dark:bg-slate-800 dark:border-slate-700">
             {{-- KIRI: SIGN IN --}}
-            <div class="w-full md:w-1/2 px-4 py-8 sm:px-8 sm:py-12 flex flex-col justify-center bg-white max-w-xs mx-auto md:mx-0 md:max-w-full">
-                <x-slot name="logo">
-                    <div class="flex justify-center mb-6">
-                        <img src="{{ asset('assets/homepage/logo.png') }}" alt="Logo" class="w-14 h-14">
-                    </div>
-                </x-slot>
+            <div class="w-full md:w-1/2 px-4 py-8 sm:px-8 sm:py-12 flex flex-col justify-center bg-white max-w-xs mx-auto md:mx-0 md:max-w-full dark:bg-slate-800">
+                <div class="flex justify-center mb-6">
+                    <img src="{{ asset('assets/homepage/logo.png') }}" alt="Logo" class="w-14 h-14">
+                </div>
 
-                <h2 class="text-2xl font-bold text-ink mb-2 text-center">Login Area</h2>
+                <h2 class="text-2xl font-bold text-ink mb-2 text-center dark:text-white">Login Area</h2>
                 <p class="text-slate-400 text-sm text-center mb-2">
                     Masuk dengan email dan password Anda!
                 </p>
-                <hr class="border-slate-200 mb-4">
+                <hr class="border-slate-200 mb-4 dark:border-slate-700">
 
                 <x-validation-errors class="mb-4" />
 
                 @if(session('status'))
-                <div class="mb-4 font-medium text-sm text-brand-deep">
+                <div class="mb-4 font-medium text-sm text-brand-deep dark:text-brand-light">
                     {{ session('status') }}
                 </div>
                 @endif
@@ -59,20 +57,20 @@
                     @csrf
                     {{-- email --}}
                     <div>
-                        <x-label for="email" value="{{ __('Email') }}" class="text-brand-deep" />
+                        <x-label for="email" value="{{ __('Email') }}" class="text-brand-deep dark:text-brand-light" />
                         <x-input
                             id="email"
-                            class="block mt-1 w-full border-slate-200 rounded-xl px-4 py-2.5 focus:ring-brand/30 focus:border-brand"
+                            class="block mt-1 w-full border-slate-200 rounded-xl px-4 py-2.5 focus:ring-brand/30 focus:border-brand dark:border-slate-600"
                             type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
                     </div>
                     {{-- password --}}
                     <div class="mt-4 relative">
-                        <x-label for="password" value="{{ __('Password') }}" class="text-brand-deep" />
+                        <x-label for="password" value="{{ __('Password') }}" class="text-brand-deep dark:text-brand-light" />
                         <x-input
                             id="password"
-                            class="block mt-1 w-full border-slate-200 rounded-xl px-4 py-2.5 focus:ring-brand/30 focus:border-brand pr-10"
+                            class="block mt-1 w-full border-slate-200 rounded-xl px-4 py-2.5 focus:ring-brand/30 focus:border-brand pr-10 dark:border-slate-600"
                             type="password" name="password" required autocomplete="current-password" />
-                        <button type="button" id="togglePassword" class="absolute right-4 top-9 text-gray-400 focus:outline-none" tabindex="-1">
+                        <button type="button" id="togglePassword" class="absolute right-4 top-9 text-gray-400 focus:outline-none dark:text-gray-300" tabindex="-1">
                             <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -83,12 +81,12 @@
                     <div class="block mt-4">
                         <label for="remember_me" class="flex items-center">
                             <x-checkbox id="remember_me" name="remember" class="text-brand focus:ring-brand/30" />
-                            <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                            <span class="ms-2 text-sm text-gray-600 dark:text-gray-300">{{ __('Remember me') }}</span>
                         </label>
                     </div>
                     {{-- actions --}}
                     <div class="flex items-center justify-between mt-6">
-                        <a href="/" class="text-brand-deep hover:text-brand underline">
+                        <a href="/" class="text-brand-deep hover:text-brand underline dark:text-brand-light">
                             ← Kembali
                         </a>
                         <x-button class="bg-brand-deep hover:bg-brand text-white px-6 rounded-full">

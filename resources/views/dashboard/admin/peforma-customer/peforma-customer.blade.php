@@ -5,7 +5,7 @@
 @section('content')
     <div class="space-y-6">
         <!-- Main Card Container -->
-        <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm space-y-6 min-h-[700px]">
+        <div class="p-6 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl shadow-sm space-y-6 min-h-[700px]">
             
             <!-- Header Section & Filter Form -->
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -63,7 +63,7 @@
             </div>
 
             <!-- Ranking Table Container -->
-            <div class="overflow-hidden border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900">
+            <div class="overflow-hidden border border-slate-200/80 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-800">
                 <div class="overflow-x-auto min-h-[450px]">
                     <table class="w-full text-xs text-left">
                         <thead class="text-[11px] font-extrabold text-slate-400 uppercase bg-slate-50/80 dark:bg-slate-800/80">
@@ -80,19 +80,19 @@
                                 <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/60 transition-colors">
                                     <td class="px-5 py-3.5 font-black text-center">
                                         @if($row->peringkat == 1)
-                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-600 shadow-md">
+                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 text-amber-600 shadow-md dark:bg-amber-900/40 dark:text-amber-400">
                                                 <i class="fas fa-trophy text-sm"></i>
                                             </span>
                                         @elseif($row->peringkat == 2)
-                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 shadow-sm">
+                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-200 text-slate-600 shadow-sm dark:bg-slate-700 dark:text-slate-300">
                                                 <i class="fas fa-medal text-sm"></i>
                                             </span>
                                         @elseif($row->peringkat == 3)
-                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-900/20 text-amber-700 shadow-sm">
+                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-amber-900/20 text-amber-700 shadow-sm dark:bg-amber-900/30 dark:text-amber-400">
                                                 <i class="fas fa-award text-sm"></i>
                                             </span>
                                         @else
-                                            <span class="text-slate-500 font-extrabold">#{{ $row->peringkat }}</span>
+                                            <span class="text-slate-500 font-extrabold dark:text-slate-400">#{{ $row->peringkat }}</span>
                                         @endif
                                     </td>
                                     <td class="px-5 py-3.5 font-bold text-slate-800 dark:text-white">

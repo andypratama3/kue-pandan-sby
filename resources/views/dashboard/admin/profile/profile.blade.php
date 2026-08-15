@@ -13,7 +13,7 @@
     @endif
 
     <!-- User Header Card -->
-    <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm flex flex-col sm:flex-row items-center gap-5">
+    <div class="p-6 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl shadow-sm flex flex-col sm:flex-row items-center gap-5">
         <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-brand/20 shadow-lg flex-shrink-0">
             <img src="{{ asset('/assets/icon/admin.png') }}" alt="Admin Avatar" class="object-cover w-full h-full" />
         </div>
@@ -36,7 +36,7 @@
     <div class="space-y-6">
         <!-- Profile Information -->
         @if (Laravel\Fortify\Features::canUpdateProfileInformation())
-            <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm space-y-4">
+            <div class="p-6 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl shadow-sm space-y-4">
                 <div>
                     <h3 class="text-base font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
                         <i class="fas fa-id-card text-brand"></i>
@@ -52,10 +52,10 @@
 
         <!-- Update Password -->
         @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
-            <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm space-y-4">
+            <div class="p-6 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl shadow-sm space-y-4">
                 <div>
                     <h3 class="text-base font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
-                        <i class="fas fa-lock text-brand-deep"></i>
+                        <i class="fas fa-lock text-brand-deep dark:text-brand-light"></i>
                         <span>Perbarui Kata Sandi</span>
                     </h3>
                     <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">Gunakan kata sandi yang kuat dan unik demi keamanan akses admin.</p>
@@ -67,7 +67,7 @@
         @endif
 
         <!-- Logout Other Browser Sessions -->
-        <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm space-y-4">
+        <div class="p-6 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl shadow-sm space-y-4">
             <div>
                 <h3 class="text-base font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
                     <i class="fas fa-desktop text-brand"></i>

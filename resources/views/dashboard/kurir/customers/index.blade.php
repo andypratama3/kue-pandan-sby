@@ -16,14 +16,14 @@
                             </svg>
                         </div>
                         <input type="text" id="live-search-input" name="search" value="{{ request('search') }}"
-                            class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                            class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-brand focus:border-brand dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                             placeholder="Cari customer...">
                     </div>
                 </form>
             </div>
             {{-- Tombol Tambah Data --}}
             <button type="button" data-target-modal="create-customer-modal"
-                class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg js-open-modal-btn md:w-auto hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-white bg-brand rounded-lg js-open-modal-btn md:w-auto hover:bg-brand-deep focus:ring-4 focus:ring-brand-light dark:bg-brand dark:hover:bg-brand-deep focus:outline-none dark:focus:ring-brand-deep">
                 <i class="fas fa-plus me-2"></i>
                 Tambah Data
             </button>

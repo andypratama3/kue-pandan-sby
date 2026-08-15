@@ -16,7 +16,7 @@
 
     <div class="space-y-6">
         <!-- Main Card Container -->
-        <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-lg min-h-[700px] space-y-6">
+        <div class="p-6 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl shadow-lg min-h-[700px] space-y-6">
             
             <!-- Header: Title & Meta -->
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-6 border-b border-slate-100 dark:border-slate-800">
@@ -55,7 +55,7 @@
             </div>
 
             <!-- Table Container -->
-            <div class="overflow-hidden border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 shadow-sm">
+            <div class="overflow-hidden border border-slate-200/80 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-800 shadow-sm">
                 <div class="overflow-x-auto min-h-[500px]">
                     @php
                         $statusLabelMap = [
@@ -202,7 +202,7 @@
                             </div>
                             <p class="text-sm font-bold text-gray-800 dark:text-white">${formatRupiah(item.price)}</p>
                         </div>
-                    `).join('') || '<p class="text-sm text-gray-500">Tidak ada produk.</p>';
+                    `).join('') || '<p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada produk.</p>';
                 }
 
                 const returnedSection = document.getElementById('returnedProductsSection');
@@ -241,7 +241,7 @@
             } catch (error) {
                 console.error('Error loading order details:', error);
                 if (loader) {
-                    loader.innerHTML = '<p class="text-center text-red-500">Gagal memuat detail pesanan.</p>';
+                    loader.innerHTML = '<p class="text-center text-red-500 dark:text-red-400">Gagal memuat detail pesanan.</p>';
                 }
             }
         }

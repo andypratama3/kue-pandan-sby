@@ -8,23 +8,23 @@
                 <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">{{ $customer->name }}</h3>
                 <dl class="space-y-4">
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Nama Perusahaan</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Nama Perusahaan</dt>
                         <dd class="mt-1 text-gray-900 dark:text-white">{{ $customer->company_name ?? '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Nomor Telepon</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Nomor Telepon</dt>
                         <dd class="mt-1 text-gray-900 dark:text-white">{{ $customer->phone ? '+' . $customer->phone : '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Alamat Lengkap</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Alamat Lengkap</dt>
                         <dd class="mt-1 text-gray-900 dark:text-white">{{ $customer->address ?? '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Patokan Tempat</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Patokan Tempat</dt>
                         <dd class="mt-1 text-gray-900 dark:text-white">{{ $customer->landmark ?? '-' }}</dd>
                     </div>
-                    <div class="pt-4 border-t">
-                        <dt class="text-sm font-medium text-gray-500">Note</dt>
+                    <div class="pt-4 border-t border-slate-100 dark:border-slate-700">
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Note</dt>
                         <dd class="mt-1 prose-sm prose max-w-none dark:text-white">
                             {!! $customer->note ? nl2br(e($customer->note)) : '-' !!}
                         </dd>
@@ -33,45 +33,45 @@
             </div>
 
             {{-- Kolom Kanan - Informasi Tambahan --}}
-            <div class="p-5 rounded-b-lg md:col-span-1 bg-gray-50 dark:bg-gray-800 md:rounded-b-none md:rounded-e-lg">
+            <div class="p-5 rounded-b-lg md:col-span-1 bg-gray-50 dark:bg-slate-700/40 md:rounded-b-none md:rounded-e-lg">
                 <h3 class="mb-4 text-lg font-semibold text-gray-700 dark:text-gray-300">Informasi Lainnya</h3>
                 <dl class="space-y-4">
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Status</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
                         <dd class="mt-1">
                             @if ($customer->is_flagged)
-                                <span class="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full">Bermasalah</span>
+                                <span class="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full dark:bg-red-900/40 dark:text-red-300">Bermasalah</span>
                             @else
-                                <span class="px-2 py-1 text-xs font-medium text-brand-deep bg-brand-light rounded-full">Normal</span>
+                                <span class="px-2 py-1 text-xs font-medium text-brand-deep bg-brand-light rounded-full dark:bg-brand-deep dark:text-brand-light">Normal</span>
                             @endif
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Kategori Customer</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Kategori Customer</dt>
                         <dd class="mt-1 text-gray-900 dark:text-white">{{ optional($customer->category)->name ?? '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Jam Buka</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Jam Buka</dt>
                         <dd class="mt-1 text-gray-900 dark:text-white">{{ $customer->opening_hours ?? '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Jenis Pembayaran</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Jenis Pembayaran</dt>
                         <dd class="mt-1 text-gray-900 dark:text-white">{{ $customer->payment_type ?? '-' }}</dd>
                     </div>
-                    <div class="pt-4 border-t">
-                        <dt class="text-sm font-medium text-gray-500">Region</dt>
+                    <div class="pt-4 border-t border-slate-100 dark:border-slate-700">
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Region</dt>
                         <dd class="mt-1 text-gray-900 dark:text-white">{{ optional($customer->region)->name ?? '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Ditambahkan Oleh</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Ditambahkan Oleh</dt>
                         <dd class="mt-1 text-gray-900 dark:text-white">{{ optional($customer->addedBy)->name ?? '-' }}</dd>
                     </div>
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Tanggal Bergabung</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Tanggal Bergabung</dt>
                         <dd class="mt-1 text-xs text-gray-900 dark:text-white">{{ $customer->created_at->format('d F Y, H:i') }}</dd>
                     </div>
                      <div>
-                        <dt class="text-sm font-medium text-gray-500">Terakhir Diperbarui</dt>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Terakhir Diperbarui</dt>
                         <dd class="mt-1 text-xs text-gray-900 dark:text-white">{{ $customer->updated_at->format('d F Y, H:i') }}</dd>
                     </div>
                 </dl>

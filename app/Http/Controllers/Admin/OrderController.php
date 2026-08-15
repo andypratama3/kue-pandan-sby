@@ -157,13 +157,21 @@ class OrderController extends Controller
             // Jika pesanan sedang dalam proses retur, tandai retur tersebut
             // sebagai "diverifikasi" agar status state-machine konsisten dan
             // kurir tidak bisa mengunggah bukti ulang setelah diapprove.
+            // Retur hanya dianggap sah bila bukti returnya sudah diunggah.
             $pendingReturn = $order->returns()
                 ->where('status', 'menunggu_konfirmasi')
                 ->latest()
                 ->first();
-            if ($pendingReturn) {
+            if ($pendingReturn && $pendingReturn->return_proof) {
                 $pendingReturn->status = 'diverifikasi';
                 $pendingReturn->admin_notes = 'Retur diterima oleh admin.';
+                $pendingReturn->save();
+            } elseif ($pendingReturn) {
+                // Retur tanpa bukti tidak bisa diverifikasi; batalkan agar
+                // tidak menggantung selamanya di status menunggu_konfirmasi.
+                ProofFile::delete($pendingReturn->return_proof);
+                $pendingReturn->status = 'ditolak';
+                $pendingReturn->admin_notes = 'Retur dibatalkan: bukti retur tidak diunggah.';
                 $pendingReturn->save();
             }
 
@@ -218,10 +226,8 @@ class OrderController extends Controller
         $order->rejection_note = $validated['rejection_note'];
         $order->save();
 
-        // [!code block:start]
         // Ganti respons JSON dengan redirect dan pesan flash
         return redirect()->route('admin.orders.index')->with('success', 'Verifikasi pesanan berhasil ditolak.');
-        // [!code block:end]
     }
 
     /**

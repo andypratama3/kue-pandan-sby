@@ -17,9 +17,22 @@
 
         <!-- Styles -->
         @livewireStyles
+
+        <!-- DARK MODE PREVENT FOUC -->
+        <script>
+            (function() {
+                const savedTheme = localStorage.getItem('color-theme');
+                let isDark = savedTheme ? savedTheme === 'dark' : false;
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            })();
+        </script>
     </head>
-    <body>
-        <div class="font-sans text-gray-900 antialiased">
+    <body class="bg-slate-50 dark:bg-slate-900">
+        <div class="font-sans text-gray-900 antialiased dark:text-slate-200">
             {{ $slot }}
         </div>
 

@@ -13,7 +13,7 @@
                 <div class="order-2 w-full max-w-full px-3 mt-4 mb-12 shrink-0 xl:w-7/12 xl:flex-0 xl:order-1 xl:mb-0">
                     <div
                         class="p-3 bg-white border border-gray-200 shadow-md rounded-xl dark:bg-gray-800 dark:border-gray-700">
-                        <p class="mb-4 font-bold tracking-wide text-black uppercase text-md dark:text-white dark:opacity-60">
+                        <p class="mb-4 font-bold tracking-wide text-black uppercase text-base dark:text-white dark:opacity-60">
                             <i class="fas fa-box mr-2"></i> Detail Produk
                         </p>
                         <div class="flex justify-end mb-4">
@@ -35,11 +35,11 @@
                         class="p-3 mb-4 bg-white border border-gray-200 shadow-md rounded-xl dark:bg-gray-800 dark:border-gray-700">
                         <div class="flex items-center justify-between">
                             <p
-                                class="mb-4 font-bold tracking-wide text-black uppercase text-md dark:text-white dark:opacity-60">
+                                class="mb-4 font-bold tracking-wide text-black uppercase text-base dark:text-white dark:opacity-60">
                                 <i class="fas fa-user mr-2"></i> Data Customer
                             </p>
                             <a href="{{ route('kurir.pesanan.index') }}"
-                                class="px-2 mb-4 font-semibold text-white rounded-full cursor-pointer text-md bg-brand hover:bg-brand-deep">
+                                class="px-2 mb-4 font-semibold text-white rounded-full cursor-pointer text-base bg-brand hover:bg-brand-deep">
                                 <i class="fas fa-caret-left"></i> Back
                             </a>
                         </div>
@@ -50,7 +50,7 @@
                                 Customer</label>
                             <div class="relative">
                                 <button id="dropdown-button" type="button"
-                                    class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-left">
+                                    class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-left">
                                     <span id="selected-customer">- Pilih Customer -</span>
                                     <svg class="absolute w-5 h-5 ml-2 -mr-1 -translate-y-1/2 right-3 top-1/2"
                                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
@@ -93,7 +93,7 @@
                                 class="inline-block mb-2 ml-1 text-xs font-bold text-slate-700 dark:text-white/80">No.
                                 HP</label>
                             <input type="text" name="phone" id="phone"
-                                class="mb-6 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 cursor-not-allowed"
+                                class="mb-6 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400"
                                 disabled>
                         </div>
 
@@ -101,7 +101,7 @@
                             <label for="address"
                                 class="inline-block mb-2 ml-1 text-xs font-bold text-slate-700 dark:text-white/80">Alamat</label>
                             <textarea id="address" name="address"
-                                class="mb-6 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 cursor-not-allowed"
+                                class="mb-6 bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400"
                                 disabled>
                                 </textarea>
                         </div>
@@ -111,7 +111,7 @@
                     <div
                         class="p-3 mt-4 bg-white border border-gray-200 shadow-md rounded-xl dark:bg-gray-800 dark:border-gray-700">
                         <p
-                            class="mb-4 font-bold tracking-wide text-black uppercase text-md dark:text-white dark:opacity-60">
+                            class="mb-4 font-bold tracking-wide text-black uppercase text-base dark:text-white dark:opacity-60">
                             💳 METODE PEMBAYARAN
                         </p>
 
@@ -121,7 +121,7 @@
                                 Pembayaran</label>
                             <div class="relative inline-block w-full text-left">
                                 <button id="payment-method-button" type="button"
-                                    class="inline-flex justify-between items-center w-full rounded-lg border border-gray-300 shadow-sm px-4 py-2.5 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600">
+                                    class="inline-flex justify-between items-center w-full rounded-lg border border-gray-300 shadow-sm px-4 py-2.5 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-brand dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600 dark:focus:ring-offset-gray-800">
                                     <span id="selected-payment-method">-Pilih metode pembayaran -</span>
                                     <svg class="w-5 h-5 ml-2 -mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                         fill="currentColor" aria-hidden="true">
@@ -131,7 +131,7 @@
                                     </svg>
                                 </button>
                                 <div id="payment-method-menu"
-                                    class="absolute left-0 hidden w-full mt-1 bg-white shadow-lg rounded-xl ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700"
+                                    class="absolute left-0 hidden w-full mt-1 bg-white shadow-lg rounded-xl ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 dark:ring-gray-600/50"
                                     role="menu">
                                     <div class="py-2" role="none">
                                         <a href="#"
@@ -156,8 +156,8 @@
                                     class="inline-block mb-2 ml-1 text-xs font-bold text-slate-700 dark:text-white/80">Bukti
                                     Pembayaran</label>
                                 <input type="file" name="payment_proof" id="payment-proof" accept="image/*"
-                                    class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none">
-                                <p class="mt-1 text-xs text-gray-500">Format: JPG, PNG. Ukuran maksimal: 2MB.</p>
+                                    class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-brand focus:outline-none">
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Format: JPG, PNG. Ukuran maksimal: 2MB.</p>
                             </div> --}}
 
                         <div class="mb-4">
@@ -165,7 +165,7 @@
                                 class="inline-block mb-2 ml-1 text-xs font-bold text-slate-700 dark:text-white/80">📝
                                 Catatan</label>
                             <textarea type="text" name="note" id="note"
-                                class="focus:shadow-primary-outline dark:bg-slate-850 dark:text-white text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"></textarea>
+                                class="block w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:border-brand focus:outline-none dark:bg-slate-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-500"></textarea>
                         </div>
 
                         <div class="hidden pt-4 mt-4 border-t border-gray-200 dark:border-gray-600 xl:block">
@@ -428,11 +428,11 @@
                 const productHtml = `
                 <div class="flex items-start justify-between text-sm">
                     <div class="flex-grow">
-                        <p class="font-semibold text-gray-800 text-md dark:text-gray-200">${escapeHtml(item.product_name)}</p>
-                        ${item.variant_name ? `<p class="text-xs text-gray-500"> ▸ ${escapeHtml(item.variant_name)}</p>` : ''}
+                        <p class="font-semibold text-gray-800 text-base dark:text-gray-200">${escapeHtml(item.product_name)}</p>
+                        ${item.variant_name ? `<p class="text-xs text-gray-500 dark:text-gray-400"> ▸ ${escapeHtml(item.variant_name)}</p>` : ''}
                         <p class="text-xs text-gray-600 dark:text-gray-400">${item.qty} x Rp ${item.price.toLocaleString('id-ID')}</p>
                     </div>
-                    <p class="font-semibold text-gray-800 text-md dark:text-gray-200">Rp ${subtotal.toLocaleString('id-ID')}</p>
+                    <p class="font-semibold text-gray-800 text-base dark:text-gray-200">Rp ${subtotal.toLocaleString('id-ID')}</p>
                 </div>`;
                 productListDiv.innerHTML += productHtml;
             });
@@ -571,17 +571,17 @@
                     p.variants.forEach(v => {
                         const sudahDipilih = cart.some(c => c.variant_id === v.id);
                         pilihDiv.innerHTML += `
-                        <div class="flex flex-row items-center gap-3 p-3 border rounded bg-gray-50">
+                        <div class="flex flex-row items-center gap-3 p-3 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
                             ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(p.name)}" class="object-cover w-16 h-16 mr-2 border rounded" />` : ''}
                             <div class="flex-1">
                                 <div class="font-semibold">
-                                    <span class="font-bold text-gray-800 text-md">${escapeHtml(p.name)}</span>
-                                    ${v.name ? `<div class="mb-1 text-xs text-gray-600"> ▸ ${escapeHtml(v.name)} </div>` : ''}
+                                    <span class="font-bold text-gray-800 text-base dark:text-gray-100">${escapeHtml(p.name)}</span>
+                                    ${v.name ? `<div class="mb-1 text-xs text-gray-600 dark:text-gray-300"> ▸ ${escapeHtml(v.name)} </div>` : ''}
                                 </div>
-                                <div class="font-bold text-brand-deep">Rp ${v.price.toLocaleString()}</div>
+                                <div class="font-bold text-brand-deep dark:text-brand-light">Rp ${v.price.toLocaleString()}</div>
                             </div>
                             ${sudahDipilih ?
-                                `<button type="button" class="px-2 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600" onclick="hapusDariCart(${p.id}, ${v.id})"><i class="fas fa-trash"></i></button>` :
+                                `<button type="button" class="px-2 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600" onclick="hapusDariCart(${p.id}, ${v.id})"><i class="fas fa-trash"></i></button>` :
                                 `<button type="button" class="px-2 py-1 text-xs text-white bg-brand rounded hover:bg-brand-deep" onclick="tambahKeCart(${p.id}, ${v.id})"><i class="fas fa-cart-plus"></i></button>`
                             }
                         </div>`;
@@ -589,14 +589,14 @@
                 } else {
                     const sudahDipilih = cart.some(c => c.product_id === p.id && !c.variant_id);
                     pilihDiv.innerHTML += `
-                    <div class="flex flex-row items-center gap-3 p-3 border rounded bg-gray-50">
+                    <div class="flex flex-row items-center gap-3 p-3 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
                         ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(p.name)}" class="object-cover w-16 h-16 mr-2 border rounded" />` : ''}
                         <div class="flex-1">
                             <div class="font-semibold">${escapeHtml(p.name)}</div>
-                            <div class="font-bold text-brand-deep">Rp ${p.price ? p.price.toLocaleString() : ''}</div>
+                            <div class="font-bold text-brand-deep dark:text-brand-light">Rp ${p.price ? p.price.toLocaleString() : ''}</div>
                         </div>
                         ${sudahDipilih ?
-                            `<button type="button" class="px-2 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600" onclick="hapusDariCart(${p.id}, null)"><i class="fas fa-trash"></i></button>` :
+                            `<button type="button" class="px-2 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600" onclick="hapusDariCart(${p.id}, null)"><i class="fas fa-trash"></i></button>` :
                             `<button type="button" class="px-2 py-1 text-xs text-white bg-brand rounded hover:bg-brand-deep" onclick="tambahKeCart(${p.id}, null)"><i class="fas fa-cart-plus"></i></button>`
                         }
                     </div>`;
@@ -731,17 +731,17 @@
                             <td class="px-2 py-2 whitespace-nowrap">Rp ${item.price.toLocaleString('id-ID')}</td>
                             <td class="px-2 py-2 whitespace-nowrap">
                                 <div class="flex items-center gap-1">
-                                    <button type="button" class="px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300" onclick="ubahQtyCart(${idx}, -1)">-</button>
+                                    <button type="button" class="px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white" onclick="ubahQtyCart(${idx}, -1)">-</button>
 
                                     <input type="number" min="1" value="${item.qty}"
                                            onchange="setQtyCart(${idx}, this.value)"
                                            class="w-12 py-1 text-center text-sm border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none">
 
-                                    <button type="button" class="px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300" onclick="ubahQtyCart(${idx}, 1)">+</button>
+                                    <button type="button" class="px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white" onclick="ubahQtyCart(${idx}, 1)">+</button>
                                 </div>
                             </td>
                             <td class="px-2 py-2 font-semibold whitespace-nowrap">Rp ${subtotal.toLocaleString('id-ID')}</td>
-                            <td class="px-2 py-2 whitespace-nowrap"><button type="button" class="px-2 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600" onclick="hapusProdukCart(${idx})">
+                            <td class="px-2 py-2 whitespace-nowrap"><button type="button" class="px-2 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600" onclick="hapusProdukCart(${idx})">
                                 <i class="fas fa-trash"></i> Hapus</button>
                             </td>
                         </tr>`;
@@ -752,20 +752,20 @@
                             <img src="${imageUrl}" alt="${item.product_name}" class="object-cover w-12 h-12 border rounded" />
                             <div class="flex-1">
                                 <div class="font-semibold text-gray-900 dark:text-white">${item.product_name}</div>
-                                ${item.variant_name ? `<div class="text-xs text-gray-500">${item.variant_name}</div>` : ''}
+                                ${item.variant_name ? `<div class="text-xs text-gray-500 dark:text-gray-400">${item.variant_name}</div>` : ''}
                                 <div class="text-xs text-gray-600 dark:text-gray-400">Harga: Rp ${item.price.toLocaleString('id-ID')}</div>
                                 <div class="flex items-center gap-1 mt-1">
-                                    <button type="button" class="px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300" onclick="ubahQtyCart(${idx}, -1)">-</button>
+                                    <button type="button" class="px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white" onclick="ubahQtyCart(${idx}, -1)">-</button>
 
                                     <input type="number" min="1" value="${item.qty}"
                                            onchange="setQtyCart(${idx}, this.value)"
                                            class="w-12 py-1 text-center text-sm border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none">
 
-                                    <button type="button" class="px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300" onclick="ubahQtyCart(${idx}, 1)">+</button>
+                                    <button type="button" class="px-2 py-1 text-xs bg-gray-200 rounded hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white" onclick="ubahQtyCart(${idx}, 1)">+</button>
                                 </div>
                                 <div class="mt-1 font-semibold">Subtotal: Rp ${subtotal.toLocaleString('id-ID')}</div>
                             </div>
-                            <button type="button" class="px-2 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600" onclick="hapusProdukCart(${idx})">
+                            <button type="button" class="px-2 py-1 text-xs text-white bg-red-500 rounded hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600" onclick="hapusProdukCart(${idx})">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>`;

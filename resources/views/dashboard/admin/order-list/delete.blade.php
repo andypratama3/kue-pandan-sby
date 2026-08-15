@@ -15,12 +15,12 @@
     </div>
     <x-slot name="footer">
         <div
-            class="flex items-center justify-center p-4 space-x-3 border-t border-gray-200 rounded-b md:p-5 dark:border-gray-600">
+            class="flex items-center justify-center p-4 space-x-3 border-t border-gray-200 rounded-b md:p-5 dark:border-slate-700">
             <button type="button"
-                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg js-close-modal-btn hover:bg-gray-300">Batal</button>
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg js-close-modal-btn hover:bg-gray-300 dark:bg-slate-700 dark:text-gray-300 dark:border dark:border-slate-600 dark:hover:bg-slate-600 dark:hover:text-white">Batal</button>
             {{-- Tombol ini akan diberi event listener oleh JavaScript --}}
             <button id="btnConfirmDelete" type="button"
-                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">
+                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700">
                 Ya, Hapus
             </button>
         </div>

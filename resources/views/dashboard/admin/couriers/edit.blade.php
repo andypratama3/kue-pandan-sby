@@ -31,10 +31,10 @@
                     <input type="password" name="password" id="password-{{ $courier->id }}"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-brand dark:focus:border-brand">
                     <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 toggle-password">
-                        <i class="text-gray-400 fas fa-eye"></i>
+                        <i class="text-gray-400 dark:text-gray-300 fas fa-eye"></i>
                     </button>
                 </div>
-                <p class="mt-1 text-sm text-gray-400">Password Minimal 8 Digit.</p>
+                <p class="mt-1 text-sm text-gray-400 dark:text-gray-400">Password Minimal 8 Digit.</p>
             </div>
             <div class="col-span-2 sm:col-span-1">
                 <label for="password_confirmation-{{ $courier->id }}"
@@ -44,10 +44,10 @@
                     <input type="password" name="password_confirmation" id="password_confirmation-{{ $courier->id }}"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-brand dark:focus:border-brand">
                     <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 toggle-password">
-                        <i class="text-gray-400 fas fa-eye"></i>
+                        <i class="text-gray-400 dark:text-gray-300 fas fa-eye"></i>
                     </button>
                 </div>
-                <p id="edit_password_error-{{ $courier->id }}" class="hidden mt-1 text-sm text-red-600">
+                <p id="edit_password_error-{{ $courier->id }}" class="hidden mt-1 text-sm text-red-600 dark:text-red-400">
                     Password tidak cocok.</p>
             </div>
         </div>

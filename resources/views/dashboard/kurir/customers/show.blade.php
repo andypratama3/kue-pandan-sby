@@ -13,7 +13,7 @@
                         <div class="flex items-center gap-5 mb-8">
                             {{-- Avatar Icon --}}
                             <div class="flex-shrink-0">
-                                <div class="flex items-center justify-center w-16 h-16 text-white bg-blue-600 rounded-full dark:bg-blue-500">
+                                <div class="flex items-center justify-center w-16 h-16 text-white bg-brand rounded-full dark:bg-brand">
                                     <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
                                 </div>
                             </div>
@@ -65,7 +65,7 @@
                         {{-- Catatan --}}
                         @if($customer->note)
                         <div class="pt-2 mt-2 border-t border-gray-200 dark:border-gray-700 ">
-                            <label class="mb-1 font-medium text-gray-900 text-md dark:text-gray-400">Catatan </label>
+                            <label class="mb-1 font-medium text-gray-900 text-base dark:text-gray-400">Catatan </label>
                             <div id="orderNotesContainer" class="p-2 font-semibold text-center text-gray-800 bg-yellow-100 rounded-lg dark:bg-yellow-900/20 dark:text-gray-50">
                             {!! nl2br(e($customer->note)) !!}
                             </div>

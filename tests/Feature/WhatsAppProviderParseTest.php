@@ -2,90 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Services\WhatsApp\FonnteProvider;
 use App\Services\WhatsApp\MetaCloudProvider;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class WhatsAppProviderParseTest extends TestCase
 {
-    public function test_fonnte_parse_incoming_normalizes_payload()
-    {
-        $provider = new FonnteProvider;
-
-        $parsed = $provider->parseIncoming([
-            'device' => '628xxx',
-            'sender' => '6281234567890',
-            'message' => 'berapa harga kue ijo?',
-            'name' => 'Budi',
-            'location' => null,
-            'timestamp' => 1753156639,
-            'inboxid' => 'inbox-99',
-        ]);
-
-        $this->assertSame('6281234567890', $parsed['sender']);
-        $this->assertSame('Budi', $parsed['name']);
-        $this->assertSame('berapa harga kue ijo?', $parsed['text']);
-        $this->assertSame('text', $parsed['type']);
-        $this->assertSame('inbox-99', $parsed['raw_reply_context']['inboxid']);
-    }
-
-    public function test_fonnte_parse_incoming_detects_media_and_location()
-    {
-        $provider = new FonnteProvider;
-
-        $media = $provider->parseIncoming([
-            'sender' => '6281',
-            'message' => '',
-            'url' => 'https://x.test/img.jpg',
-            'filename' => 'img.jpg',
-            'extension' => 'jpg',
-        ]);
-        $this->assertSame('media', $media['type']);
-
-        $location = $provider->parseIncoming([
-            'sender' => '6281',
-            'location' => '-8.70,115.22',
-        ]);
-        $this->assertSame('location', $location['type']);
-    }
-
-    public function test_fonnte_verify_webhook_is_null()
-    {
-        $this->assertNull((new FonnteProvider)->verifyWebhook([]));
-    }
-
-    public function test_fonnte_normalize_number_converts_leading_zero_to_62()
-    {
-        $provider = new FonnteProvider;
-
-        $this->assertSame('6282217160075', $provider->normalizeNumber('082217160075'));
-        $this->assertSame('6282217160075', $provider->normalizeNumber('6282217160075'));
-        $this->assertSame('6282217160075', $provider->normalizeNumber('+62 8221-7160075'));
-    }
-
-    public function test_fonnte_send_message_hits_correct_endpoint_with_normalized_number()
-    {
-        Http::fake([
-            'api.fonnte.com/*' => Http::response(['status' => true, 'id' => ['msg-1']], 200),
-        ]);
-
-        config()->set('services.fonnte.token', 'dummy-token');
-        config()->set('services.fonnte.base_url', 'https://api.fonnte.com');
-
-        $provider = new FonnteProvider;
-        $result = $provider->sendMessage('082217160075', 'Halo dari test');
-
-        Http::assertSent(function ($request) {
-            return $request->url() === 'https://api.fonnte.com/send'
-                && $request['target'] === '6282217160075'
-                && $request['message'] === 'Halo dari test'
-                && $request->hasHeader('Authorization', 'dummy-token');
-        });
-
-        $this->assertTrue($result['status']);
-    }
-
     public function test_meta_parse_incoming_normalizes_nested_payload()
     {
         $provider = new MetaCloudProvider;

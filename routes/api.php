@@ -19,10 +19,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Webhook WhatsApp generik — dipakai Fonnte (POST) dan Meta (POST /meta).
-// Meta butuh GET terpisah untuk verifikasi awal hub.challenge.
-// Rate limiting: 60 requests/menit untuk prevent spam/abuse
-Route::post('/webhook/whatsapp', [WhatsAppWebhookController::class, 'handle'])->middleware('throttle:60,1')->name('webhook.whatsapp.fonnte');
+// Webhook WhatsApp Meta Cloud API.
+// GET untuk verifikasi awal hub.challenge, POST untuk menerima pesan masuk.
+// Rate limiting: 60 requests/menit untuk prevent spam/abuse.
 Route::get('/webhook/whatsapp/meta', [WhatsAppWebhookController::class, 'verify'])->middleware('throttle:20,1')->name('webhook.whatsapp.meta.verify');
 Route::post('/webhook/whatsapp/meta', [WhatsAppWebhookController::class, 'handle'])->middleware('throttle:60,1')->name('webhook.whatsapp.meta.handle');
 

@@ -243,13 +243,11 @@ class HistoryOrderController extends Controller
 
         $orders = $ordersQuery->latest()->get();
 
-        // [!code focus:start]
         // TAMBAHKAN LOGIKA INI - Kalkulasi total akhir untuk setiap pesanan
         foreach ($orders as $order) {
             $order->has_return = $order->returns->isNotEmpty();
             $order->final_total = $order->has_return ? $order->total_amount - $order->returns->first()->total_amount_returned : $order->total_amount;
         }
-        // [!code focus:end]
 
         // Siapkan data untuk view PDF
         $bulan = $months[$selectedMonth].' '.$selectedYear;
@@ -353,7 +351,6 @@ class HistoryOrderController extends Controller
                 : ['text' => 'Belum Lunas', 'class' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'];
         }
 
-        // [!code focus:start]
         // MODIFIKASI: Handle request AJAX untuk live search
         if ($request->ajax()) {
             $response = [];
@@ -370,7 +367,6 @@ class HistoryOrderController extends Controller
 
             return response()->json($response);
         }
-        // [!code focus:end]
 
         $viewData = compact('orders', 'months', 'years', 'couriers', 'selectedMonth', 'selectedYear', 'selectedCourier');
 

@@ -22,7 +22,7 @@
 
         {{-- Daftar Kategori --}}
         @forelse ($categories as $category)
-            <div class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 sm:p-6 shadow-sm">
+            <div class="rounded-3xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-5 sm:p-6 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                         <i class="fas fa-tag text-brand"></i>
@@ -62,7 +62,7 @@
                 </div>
             </div>
         @empty
-            <div class="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-10 text-center shadow-sm">
+            <div class="rounded-3xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 p-10 text-center shadow-sm">
                 <i class="fas fa-box-open text-4xl text-slate-300 dark:text-slate-600 mb-3"></i>
                 <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">Belum ada produk aktif di cabang {{ $regionName }}.</p>
             </div>

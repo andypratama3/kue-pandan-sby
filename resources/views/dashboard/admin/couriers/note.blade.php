@@ -8,7 +8,7 @@
             <div>
                 <label for="note-{{ $courier->id }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Catatan</label>
                 <textarea id="note-{{ $courier->id }}" name="note" rows="4"
-                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-brand focus:border-brand dark:bg-gray-600 dark:border-gray-500"
+                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-brand focus:border-brand dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
                     placeholder="Tambahkan catatan untuk kurir ini...">{{ $courier->note }}</textarea>
             </div>
         </div>

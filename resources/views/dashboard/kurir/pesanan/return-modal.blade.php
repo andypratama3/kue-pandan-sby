@@ -2,7 +2,7 @@
 <x-modal-custom id="returnProductModal" title="Pilih Produk untuk Pengembalian" size="xl">
     {{-- Loader --}}
     <div id="returnModalLoader" class="text-center">
-        <svg class="w-8 h-8 mx-auto text-blue-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+        <svg class="w-8 h-8 mx-auto text-blue-600 dark:text-blue-400 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
             viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
             </circle>
@@ -65,9 +65,9 @@
                 <textarea id="return_reason" name="return_reason" rows="4" required
                     placeholder="Tuliskan alasan pengembalian produk (contoh: produk rusak, tidak sesuai pesanan, dll)"
                     class="w-full px-4 py-3 text-sm border border-gray-300 rounded-xl resize-none
-               focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+               focus:ring-2 focus:ring-brand focus:border-brand
                dark:bg-gray-800 dark:border-gray-600 dark:text-white
-               dark:focus:ring-blue-600 dark:focus:border-blue-600"></textarea>
+               dark:focus:ring-brand dark:focus:border-brand"></textarea>
 
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     * Alasan pengembalian wajib diisi
@@ -89,7 +89,7 @@
                 <button type="button"
                     onclick="handleReturnRequestSubmit(document.getElementById('returnOrderId').value)"
                     id="submitReturnRequestButton"
-                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 disabled:opacity-50 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-brand rounded-lg hover:bg-brand-deep focus:ring-4 focus:outline-none focus:ring-brand-light disabled:opacity-50 dark:bg-brand dark:hover:bg-brand-deep dark:focus:ring-brand-deep">
                     <span id="submitReturnRequestButtonText">Kirim Pengajuan</span>
                     <svg id="submitReturnRequestButtonSpinner" class="hidden w-4 h-4 ml-2 text-white animate-spin"
                         viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">

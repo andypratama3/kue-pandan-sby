@@ -39,7 +39,6 @@
             margin: 5px 0;
         }
 
-        /* [!code focus:start] */
         .price-final {
             color: green;
             font-weight: bold;
@@ -51,7 +50,6 @@
             font-size: 10px;
         }
 
-        /* [!code focus:end] */
     </style>
 </head>
 

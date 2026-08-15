@@ -17,7 +17,7 @@
                     <div class="relative">
                         <label class="block mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">Bulan</label>
                         <select name="month"
-                            class="px-3 py-2 text-sm border rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                            class="px-3 py-2 text-sm border rounded-lg appearance-none focus:ring-2 focus:ring-brand dark:bg-slate-700 dark:border-slate-600 dark:text-white">
                             @foreach($months as $num => $name)
                             <option value="{{ $num }}" @if($selectedMonth == $num) selected @endif>{{ $name }}</option>
                             @endforeach
@@ -26,14 +26,14 @@
                     <div class="relative">
                         <label class="block mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">Tahun</label>
                         <select name="year"
-                            class="px-3 py-2 text-sm border rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                            class="px-3 py-2 text-sm border rounded-lg appearance-none focus:ring-2 focus:ring-brand dark:bg-slate-700 dark:border-slate-600 dark:text-white">
                             @foreach($years as $year)
                             <option value="{{ $year }}" @if($selectedYear == $year) selected @endif>{{ $year }}</option>
                             @endforeach
                         </select>
                     </div>
                     <button type="submit"
-                        class="flex items-center px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800 focus:outline-none dark:focus:ring-blue-800 shadow-lg shadow-blue-500/30 transition-all mt-5">
+                        class="flex items-center px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-brand to-brand-deep rounded-xl hover:from-brand-deep hover:to-brand focus:ring-4 focus:ring-brand-light dark:from-brand dark:to-brand-deep dark:hover:from-brand-deep dark:hover:to-brand focus:outline-none dark:focus:ring-brand-deep shadow-lg shadow-brand/30 transition-all mt-5">
                         <i class="fas fa-eye mr-2"></i>Lihat
                     </button>
                 </form>
@@ -47,7 +47,7 @@
                             <i class="fas fa-search text-gray-400"></i>
                         </div>
                         <input type="text" id="live-search-input" name="search"
-                            class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-700 dark:border-slate-600 dark:placeholder-gray-400 dark:text-white transition-all"
+                            class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-2 focus:ring-brand focus:border-brand dark:bg-slate-700 dark:border-slate-600 dark:placeholder-gray-400 dark:text-white transition-all"
                             placeholder="Cari invoice atau customer...">
                     </div>
                 </form>
@@ -134,7 +134,7 @@
             } catch (error) {
                 console.error('Error fetching order details:', error);
                 content.innerHTML =
-                    `<div class="py-10 text-center"><p class="font-semibold text-red-600">Gagal memuat detail pesanan.</p><p class="text-sm text-gray-500">Silakan coba lagi.</p></div>`;
+                    `<div class="py-10 text-center"><p class="font-semibold text-red-600 dark:text-red-400">Gagal memuat detail pesanan.</p><p class="text-sm text-gray-500 dark:text-gray-400">Silakan coba lagi.</p></div>`;
             } finally {
                 hideLoader();
             }
@@ -218,7 +218,7 @@
 
                 if (!orderItemTemplate) {
                     console.error('Template #orderItemTemplate not found!');
-                    content.innerHTML = `<p class="py-10 text-center text-red-500">Error: Template produk tidak ditemukan.</p>`;
+                    content.innerHTML = `<p class="py-10 text-center text-red-500 dark:text-red-400">Error: Template produk tidak ditemukan.</p>`;
                     return;
                 }
 
@@ -319,7 +319,7 @@
                         returnImg.className = 'w-full border rounded cursor-pointer hover:border-red-500';
                         elements.returnProof.appendChild(returnImg);
                     } else {
-                        elements.returnProof.innerHTML = '<p class="text-sm text-center text-gray-500">Tidak ada bukti retur</p>';
+                        elements.returnProof.innerHTML = '<p class="text-sm text-center text-gray-500 dark:text-gray-400">Tidak ada bukti retur</p>';
                     }
                 } else {
                     elements.singleTotalContainer.classList.remove('hidden');
@@ -339,11 +339,11 @@
                     elements.paymentProof.appendChild(paymentImg);
                 } else {
                     elements.paymentProof.innerHTML =
-                        '<p class="text-sm text-center text-gray-500">Tidak ada bukti pembayaran</p>';
+                        '<p class="text-sm text-center text-gray-500 dark:text-gray-400">Tidak ada bukti pembayaran</p>';
                 }
             } catch (e) {
                 console.error("Error populating modal content:", e);
-                content.innerHTML = `<div class="py-10 text-center"><p class="font-semibold text-red-600">Terjadi kesalahan saat memproses data.</p><p class="text-sm text-gray-500">Silakan coba lagi.</p></div>`;
+                content.innerHTML = `<div class="py-10 text-center"><p class="font-semibold text-red-600 dark:text-red-400">Terjadi kesalahan saat memproses data.</p><p class="text-sm text-gray-500 dark:text-gray-400">Silakan coba lagi.</p></div>`;
             }
         }
     });

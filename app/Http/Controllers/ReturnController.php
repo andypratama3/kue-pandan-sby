@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB; // Impor Auth
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException; // [!code ++]
+use Illuminate\Validation\ValidationException;
 
 class ReturnController extends Controller
 {
@@ -23,7 +23,6 @@ class ReturnController extends Controller
         }
     }
 
-    // [!code block:start]
     // --- Helper Functions for Timezone ---
     private function getUserTimezone()
     {
@@ -34,7 +33,6 @@ class ReturnController extends Controller
     {
         return Carbon::now($this->getUserTimezone());
     }
-    // [!code block:end]
 
     public function requestReturn(Request $request, Order $order)
     {
@@ -125,6 +123,10 @@ class ReturnController extends Controller
                 'message' => 'Pengajuan pengembalian produk berhasil dikirim.',
                 'order' => $this->formatOrderDetails($order),
             ]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            return response()->json(['message' => 'Data tidak valid.', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Pengajuan retur gagal untuk order '.$order->id.': '.$e->getMessage());
@@ -234,21 +236,23 @@ class ReturnController extends Controller
                 'message' => 'Bukti retur berhasil diunggah.',
                 'order' => $order,
             ]);
+        } catch (ValidationException $e) {
+            return response()->json(['message' => 'Data tidak valid.', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             Log::error('Upload bukti retur gagal untuk order '.$order->id.': '.$e->getMessage());
 
             return response()->json(['message' => 'Gagal mengunggah file. Silakan coba lagi.'], 500);
         }
-
-        return response()->json(['message' => 'File tidak ditemukan.'], 400);
     }
 
     public function editReturn(Request $request, Order $order)
     {
         $this->assertOwnOrder($order);
 
-        // Retur yang sudah diverifikasi/ditolak tidak bisa diedit lagi.
-        if ($order->status === 'diverifikasi_admin' || $order->returns()->whereIn('status', ['diverifikasi', 'ditolak'])->exists()) {
+        // Sekali bukti retur diunggah (status pesanan menunggu_verifikasi_admin),
+        // pengajuan sudah "dikirim" ke admin dan tidak boleh diedit lagi.
+        if (in_array($order->status, ['menunggu_verifikasi_admin', 'diverifikasi_admin'])
+            || $order->returns()->whereIn('status', ['diverifikasi', 'ditolak'])->exists()) {
             return response()->json(['message' => 'Pengajuan retur sudah diproses admin dan tidak dapat diedit lagi.'], 409);
         }
 
@@ -262,8 +266,6 @@ class ReturnController extends Controller
         DB::beginTransaction();
 
         try {
-            $kurir = Auth::user();
-
             // ================= AMBIL RETUR BERDASARKAN ID =================
             $orderReturn = $order->returns()
                 ->where('id', $validated['order_return_id'])
@@ -281,6 +283,7 @@ class ReturnController extends Controller
                 ->keyBy(fn ($item) => $item->product_id.'-'.($item->variant_id ?? 0));
 
             $totalAmountReturned = 0;
+            $submittedKeys = [];
 
             foreach ($validated['return_quantities'] as $key => $quantity) {
                 if ($quantity <= 0) {
@@ -306,6 +309,7 @@ class ReturnController extends Controller
                 $price = $orderItem->price;
                 $subtotal = $price * $quantity;
                 $totalAmountReturned += $subtotal;
+                $submittedKeys[] = $key;
 
                 // ================= UPDATE / INSERT PRODUK RETUR =================
                 $orderReturn->returnedProducts()->updateOrCreate(
@@ -319,6 +323,15 @@ class ReturnController extends Controller
                         'subtotal' => $subtotal,
                     ]
                 );
+            }
+
+            // Sinkronisasi: hapus produk retur yang tidak lagi disertakan dalam edit,
+            // supaya total nilai retur dan perhitungan sisa produk tetap akurat.
+            foreach ($orderReturn->returnedProducts()->get() as $row) {
+                $rowKey = $row->product_id.'-'.($row->product_variant_id ?? 0);
+                if (! in_array($rowKey, $submittedKeys, true)) {
+                    $row->delete();
+                }
             }
 
             // ================= UPDATE TOTAL =================
@@ -339,6 +352,10 @@ class ReturnController extends Controller
                 'message' => 'Pengajuan retur berhasil diperbarui.',
                 'order' => $this->formatOrderDetails($order),
             ]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            return response()->json(['message' => 'Data tidak valid.', 'errors' => $e->errors()], 422);
         } catch (\Exception $e) {
             DB::rollBack();
 

@@ -19,19 +19,19 @@
 {{-- Div utama modal, memiliki ID dan role="dialog" untuk JS kustom --}}
 {{-- PERUBAHAN: Tambahkan kelas 'custom-modal-wrapper' di sini --}}
 <div id="{{ $id }}" tabindex="-1" aria-hidden="true" role="dialog"
-    class="custom-modal-wrapper fixed inset-0 top-0 left-0 right-0 z-50 flex items-center justify-center hidden w-full h-full overflow-x-hidden bg-gray-900 bg-opacity-50">
+    class="custom-modal-wrapper fixed inset-0 top-0 left-0 right-0 z-50 flex items-center justify-center hidden w-full h-full overflow-x-hidden bg-slate-900/50">
 
     <div class="relative w-full p-4 {{ $maxWidthClass }}">
         {{-- Konten Modal --}}
-        <div class="relative flex flex-col bg-white rounded-lg shadow max-h-[90vh] dark:bg-gray-700 overflow-hidden">
+        <div class="relative flex flex-col bg-white rounded-2xl shadow-xl max-h-[90vh] dark:bg-slate-800 dark:border dark:border-slate-700 overflow-hidden">
             {{-- Header Modal (tidak diubah, akan tetap di atas) --}}
             <div
-                class="flex items-center justify-between p-4 border-b border-gray-200 rounded-t md:p-5 shrink-0 dark:border-gray-600">
+                class="flex items-center justify-between p-4 border-b border-gray-200 rounded-t md:p-5 shrink-0 dark:border-slate-700">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                     {{ $title }}
                 </h3>
                 <button type="button"
-                    class="inline-flex items-center justify-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg js-close-modal-btn hover:bg-gray-200 hover:text-gray-900 ms-auto dark:hover:bg-gray-600 dark:hover:text-white">
+                    class="inline-flex items-center justify-center w-8 h-8 text-sm text-gray-400 bg-transparent rounded-lg js-close-modal-btn hover:bg-gray-200 hover:text-gray-900 ms-auto dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-white focus:ring-2 focus:ring-brand/40">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 14 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -43,7 +43,7 @@
 
             {{-- Body Modal (Konten Utama) --}}
             {{-- Elemen ini akan di-scroll jika isinya panjang --}}
-            <div class="p-4 overflow-y-auto md:p-5">
+            <div class="flex-1 min-h-0 basis-0 p-4 overflow-y-auto md:p-5">
                 {{ $slot }}
             </div>
 

@@ -1,6 +1,6 @@
 <!-- MODERN EMERALD SIDENAV SYSTEM -->
 <aside id="sidebar"
-    class="fixed inset-y-0 z-50 flex flex-col w-64 p-0 my-4 overflow-y-hidden antialiased transition-all duration-300 -translate-x-full bg-white/95 backdrop-blur-2xl border border-slate-200/80 shadow-xl group dark:shadow-none dark:bg-slate-900/95 dark:border-slate-800 ease-nav-brand lg:ml-6 rounded-3xl lg:left-0 lg:translate-x-0"
+    class="fixed inset-y-0 z-50 flex flex-col w-64 p-0 my-4 overflow-y-hidden antialiased transition-all duration-300 -translate-x-full bg-white/95 backdrop-blur-2xl border border-slate-200/80 shadow-xl group dark:shadow-none dark:bg-slate-800/60 dark:backdrop-blur-2xl dark:border-slate-700/70 ease-nav-brand lg:ml-6 rounded-3xl lg:left-0 lg:translate-x-0"
     aria-expanded="false">
 
     @auth
@@ -234,7 +234,7 @@
         </div>
 
         {{-- Bottom CTA Box --}}
-        <div class="p-3.5 m-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 shadow-xs">
+        <div class="p-3.5 m-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 shadow-sm">
             <div class="flex items-center gap-2 mb-1">
                 <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-extrabold text-brand-deep bg-brand/10 dark:bg-brand-deep/60 dark:text-brand-light rounded-md">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse mr-1"></span> Cabang Active

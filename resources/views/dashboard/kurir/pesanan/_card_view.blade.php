@@ -9,7 +9,7 @@ return $statusLabelMap[$status] ?? ucwords(str_replace('_', ' ', $status));
 @endphp
 
 @forelse ($orders as $order)
-<div class="relative p-3 overflow-hidden bg-white shadow-lg rounded-xl dark:bg-gray-700"
+<div class="relative p-3 overflow-hidden bg-white shadow-lg rounded-xl dark:bg-gray-700 dark:border dark:border-gray-600"
     data-order-id="{{ $order->id }}">
     {{-- Color Bar --}}
     <div class="absolute top-0 left-0 h-full w-2.5
@@ -48,13 +48,13 @@ return $statusLabelMap[$status] ?? ucwords(str_replace('_', ' ', $status));
             <div class="flex-shrink-0 text-right">
                 <span class="status-badge inline-block px-2 py-0.5 text-xs font-semibold rounded-full
                         @switch($order->status ?? 'baru')
-                            @case('diambil') bg-blue-100 text-blue-800 @break
-                            @case('diantar') bg-yellow-100 text-yellow-800 @break
-                            @case('diterima_pembeli') bg-purple-100 text-purple-800 @break
-                            @case('menunggu_retur') bg-red-100 text-red-800 @break
-                            @case('menunggu_verifikasi_admin') bg-orange-100 text-orange-800 @break
-                            @case('selesai') bg-brand-light text-brand-deep @break
-                            @default bg-gray-100 text-gray-800
+                            @case('diambil') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 @break
+                            @case('diantar') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 @break
+                            @case('diterima_pembeli') bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 @break
+                            @case('menunggu_retur') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 @break
+                            @case('menunggu_verifikasi_admin') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 @break
+                            @case('selesai') bg-brand-light text-brand-deep dark:bg-brand-deep/60 dark:text-brand-light @break
+                            @default bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300
                         @endswitch
                         ">
                     {{ $labelStatus($order->status) }}
@@ -66,7 +66,7 @@ return $statusLabelMap[$status] ?? ucwords(str_replace('_', ' ', $status));
         <div class="flex items-start justify-between mt-2">
             {{-- SISI KIRI: DATA CUSTOMER --}}
             <div class="pr-4">
-                <p class="text-md font-bold text-gray-800 dark:text-gray-200 mb-1">
+                <p class="text-base font-bold text-gray-800 dark:text-gray-200 mb-1">
                     {{ $order->customer->name ?? '-' }}
                 </p>
                 <p class="text-xs text-gray-600 dark:text-gray-300">
@@ -86,12 +86,12 @@ return $statusLabelMap[$status] ?? ucwords(str_replace('_', ' ', $status));
         </div>
         <div class="flex justify-end pt-2 space-x-2 border-t border-gray-200 dark:border-gray-600">
             <button type="button"
-                class="js-open-status-modal px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                class="js-open-status-modal px-2 py-1 text-xs font-medium text-white bg-brand rounded-lg hover:bg-brand-deep transition-colors"
                 data-order-id="{{ $order->id }}">
                 Ubah Status
             </button>
             <button type="button"
-                class="js-open-details-modal px-2 py-1 text-xs font-medium text-gray-900 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                class="js-open-details-modal px-2 py-1 text-xs font-medium text-gray-900 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600"
                 data-order-id="{{ $order->id }}">
                 Rincian
             </button>
@@ -99,7 +99,7 @@ return $statusLabelMap[$status] ?? ucwords(str_replace('_', ' ', $status));
     </div>
 </div>
 @empty
-<div class="p-4 text-sm text-center text-gray-500">
+<div class="p-4 text-sm text-center text-gray-500 dark:text-gray-400">
     Tidak ada pesanan yang cocok dengan pencarian Anda.
 </div>
 @endforelse

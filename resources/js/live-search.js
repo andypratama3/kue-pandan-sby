@@ -9,7 +9,6 @@
  */
 window.initializeLiveSearch = function (options) {
     const searchInput = document.getElementById(options.searchInputId);
-    console.log(searchInput)
     const desktopContainer = document.getElementById(options.desktopContainerId);
     const mobileContainer = document.getElementById(options.mobileContainerId);
 

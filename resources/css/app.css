@@ -2,12 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design tokens - shared across homepage, admin, and auth */
+/* Design tokens - shared across homepage, admin, and auth.
+   Palette dirancang seimbang: tidak terlalu terang (light) maupun terlalu
+   gelap (dark). Light memakai canvas sage hangat, dark memakai slate-900
+   (bukan hitam pekat) dengan kartu satu tingkat lebih terang. */
 :root {
     --brand: #6f8f5f;
     --brand-deep: #3f5d3a;
+    --brand-light: #a9c19a;
     --ink: #1f2a33;
     --mint: #eef3ec;
+    /* Balanced canvas surfaces */
+    --canvas: #f1f4ec;
+    --canvas-dark: #0f172a;
+    --card: #ffffff;
+    --card-dark: #1e293b;
 }
 
 /* Custom sidebar styles */
@@ -252,7 +261,11 @@ body.dark #sidebar .sidebar-icon-container i::after {
 }
 
 .sidebar-menu-item:hover {
-    background-color: rgba(59, 130, 246, 0.1);
+    background-color: rgba(111, 143, 95, 0.12);
+}
+
+.dark .sidebar-menu-item:hover {
+    background-color: rgba(169, 193, 154, 0.14);
 }
 
 /* Tooltip for collapsed sidebar */
@@ -334,7 +347,7 @@ body.dark #sidebar .sidebar-icon-container i::after {
     }
 
     .dark #navbar-main {
-        background-color: rgba(15, 23, 42, 0.92) !important; /* slate-900 for dark mode mobile */
+        background-color: rgba(30, 41, 59, 0.92) !important; /* slate-800 for dark mode mobile */
     }
 
     /* Mobile navbar container */
@@ -425,6 +438,12 @@ body.dark #sidebar .sidebar-icon-container i::after {
         border-radius: 0.5rem !important;
     }
 
+    .dark #navbar-main li.group .absolute.top-full.bg-white {
+        background-color: #1e293b !important;
+        border-color: rgba(51, 65, 85, 0.8) !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4) !important;
+    }
+
     /* Last Activity text styling for mobile */
     #navbar-main li.group .absolute.top-full .text-xs.text-gray-500 {
         color: #6b7280 !important; /* Ensure text is visible */
@@ -432,11 +451,19 @@ body.dark #sidebar .sidebar-icon-container i::after {
         line-height: 1.4 !important;
     }
 
+    .dark #navbar-main li.group .absolute.top-full .text-xs.text-gray-500 {
+        color: #94a3b8 !important;
+    }
+
     /* Last Activity value styling for mobile */
     #navbar-main li.group .absolute.top-full .block.mt-1 {
         color: #374151 !important; /* Darker color for better visibility */
         font-weight: 600 !important;
         font-size: 0.875rem !important; /* Slightly larger text */
+    }
+
+    .dark #navbar-main li.group .absolute.top-full .block.mt-1 {
+        color: #e2e8f0 !important;
     }
 }
 
@@ -490,8 +517,8 @@ body {
 
 /* Dark mode navbar styling */
 .dark #navbar-main {
-    background-color: rgba(15, 23, 42, 0.88) !important;
-    border-color: rgba(30, 41, 59, 0.8) !important;
+    background-color: rgba(30, 41, 59, 0.88) !important;
+    border-color: rgba(51, 65, 85, 0.8) !important;
     box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3) !important;
 }
 
@@ -583,6 +610,12 @@ body {
         max-width: 320px !important;
     }
 
+    .dark #navbar-main li.group .absolute.top-full.bg-white {
+        background-color: #1e293b !important;
+        border-color: rgba(51, 65, 85, 0.8) !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4) !important;
+    }
+
     /* Last Activity text styling */
     #navbar-main li.group .absolute.top-full .text-xs.text-gray-500 {
         color: #6b7280 !important; /* Ensure text is visible */
@@ -590,11 +623,19 @@ body {
         line-height: 1.4 !important;
     }
 
+    .dark #navbar-main li.group .absolute.top-full .text-xs.text-gray-500 {
+        color: #94a3b8 !important;
+    }
+
     /* Last Activity value styling */
     #navbar-main li.group .absolute.top-full .block.mt-1 {
         color: #374151 !important; /* Darker color for better visibility */
         font-weight: 600 !important;
         font-size: 0.875rem !important; /* Slightly larger text */
+    }
+
+    .dark #navbar-main li.group .absolute.top-full .block.mt-1 {
+        color: #e2e8f0 !important;
     }
 }
 

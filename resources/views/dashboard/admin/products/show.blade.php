@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="space-y-6">
-        <div class="p-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm space-y-6">
+        <div class="p-6 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-3xl shadow-sm space-y-6">
             <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
                 <div class="space-y-1">
                     <h2 class="text-xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">

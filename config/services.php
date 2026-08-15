@@ -32,18 +32,16 @@ return [
     ],
 
     'whatsapp' => [
-        'provider' => env('WHATSAPP_PROVIDER', 'fonnte'), // 'fonnte' | 'meta'
-        'webhook_token' => env('WHATSAPP_WEBHOOK_TOKEN'),
-    ],
-
-    'fonnte' => [
-        'token' => env('FONNTE_TOKEN'),
+        'provider' => env('WHATSAPP_PROVIDER', 'meta'), // 'meta'
     ],
 
     'meta_whatsapp' => [
         'access_token' => env('META_ACCESS_TOKEN'),
         'phone_number_id' => env('META_PHONE_NUMBER_ID'),
         'verify_token' => env('META_VERIFY_TOKEN'),
+        // App Secret aplikasi Meta — dipakai memverifikasi X-Hub-Signature-256
+        // pada setiap webhook masuk (HMAC-SHA256 dari raw body).
+        'app_secret' => env('META_APP_SECRET'),
         'api_version' => env('META_API_VERSION', 'v23.0'),
     ],
 

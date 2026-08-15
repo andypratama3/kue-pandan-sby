@@ -5,13 +5,13 @@
         {{ ($orders->currentPage() - 1) * $orders->perPage() + $loop->iteration }}
     </td>
     <td class="px-4 py-2">
-        <p class="mb-0.5 text-md text-gray-900 dark:text-white font-semibold leading-tight">{{ $order->invoice_number }}</p>
+        <p class="mb-0.5 text-base text-gray-900 dark:text-white font-semibold leading-tight">{{ $order->invoice_number }}</p>
         <p class="mb-0 text-xs leading-tight text-slate-400">
             {{ $order->created_at->isoFormat('D MMM YYYY, HH:mm') }}
         </p>
     </td>
     <td class="px-4 py-2">
-        <p class="mb-0 font-semibold leading-tight text-gray-900 text-md dark:text-white">{{ $order->customer->name ?? '-' }}
+        <p class="mb-0 font-semibold leading-tight text-gray-900 text-base dark:text-white">{{ $order->customer->name ?? '-' }}
         </p>
         <p class="mb-0 text-xs leading-tight text-slate-400">
             {{ $order->customer->company_name ?? '-' }}
@@ -31,21 +31,21 @@
     </td>
     <td class="px-4 py-2">
         @if ($order->has_return) <p
-            class="mb-0 font-semibold leading-tight text-brand-deep text-md dark:text-brand-light">
+            class="mb-0 font-semibold leading-tight text-brand-deep text-base dark:text-brand-light">
             Rp {{ number_format($order->final_total, 0, ',', '.') }}
         </p>
         <p class="mb-0 text-xs leading-tight line-through text-slate-400">
             Rp {{ number_format($order->total_amount, 0, ',', '.') }}
         </p>
         @else
-        <p class="mb-0 font-semibold leading-tight text-md">
+        <p class="mb-0 font-semibold leading-tight text-base">
             Rp {{ number_format($order->total_amount, 0, ',', '.') }}
         </p>
         @endif
     </td>
     <td class="px-4 py-2 text-center">
         <button type="button"
-            class="js-open-modal-btn text-xs px-3 py-1.5 font-semibold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+            class="js-open-modal-btn text-xs px-3 py-1.5 font-semibold text-white bg-brand rounded-lg shadow-md hover:bg-brand-deep focus:outline-none focus:ring-2 focus:ring-brand-light focus:ring-opacity-75"
             data-target-modal="showOrderModal" data-order-id="{{ $order->id }}">
             Detail
         </button>
@@ -54,7 +54,7 @@
 @empty
 <tr>
     <td colspan="6" class="px-4 py-2 text-center">
-        <p class="mb-0 text-sm text-gray-500">Tidak ada data history pesanan</p>
+        <p class="mb-0 text-sm text-gray-500 dark:text-gray-400">Tidak ada data history pesanan</p>
     </td>
 </tr>
 @endforelse

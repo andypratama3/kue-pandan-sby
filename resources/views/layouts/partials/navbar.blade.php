@@ -3,7 +3,7 @@
     // shrink-to-fit; top-0 saat scroll tanpa jump karena in-flow di main.
 @endphp
 <nav id="navbar-main"
-    class="sticky top-0 z-40 flex items-center justify-between mx-3 transition-all duration-300 ease-in-out bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 backdrop-blur-xl shadow-md rounded-2xl lg:mx-4"
+    class="sticky top-0 z-40 flex items-center justify-between mx-3 transition-all duration-300 ease-in-out bg-white/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700 backdrop-blur-xl shadow-md rounded-2xl lg:mx-4"
     navbar-main navbar-scroll="true">
     
     <!-- Subtle gradient line at the bottom of header -->
@@ -111,7 +111,7 @@
             @if ($isOwner)
             <div class="relative hidden sm:block">
                 <button id="branch-switcher-btn" type="button"
-                    class="flex items-center px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl border border-slate-200/80 dark:border-slate-700 focus:outline-none transition-all shadow-xs">
+                    class="flex items-center px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-xl border border-slate-200/80 dark:border-slate-700 focus:outline-none transition-all shadow-sm">
                     <i class="fas fa-store mr-2 text-brand-deep dark:text-brand text-xs"></i>
                     <span id="current-branch-name">{{ $currentRegion->name ?? 'Pilih Cabang' }}</span>
                     <i class="fas fa-chevron-down ml-2 text-[9px] opacity-70 transition-transform duration-200"></i>
@@ -156,7 +156,7 @@
                             <circle cx="12" cy="12" r="4.5"></circle>
                             <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"></path>
                         </svg>
-                        <svg class="absolute inset-0 w-full h-full text-brand-deep dark:text-indigo-300 transition-all duration-300 rotate-90 scale-0 dark:rotate-0 dark:scale-100" fill="currentColor" viewBox="0 0 24 24">
+                        <svg class="absolute inset-0 w-full h-full text-brand-deep dark:text-brand transition-all duration-300 rotate-90 scale-0 dark:rotate-0 dark:scale-100" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12.9 2.6a8.4 8.4 0 1 0 8.5 8.5 6.6 6.6 0 0 1-8.5-8.5Z"></path>
                         </svg>
                     </div>
@@ -166,7 +166,7 @@
             {{-- Profile section with Avatar & Dropdown --}}
             <ul class="flex flex-row items-center justify-end h-full pl-0 mb-0 list-none shrink-0">
                 <li class="relative flex items-center h-full group">
-                    <div class="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden border-2 border-brand/40 dark:border-brand/60 rounded-full cursor-pointer hover:scale-105 transition-all shadow-xs hover:shadow-md hover:border-brand">
+                    <div class="relative w-10 h-10 sm:w-11 sm:h-11 overflow-hidden border-2 border-brand/40 dark:border-brand/60 rounded-full cursor-pointer hover:scale-105 transition-all shadow-sm hover:shadow-md hover:border-brand">
                         @php
                             $avatarSrc = '/assets/icon/admin.png';
                             if (Auth::user() && Auth::user()->hasRole('kurir')) {
@@ -240,8 +240,8 @@
                             @csrf
                             <button type="submit"
                                 class="flex items-center w-full px-6 py-3.5 text-sm font-semibold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40 transition-colors border-t border-slate-100 dark:border-slate-700 group/btn">
-                                <span class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-950/30 flex items-center justify-center mr-3 group-hover/btn:bg-red-200 transition-colors">
-                                    <i class="fas fa-sign-out-alt text-red-500 text-sm"></i>
+                                <span class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-950/30 flex items-center justify-center mr-3 group-hover/btn:bg-red-200 dark:group-hover/btn:bg-red-900/50 transition-colors">
+                                    <i class="fas fa-sign-out-alt text-red-500 dark:text-red-400 text-sm"></i>
                                 </span>
                                 <span>Keluar Aplikasi</span>
                             </button>

@@ -4,12 +4,12 @@
 </x-slot>
 
 <x-slot name="description">
-    <span class="text-gray-600 dark:text-white">{{ __('Permanently delete your account.') }}</span>
+    <span class="text-gray-600 dark:text-gray-400">{{ __('Permanently delete your account.') }}</span>
 </x-slot>
 
 
     <x-slot name="content">
-        <div class="max-w-xl text-sm text-gray-600">
+        <div class="max-w-xl text-sm text-gray-600 dark:text-gray-300">
             {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
         </div>
 

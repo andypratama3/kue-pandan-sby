@@ -1,5 +1,5 @@
 @forelse ($orders as $order)
-    <tr class="text-sm font-normal text-gray-700 border-b dark:text-gray-400 dark:border-gray-700">
+    <tr class="text-sm font-normal text-gray-700 border-b dark:text-gray-400 dark:border-slate-800 hover:bg-slate-50/60 dark:hover:bg-slate-800/60 transition-colors">
         <td class="px-4 py-2 text-center">{{ $loop->iteration }}</td>
         <td class="px-4 py-2 font-mono">{{ $order->invoice_number }}</td>
         <td class="px-4 py-2">{{ $order->customer->name ?? '-' }}</td>
@@ -8,10 +8,10 @@
             <span
                 class="inline-block px-2 py-1 text-xs font-semibold rounded-full
                                         @switch($order->status)
-                                            @case('selesai') bg-brand-light text-brand-deep @break
+                                            @case('selesai') bg-brand-light text-brand-deep dark:bg-brand-deep dark:text-brand-light @break
                                             @case('menunggu_verifikasi_admin') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 @break
-                                            @case('diverifikasi_admin') bg-brand-light text-brand-deep @break
-                                            @default bg-gray-100 text-gray-800
+                                            @case('diverifikasi_admin') bg-brand-light text-brand-deep dark:bg-brand-deep dark:text-brand-light @break
+                                            @default bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-200
                                         @endswitch">
                 {{ $labelStatus($order->status) }}
             </span>
@@ -24,9 +24,9 @@
                 $afterReturn = $order->total_amount - $returnedAmount;
             @endphp
             @if ($activeReturn && $returnedAmount > 0)
-                <span class="block text-xs text-gray-500 line-through">Rp
+                <span class="block text-xs text-gray-500 dark:text-gray-400 line-through">Rp
                     {{ number_format($order->total_amount, 0, ',', '.') }}</span>
-                <span class="block font-bold text-brand-deep">Rp
+                <span class="block font-bold text-brand-deep dark:text-brand-light">Rp
                     {{ number_format($afterReturn, 0, ',', '.') }}</span>
             @else
                 Rp {{ number_format($order->total_amount, 0, ',', '.') }}
@@ -70,6 +70,6 @@
     </tr>
 @empty
     <tr>
-        <td colspan="8" class="py-6 text-center text-gray-500">Tidak ada pesanan ditemukan.</td>
+        <td colspan="8" class="py-6 text-center text-gray-500 dark:text-gray-400">Tidak ada pesanan ditemukan.</td>
     </tr>
 @endforelse

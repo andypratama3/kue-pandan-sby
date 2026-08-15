@@ -11,14 +11,14 @@
                     <div class="col-span-2">
                         <label for="create-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama Produk</label>
                         <input type="text" name="name" id="create-name" value="{{ old('name') }}"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
                             placeholder="Nama Produk (e.g., Kue Ijo)" required>
                     </div>
                     {{-- Kategori --}}
                     <div class="col-span-2 sm:col-span-1">
                         <label for="create-category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kategori</label>
                         <select id="create-category" name="category_id"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5">
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400">
                             @foreach ($categories as $category)
                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                             @endforeach
@@ -28,21 +28,21 @@
                     <div class="col-span-2 sm:col-span-1">
                         <label for="create-tag" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tag (Opsional)</label>
                         <input type="text" name="tag" id="create-tag" value="{{ old('tag') }}"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand focus:border-brand block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
                             placeholder="Tag (e.g., Ala Carte)">
                     </div>
                     {{-- Deskripsi --}}
                     <div class="col-span-2">
                         <label for="create-description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Deskripsi</label>
                         <textarea id="create-description" name="description" rows="5"
-                            class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 max-h-48"
+                            class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 max-h-48 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
                             placeholder="Deskripsi singkat produk..." required>{{ old('description') }}</textarea>
                     </div>
                     {{-- Gambar --}}
                     <div class="col-span-2">
                         <label for="create-image" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Gambar Produk</label>
                         <input type="file" name="image" id="create-image"
-                            class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+                            class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none dark:bg-gray-600 dark:border-gray-500 dark:text-white"
                             required>
                     </div>
                     {{-- Varian Produk --}}
@@ -52,8 +52,8 @@
                             @if (old('variants'))
                                 @foreach (old('variants') as $index => $variant)
                                     <div class="flex items-center space-x-2 variant-item">
-                                        <input type="text" name="variants[{{ $index }}][name]" class="w-full p-2 text-sm border-gray-300 rounded-lg" placeholder="Nama Varian" value="{{ $variant['name'] }}" required>
-                                        <input type="number" name="variants[{{ $index }}][price]" class="w-full p-2 text-sm border-gray-300 rounded-lg" placeholder="Harga" value="{{ $variant['price'] }}" required>
+                                        <input type="text" name="variants[{{ $index }}][name]" class="w-full p-2 text-sm bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400" placeholder="Nama Varian" value="{{ $variant['name'] }}" required>
+                                        <input type="number" name="variants[{{ $index }}][price]" class="w-full p-2 text-sm bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400" placeholder="Harga" value="{{ $variant['price'] }}" required>
                                         <button type="button" class="px-3 py-2 text-white bg-red-600 rounded-lg remove-variant-btn">&times;</button>
                                     </div>
                                 @endforeach
@@ -66,7 +66,7 @@
             {{-- Footer Modal --}}
             <div class="flex items-center justify-end pt-4 mt-4 space-x-2 border-t border-gray-200 dark:border-gray-600">
                 <button type="submit" class="text-white bg-brand hover:bg-brand-deep font-medium rounded-lg text-sm px-5 py-2.5 text-center">Simpan Produk</button>
-                <button type="button" class="js-close-modal-btn py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100">Batal</button>
+                <button type="button" class="js-close-modal-btn py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Batal</button>
             </div>
         </div>
     </form>
@@ -88,8 +88,8 @@
                 const index = Date.now(); // Gunakan timestamp untuk index unik
                 const newVariantHtml = `
                     <div class="flex items-center mb-2 space-x-2 variant-item">
-                        <input type="text" name="variants[${index}][name]" class="w-full p-2 text-sm border-gray-300 rounded-lg" placeholder="Nama Varian (e.g., Isi 3)" required>
-                        <input type="number" name="variants[${index}][price]" class="w-full p-2 text-sm border-gray-300 rounded-lg" placeholder="Harga (e.g., 9000)" required>
+                        <input type="text" name="variants[${index}][name]" class="w-full p-2 text-sm bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400" placeholder="Nama Varian (e.g., Isi 3)" required>
+                        <input type="number" name="variants[${index}][price]" class="w-full p-2 text-sm bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400" placeholder="Harga (e.g., 9000)" required>
                         <button type="button" class="px-3 py-2 text-white bg-red-600 rounded-lg remove-variant-btn" title="Hapus Varian">&times;</button>
                     </div>
                 `;

@@ -308,7 +308,6 @@ class PeformaKurirController extends Controller
             return $item;
         });
 
-        // [!code focus:start]
         // BUAT PAGINASI MANUAL
         $perPage = 10; // Tentukan jumlah item per halaman
         $currentPage = Paginator::resolveCurrentPage('page');
@@ -320,10 +319,9 @@ class PeformaKurirController extends Controller
             $currentPage,
             ['path' => Paginator::resolveCurrentPath()]
         );
-        // [!code focus:end]
 
         return view('dashboard.admin.peforma-kurir.peforma-kurir', [
-            'ranking' => $paginatedRanking, // [!code focus]
+            'ranking' => $paginatedRanking,
         ]);
     }
 

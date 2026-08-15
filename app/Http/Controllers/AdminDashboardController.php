@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\Region;
 use App\Models\User;
 use App\Support\RegionContext;
@@ -235,7 +238,7 @@ class AdminDashboardController extends Controller
                 ->selectRaw('MONTH(created_at) as month, COUNT(*) as total')
                 ->groupBy('month')
                 ->get()
-                ->avg('total');
+                ->avg('total') ?? 0;
 
             return [
                 'total_sales_this_month' => $totalSalesThisMonth,
@@ -248,7 +251,7 @@ class AdminDashboardController extends Controller
 
         $totalSalesThisMonth = $monthlyStats['total_sales_this_month'];
         $totalSalesLastMonth = $monthlyStats['total_sales_last_month'];
-        $avgSalesPerMonth = $monthlyStats['avg_sales_this_year'];
+        $avgSalesPerMonth = $monthlyStats['avg_sales_this_year'] ?? 0;
         $daysThisMonth = $monthlyStats['days_this_month'];
         $daysLastMonth = $monthlyStats['days_last_month'];
 
@@ -339,6 +342,15 @@ class AdminDashboardController extends Controller
             ->count();
 
         $couriers = User::role('kurir')->where('region_id', $regionId)->latest()->paginate(5, ['*'], 'couriers_page');
+
+        // Statistik katalog region: produk, varian aktif, kategori.
+        $catalogStats = [
+            'products' => Product::where('region_id', $regionId)->count(),
+            'variants' => ProductVariant::whereHas('product', fn ($q) => $q->where('region_id', $regionId))
+                ->where('is_active', true)
+                ->count(),
+            'categories' => Category::count(),
+        ];
 
         // --- LOGIKA BARU UNTUK GRAFIK PENJUALAN ADMIN ---
         $chartLabels = [];
@@ -509,6 +521,9 @@ class AdminDashboardController extends Controller
             // CABANG
             'regionModel',
             'branchSummary',
+
+            // KATALOG
+            'catalogStats',
             
             // NOTIFICATION
             'pendingOrders',
