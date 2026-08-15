@@ -9,6 +9,7 @@ use App\Models\Region;
 use App\Models\WhatsAppBusinessNumber;
 use App\Services\DeepSeekService;
 use App\Services\WhatsApp\WhatsAppConversationStateService;
+use App\Services\WhatsApp\WhatsAppOrderService;
 use App\Services\WhatsApp\WhatsAppReplyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +20,7 @@ class WhatsAppWebhookController extends Controller
         protected WhatsAppProviderInterface $provider,
         protected WhatsAppReplyService $replyService,
         protected WhatsAppConversationStateService $stateService,
+        protected WhatsAppOrderService $orderService,
         protected ?DeepSeekService $ai = null,
     ) {}
 
@@ -72,15 +74,51 @@ class WhatsAppWebhookController extends Controller
         $context['current_step'] = $currentState['step'];
         $context['state_context'] = $currentState['context'] ?? [];
 
-        $reply = $this->resolveReply($incoming, $context);
-        $handledByAi = (bool) ($context['handled_by_ai'] ?? false);
+        $text = trim((string) ($incoming['text'] ?? ''));
+        $intent = $this->resolveIntent($text, $incoming);
 
-        $intent = $context['intent'] ?? 'lainnya';
-        $nextStep = $this->stateService->determineNextStep(
-            $currentState['step'],
-            $intent,
-            $incoming['text'] ?? ''
-        );
+        // ----- ALUR ORDER (WhatsAppOrderService) -----
+        // Aktif jika sedang berada di salah satu step order, ATAU user baru
+        // mengetik intent memulai order / batal.
+        $inOrderFlow = $this->orderService->isOrderStep($currentState['step'])
+            || in_array($intent, ['start_order', 'cancel_order'], true);
+
+        $nextStep = null;
+        $persistData = [];
+        $handledByAi = false;
+
+        if ($inOrderFlow) {
+            $result = $this->orderService->resolve(
+                $this->orderService->isOrderStep($currentState['step']) ? $currentState['step'] : null,
+                $text,
+                $currentState['context'] ?? [],
+                $region,
+                $incoming['sender'],
+                $incoming['name'] ?? null,
+            );
+
+            $reply = $result['reply'];
+            $nextStep = $result['next_step'] ?? null;
+            $persistData = $result['persist'] ?? [];
+            $intent = $result['intent'] ?? $intent;
+            $context['intent'] = $intent;
+            $context['handled_by_ai'] = false;
+        } else {
+            $reply = $this->resolveReply($incoming, $context);
+            $intent = $context['intent'] ?? 'lainnya';
+            $handledByAi = (bool) ($context['handled_by_ai'] ?? false);
+
+            $nextStep = $this->stateService->determineNextStep(
+                $currentState['step'],
+                $intent,
+                $text
+            );
+        }
+
+        // Step final: order selesai (nextStep null) -> kembali idle.
+        $finalStep = $inOrderFlow && $nextStep === null
+            ? 'idle'
+            : ($nextStep ?? $this->stateService->determineNextStep($currentState['step'], $intent, $text));
 
         try {
             $this->provider->sendTyping($incoming['sender']);
@@ -107,15 +145,15 @@ class WhatsAppWebhookController extends Controller
             $region?->id,
             $context,
             $reply,
-            $handledByAi,
+            false,
             $messageId,
         );
 
         // Simpan step berikutnya + konteks aktual ke record percakapan-nya.
         $this->stateService->updateState(
             $incoming['sender'],
-            $nextStep,
-            $this->persistableContext($context, $intent),
+            $finalStep,
+            $inOrderFlow ? $persistData : $this->persistableContext($context, $intent),
             $conversationId
         );
 
@@ -264,6 +302,29 @@ class WhatsAppWebhookController extends Controller
         return $number;
     }
 
+    // ====== INTENT ======
+
+    /**
+     * Deteksi intent pesan masuk: prefer DeepSeek bila aktif & terkonfigurasi,
+     * else rule-based. Tidak menulis ke $context — murni untuk routing.
+     */
+    protected function resolveIntent(string $text, array $incoming): string
+    {
+        if ($text === '') {
+            return 'lainnya';
+        }
+
+        if (config('services.deepseek.enabled', false) && $this->ai?->isConfigured()) {
+            $aiIntent = $this->ai->detectIntent($text)['intent'] ?? null;
+
+            if (is_string($aiIntent) && $aiIntent !== '') {
+                return $aiIntent;
+            }
+        }
+
+        return $this->replyService->detectIntent($text);
+    }
+
     // ====== REPLY ======
 
     /**
@@ -284,12 +345,7 @@ class WhatsAppWebhookController extends Controller
                 .'Ketik "menu", "harga", "lokasi", atau "cara order" untuk info produk dan outlet.';
         }
 
-        // Intent: prefer DeepSeek bila aktif & terkonfigurasi, else rule-based.
-        $intent = null;
-        if (config('services.deepseek.enabled', false) && $this->ai?->isConfigured()) {
-            $intent = $this->ai->detectIntent($text)['intent'] ?? null;
-        }
-        $intent = $intent ?: $this->replyService->detectIntent($text);
+        $intent = $this->resolveIntent($text, $incoming);
 
         $context['handled_by_ai'] = false;
         $context['intent'] = $intent;

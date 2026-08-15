@@ -50,7 +50,7 @@ class DeepSeekService
      */
     public function detectIntent(string $userMessage): array
     {
-        $allowed = ['sapaan', 'tanya_harga', 'tanya_produk', 'tanya_lokasi_jam', 'cara_order', 'tanya_delivery', 'komplain', 'lainnya'];
+        $allowed = ['sapaan', 'tanya_harga', 'tanya_produk', 'tanya_lokasi_jam', 'cara_order', 'tanya_delivery', 'komplain', 'start_order', 'cancel_order', 'lainnya'];
 
         if (! $this->isConfigured()) {
             return ['intent' => 'lainnya', 'confidence' => 0.0, 'entities' => ['produk' => null, 'kategori' => null]];
@@ -61,7 +61,7 @@ class DeepSeekService
                 'role' => 'system',
                 'content' => "Kamu adalah pendeteksi intent chat WhatsApp toko kue.\n"
                     ."Jawab HANYA dengan JSON valid (tanpa teks lain):\n"
-                    .'{"intent": "sapaan|tanya_harga|tanya_produk|tanya_lokasi_jam|cara_order|tanya_delivery|komplain|lainnya", '
+                    .'{"intent": "sapaan|tanya_harga|tanya_produk|tanya_lokasi_jam|cara_order|tanya_delivery|komplain|start_order|cancel_order|lainnya", '
                     .'"confidence": 0.0, "entities": {"produk": null, "kategori": null}}',
             ],
             ['role' => 'user', 'content' => $userMessage],

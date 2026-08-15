@@ -20,7 +20,24 @@ class WhatsAppConversationStateService
     const STATE_WELCOMED = 'welcomed';
     const STATE_BROWSING_CATALOG = 'browsing_catalog';
     const STATE_AWAITING_DELIVERY = 'awaiting_delivery_question';
-    
+
+    // State alur order (di-refresh dari WhatsAppOrderService::ORDER_STEPS).
+    const STATE_ORDER_CATALOG = 'order_catalog';
+    const STATE_ORDER_VARIANT = 'order_variant';
+    const STATE_ORDER_QUANTITY = 'order_quantity';
+    const STATE_ORDER_LOCATION = 'order_location';
+    const STATE_ORDER_ADDRESS = 'order_address';
+    const STATE_ORDER_CONFIRM = 'order_confirm';
+
+    const ORDER_STEPS = [
+        self::STATE_ORDER_CATALOG,
+        self::STATE_ORDER_VARIANT,
+        self::STATE_ORDER_QUANTITY,
+        self::STATE_ORDER_LOCATION,
+        self::STATE_ORDER_ADDRESS,
+        self::STATE_ORDER_CONFIRM,
+    ];
+
     const TIMEOUT_HOURS = 24; // Reset state setelah 24 jam tidak aktif
 
     /**
@@ -112,9 +129,25 @@ class WhatsAppConversationStateService
      */
     public function determineNextStep(string $currentStep, string $intent, string $messageText): string
     {
+        // Jika sedang berada di alur order, tetap bertahan di step tersebut
+        // (langkah maju ditentukan oleh WhatsAppOrderService).
+        if (in_array($currentStep, self::ORDER_STEPS, true)) {
+            return $currentStep;
+        }
+
         // Sapaan selalu membuka/mengembalikan percakapan ke welcome.
         if ($intent === 'sapaan') {
             return self::STATE_WELCOMED;
+        }
+
+        // Mulai order -> buka katalog order.
+        if ($intent === 'start_order') {
+            return self::STATE_ORDER_CATALOG;
+        }
+
+        // Batal order -> kembali idle.
+        if ($intent === 'cancel_order') {
+            return self::STATE_IDLE;
         }
 
         // Tanya produk / harga -> sedang melihat katalog (dari state mana pun).

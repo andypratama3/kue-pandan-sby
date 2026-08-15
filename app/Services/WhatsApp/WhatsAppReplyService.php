@@ -105,7 +105,19 @@ class WhatsAppReplyService
             return 'tanya_produk';
         }
 
-        if (Str::contains($lower, ['cara order', 'cara pesan', 'bagaimana', 'order', 'pesan', 'beli', 'belanja', 'checkout'])) {
+        if (Str::startsWith($lower, ['batal', 'cancel', 'gajadi', 'nggak jadi', 'tidak jadi', 'batalkan'])) {
+            return 'cancel_order';
+        }
+
+        // Mulai order: kata-kata yang jelas menunjukkan niat memesan,
+        // dipisah dari 'cara_order' (bertanya CARA pesan).
+        if (Str::contains($lower, ['mau pesan', 'mau beli', 'saya mau pesan', 'saya mau beli', 'ingin pesan', 'ingin beli', 'mau order', 'pesan sekarang', 'beli sekarang', 'order sekarang', 'nitip', 'tambah pesanan', 'lanjut bayar', 'checkout'])
+            || in_array(trim($lower), ['pesan', 'beli', 'order', 'mau', 'mau beli', 'mau pesan', 'check out', 'check-out', 'belanja'], true)) {
+            return 'start_order';
+        }
+
+        if (Str::contains($lower, ['cara order', 'cara pesan', 'bagaimana', 'gimana cara', 'tutorial order', 'tutorial pesan', 'step order', 'langkah pesan'],)
+            || Str::startsWith($lower, ['bagaimana', 'gimana'])) {
             return 'cara_order';
         }
 
@@ -138,6 +150,9 @@ class WhatsAppReplyService
             'cara_order' => $this->replyHowToOrder($regionName),
         'tanya_delivery' => $this->replyDelivery($outlet, $regionName),
             'komplain' => $this->replyComplaint($regionName),
+            'start_order' => "Silakan ketik nama produk yang ingin dipesan, misalnya *\"kue ijo\"* atau *\"hampers\"*. "
+                ."Bot akan memandu Anda sampai pesanan selesai dibuat. 😊\nKetik *\"menu\"* untuk melihat katalog.",
+            'cancel_order' => "Pesanan dibatalkan. 😊\nKetik *\"pesan\"* untuk mulai order, atau *\"menu\"* untuk lihat katalog.",
             default => $this->replyFallback($regionName),
         };
     }

@@ -396,4 +396,160 @@ class WhatsAppWebhookTest extends TestCase
             'region_id' => $region->id,
         ]);
     }
+
+    // ====== ALUR ORDER (WhatsAppOrderService) ======
+
+    protected function seedOrderFlowRegion(): Region
+    {
+        $region = $this->seedSurabayaWithKueIjo();
+
+        \App\Models\ShippingArea::create([
+            'region_id' => $region->id,
+            'area_name' => 'Rungkut',
+            'distance_km' => 5,
+            'shipping_fee' => 10000,
+        ]);
+        \App\Models\ShippingArea::create([
+            'region_id' => $region->id,
+            'area_name' => 'Wonokromo',
+            'distance_km' => 12,
+            'shipping_fee' => 15000,
+        ]);
+
+        return $region;
+    }
+
+    public function test_order_flow_full_turn_creates_order_from_database()
+    {
+        $region = $this->seedOrderFlowRegion();
+
+        // 1. Mulai order -> katalog ditampilkan.
+        $this->postMeta($this->metaPayload('pesan'))
+            ->assertOk();
+        $this->assertStringContainsString('Kue Ijo', $this->lastReply());
+        $this->assertDatabaseHas('chatbot_conversations', [
+            'sender_number' => '6281234567890',
+            'current_step' => 'order_catalog',
+        ]);
+
+        // 2. Pilih produk dengan nomor -> varian ditampilkan.
+        $this->postMeta($this->metaPayload('1'))
+            ->assertOk();
+        $this->assertStringContainsString('Isi 3 Kemasan Mika', $this->lastReply());
+        $this->assertDatabaseHas('chatbot_conversations', [
+            'sender_number' => '6281234567890',
+            'current_step' => 'order_variant',
+        ]);
+
+        // 3. Pilih varian -> minta jumlah.
+        $this->postMeta($this->metaPayload('1'))
+            ->assertOk();
+        $this->assertDatabaseHas('chatbot_conversations', [
+            'sender_number' => '6281234567890',
+            'current_step' => 'order_quantity',
+        ]);
+
+        // 4. Jumlah -> minta area.
+        $this->postMeta($this->metaPayload('2'))
+            ->assertOk();
+        $this->assertStringContainsString('area', mb_strtolower($this->lastReply()));
+        $this->assertDatabaseHas('chatbot_conversations', [
+            'sender_number' => '6281234567890',
+            'current_step' => 'order_location',
+        ]);
+
+        // 5. Area -> minta alamat + hitung ongkir (Rp 10.000 untuk Rungkut).
+        $this->postMeta($this->metaPayload('Rungkut'))
+            ->assertOk();
+        $this->assertStringContainsString('10.000', $this->lastReply());
+        $this->assertStringContainsString('alamat', mb_strtolower($this->lastReply()));
+        $this->assertDatabaseHas('chatbot_conversations', [
+            'sender_number' => '6281234567890',
+            'current_step' => 'order_address',
+        ]);
+
+        // 6. Alamat -> ringkasan pesanan.
+        $this->postMeta($this->metaPayload('Jl. Rungkut Harapan 12, Surabaya'))
+            ->assertOk();
+        $this->assertStringContainsString('TOTAL', $this->lastReply());
+        $this->assertDatabaseHas('chatbot_conversations', [
+            'sender_number' => '6281234567890',
+            'current_step' => 'order_confirm',
+        ]);
+
+        // 7. Konfirmasi -> order dibuat (source wa_bot, harga dari DB).
+        $this->postMeta($this->metaPayload('YA'))
+            ->assertOk();
+        $this->assertStringContainsString('Pesanan berhasil dibuat', $this->lastReply());
+
+        $order = \App\Models\Order::where('source', 'wa_bot')->first();
+        $this->assertNotNull($order);
+        $this->assertEquals('baru', $order->status);
+        $this->assertEquals('wa_bot', $order->payment_method);
+        $this->assertEquals($region->id, $order->region_id);
+        $this->assertEquals(28000, (int) $order->total_amount); // 2x9000 + ongkir 10.000
+        $this->assertSame('INV/WA/', substr($order->invoice_number, 0, 7));
+
+        $this->assertDatabaseHas('order_items', [
+            'order_id' => $order->id,
+            'variant_name' => 'Isi 3 Kemasan Mika',
+            'quantity' => 2,
+            'price' => 9000,
+        ]);
+
+        $this->assertDatabaseHas('customers', [
+            'phone' => '6281234567890',
+        ]);
+    }
+
+    public function test_order_flow_cancel_from_catalog_resets_state()
+    {
+        $this->seedOrderFlowRegion();
+
+        $this->postMeta($this->metaPayload('pesan'))
+            ->assertOk();
+        $this->assertDatabaseHas('chatbot_conversations', [
+            'sender_number' => '6281234567890',
+            'current_step' => 'order_catalog',
+        ]);
+
+        $this->postMeta($this->metaPayload('batal'))
+            ->assertOk();
+        $this->assertStringContainsString('dibatalkan', mb_strtolower($this->lastReply()));
+        $this->assertDatabaseHas('chatbot_conversations', [
+            'sender_number' => '6281234567890',
+            'current_step' => 'idle',
+        ]);
+    }
+
+    public function test_order_flow_invalid_product_stays_on_catalog()
+    {
+        $this->seedOrderFlowRegion();
+
+        $this->postMeta($this->metaPayload('pesan'))->assertOk();
+        $this->postMeta($this->metaPayload('produk yang tidak ada'))
+            ->assertOk();
+        $this->assertStringContainsString('ulangi', mb_strtolower($this->lastReply()));
+        $this->assertDatabaseHas('chatbot_conversations', [
+            'sender_number' => '6281234567890',
+            'current_step' => 'order_catalog',
+        ]);
+    }
+
+    public function test_order_flow_stays_in_flow_when_question_asked_after_start()
+    {
+        $this->seedOrderFlowRegion();
+
+        // Mulai order, lalu (mis. user berubah pikiran) tanya harga produk.
+        $this->postMeta($this->metaPayload('pesan'))->assertOk();
+        $this->postMeta($this->metaPayload('berapa harga kue ijo'))
+            ->assertOk();
+
+        // Karena masih berada di step order, pesan tersebut dianggap pilihan
+        // produk (bukan navigasi bebas) - state tidak keluar dari alur order.
+        $this->assertDatabaseHas('chatbot_conversations', [
+            'sender_number' => '6281234567890',
+            'current_step' => 'order_catalog',
+        ]);
+    }
 }
