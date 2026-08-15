@@ -111,6 +111,15 @@ class MetaCloudProvider implements WhatsAppProviderInterface
 
         $name = $value['contacts'][0]['profile']['name'] ?? null;
 
+        // BSUID (Business-Scoped User ID): saat username WhatsApp aktif, Meta
+        // dapat mengirim BSUID sebagai identitas pengirim (bukan wa_id/phone).
+        // `from` sudah diisi Meta dengan nilai tersebut; tetap diteruskan apa
+        // adanya agar balasan (to) juga memakai identitas yang sama.
+        $bsuid = $message['bsuid']
+            ?? $value['contacts'][0]['bsuid']
+            ?? $message['context']['bsuid']
+            ?? null;
+
         return [
             'sender' => $from ? (string) $from : '',
             'name' => $name ? (string) $name : null,
@@ -120,6 +129,7 @@ class MetaCloudProvider implements WhatsAppProviderInterface
             'raw_reply_context' => [
                 'message_id' => $message['id'] ?? null,
                 'sender' => $from,
+                'bsuid' => $bsuid,
             ],
         ];
     }

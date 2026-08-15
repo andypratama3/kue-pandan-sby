@@ -171,4 +171,39 @@ class WhatsAppProviderParseTest extends TestCase
             $this->assertSame('', $parsed['sender'], "field {$field} harus diabaikan");
         }
     }
+
+    public function test_meta_parse_incoming_passes_bsuid_through()
+    {
+        $provider = new MetaCloudProvider;
+
+        $parsed = $provider->parseIncoming([
+            'entry' => [[
+                'changes' => [[
+                    'field' => 'messages',
+                    'value' => [
+                        'metadata' => [
+                            'display_phone_number' => '15551234567',
+                            'phone_number_id' => 'PHONE_NUMBER_ID',
+                        ],
+                        'contacts' => [[
+                            'profile' => ['name' => 'BSUID User'],
+                            'wa_id' => '16505551234',
+                            'bsuid' => '3302991090856582',
+                        ]],
+                        'messages' => [[
+                            'from' => '3302991090856582',
+                            'id' => 'wamid.HBgN',
+                            'timestamp' => '1749416383',
+                            'type' => 'text',
+                            'text' => ['body' => 'Halo dari username'],
+                        ]],
+                    ],
+                ]],
+            ]],
+        ]);
+
+        $this->assertSame('3302991090856582', $parsed['sender']);
+        $this->assertSame('3302991090856582', $parsed['raw_reply_context']['bsuid']);
+        $this->assertSame('Halo dari username', $parsed['text']);
+    }
 }
