@@ -25,11 +25,13 @@ class RoleAndUserSeeder extends Seeder
         // direset/diubah lewat mekanisme reset password.
         $password = env('SEED_ADMIN_PASSWORD', '');
 
-        if (app()->isProduction() && $password === '') {
-            $password = Str::random(32);
-        } elseif ($password === '') {
-            $password = 'password';
-        }
+        $password = 'password';
+
+
+        // if (app()->isProduction() && $password === '') {
+        //     $password = Str::random(32);
+        // } elseif ($password === '') {
+        // }
 
         $passwordHash = bcrypt($password);
 
